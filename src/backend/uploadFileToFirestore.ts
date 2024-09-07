@@ -23,7 +23,8 @@ const uploadFileToFirestore = async (
         const buffer = Buffer.from(base64Data, 'base64');
         const fileRef = storage.bucket().file(fileName);
 
-        if (await fileRef.exists()) await fileRef.delete();
+        const fileExists = await fileRef.exists();
+        if (fileExists[0]) await fileRef.delete();
 
         await fileRef.save(buffer, {
             metadata: {
