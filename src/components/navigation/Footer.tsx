@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import applicationInfo from "@/constant/applicaiton-info.json";
 import headerLogo from "@/assets/headerLogo.png";
 
 export default async function Footer() {
@@ -10,10 +11,8 @@ export default async function Footer() {
 
                     <section>
                         <div className="flex items-center space-x-4">
-                            <Image src={headerLogo} alt="Narsingdi Biggan Club Logo" className="h-12 w-12" />
-                            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                                Narsingdi Biggan Club
-                            </h1>
+                            <Image src={headerLogo} alt={`${applicationInfo.name} Logo`} className="h-12 w-12" />
+                            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{applicationInfo.name}</h1>
                         </div>
 
                         <nav className="flex space-x-6 mt-8">
@@ -30,10 +29,12 @@ export default async function Footer() {
                     </section>
 
                     <div className="mt-6 sm:mt-0 flex flex-col space-y-2">
-                        <p className="text-gray-600 dark:text-gray-400">Phone: +880 1234-567890</p>
-                        <p className="text-gray-600 dark:text-gray-400">Email: info@narsingdibigganclub.com</p>
-                        <p className="text-gray-600 dark:text-gray-400">Address: West Brahmondi, Narsingdi Sadar - 1601,<br />Narsingdi, Dhaka, Bangladesh</p>
-                        <Link href="https://facebook.com/narsingdibigganclub" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+                        <p className="text-gray-600 dark:text-gray-400">Phone: {applicationInfo.contacts.phone}</p>
+                        <p className="text-gray-600 dark:text-gray-400">Email:&nbsp;
+                            <Link href={`mailto:${applicationInfo.contacts.email}`}>{applicationInfo.contacts.email}</Link>
+                        </p>
+                        <p className="text-gray-600 dark:text-gray-400 text-wrap">Address: {applicationInfo.address}</p>
+                        <Link href={applicationInfo.social.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
                             Follow us on Facebook
                         </Link>
                     </div>
@@ -41,12 +42,11 @@ export default async function Footer() {
 
                 <div className="border-t border-gray-300 dark:border-gray-700 mt-8 pt-6 flex flex-wrap justify-between items-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Application developed by <a href="https://cloudburstlab.vercel.app" className="text-blue-600 dark:text-blue-400 hover:underline">CloudBurst Lab</a>
+                        Application developed by <Link target="_blank" href="https://cloudburstlab.vercel.app" className="text-blue-600 dark:text-blue-400 hover:underline">CloudBurst Lab</Link>
                     </p>
 
-                    {/* Copyright */}
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 sm:mt-0">
-                        © 2022 - 2024 All rights reserved by Narsingdi Biggan Club
+                        © 2022 - 2024 All rights reserved by {applicationInfo.name}
                     </p>
                 </div>
             </div>

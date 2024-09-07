@@ -1,71 +1,63 @@
 "use client";
-import { useRef, useState } from "react";
-import verifyDocument from "@/backend/verifyDocument";
-import { DocumentVerifyClientType } from "@/types/customTypes";
-import formatDate from "@/lib/formatDate";
+import { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form"
+import { verifyDocument } from "@/backend/document";
+import { DocumentVerificationType } from "@/types";
+import { formatDate } from "@/utils";
+import applicationInfo from "@/constant/applicaiton-info.json";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FaFileCircleCheck } from "react-icons/fa6";
 import { ImSpinner8 } from "react-icons/im";
 
 
 
-export default function DocumentVerifyClient({ defaultPageData }: { defaultPageData: DocumentVerifyClientType }) {
+export default function DocumentVerifyClient({ defaultPageData, defaultDocId }: { defaultPageData: DocumentVerificationType; defaultDocId?: string }) {
 
-    const [pageData, setPageData] = useState<DocumentVerifyClientType>(defaultPageData);
-    const [isLoading, setLoading] = useState(false);
+    const [pageData, setPageData] = useState<DocumentVerificationType>(defaultPageData);
 
-    const verifyDocInputRef = useRef<HTMLInputElement>(null);
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<{ docId: string }>({ defaultValues: { docId: defaultDocId } });
 
-    const verifyDocumentButton = async () => {
-        setLoading(true);
+    const onSubmit: SubmitHandler<{ docId: string }> = async (data) => {
         try {
-            if (verifyDocInputRef.current) {
-                const verifyDocInputValue = verifyDocInputRef.current.value;
-                const newPageData = await verifyDocument(verifyDocInputValue);
-                setPageData(newPageData);
-            }
-            setLoading(false);
+            const newPageData = await verifyDocument(data.docId);
+            setPageData(newPageData);
         } catch (error) {
             console.error('Error verifying document:', error);
-        } finally {
-            setLoading(false);
         }
-    };
+    }
 
     return (
-        <main className="min-h-[750px] bg-white text-black dark:bg-black dark:text-gray-200 pt-[50px]">
+        <main className="min-h-[750px] bg-white text-black dark:bg-black dark:text-gray-200 pt-[100px]">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <section className="grid lg:grid-cols-2 gap-5">
                     <div>
                         <div className="py-6 px-4 bg-blue-100 dark:bg-gray-800 rounded-lg shadow-md mt-10 max-w-md">
                             <label
-                                htmlFor="doc-verification-id"
+                                htmlFor="docId"
                                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                             >
                                 Enter Document ID:
                             </label>
-                            <div className="flex flex-col md:flex-row items-center gap-3">
+                            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col md:flex-row items-center gap-3">
                                 <input
-                                    id="doc-verification-id"
                                     type="text"
-                                    ref={verifyDocInputRef}
-                                    defaultValue={pageData?.docInfo?.id}
+                                    {...register("docId", { required: { value: true, message: "Document ID not provided!" }, minLength: { value: 7, message: "Minimum 7 characters is required!" }, maxLength: { value: 15, message: "Maximum 15 characters is allowed!" } })}
                                     className="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700 dark:bg-gray-900 dark:text-gray-300 text-sm w-full"
                                     placeholder="e.g., 123456789"
                                 />
                                 <button
-                                    type="button"
-                                    disabled={isLoading}
-                                    onClick={verifyDocumentButton}
+                                    type="submit"
+                                    disabled={isSubmitting}
                                     className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-black shadow-md disabled:bg-gray-400 flex items-center justify-center space-x-2"
                                 >
-                                    {isLoading && <ImSpinner8 size={16} className="animate-spin" />}
-                                    <p>{isLoading ? "Verifying" : "Verify"}</p>
+                                    {isSubmitting && <ImSpinner8 size={16} className="animate-spin" />}
+                                    <p>{isSubmitting ? "Verifying" : "Verify"}</p>
                                 </button>
-                            </div>
+                            </form>
+                            {errors.docId && <p className="mt-2 text-xs text-red-500 dark:text-red-400">{errors.docId.message}</p>}
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400 my-5 max-w-[400px]">
-                            Note: The document verification ID can be found at the top right corner beside the QR code on documents issued by Narsingdi Biggan Club. Alternatively, scanning the QR code will automatically redirect you to the verification page.
+                            Note: The document verification ID can be found at the top right corner beside the QR code on documents issued by {applicationInfo.name}. Alternatively, scanning the QR code will automatically redirect you to the verification page.
                         </p>
                     </div>
                     {!!pageData.statusText && (

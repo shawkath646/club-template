@@ -5,11 +5,11 @@ import DynamicBox from "@/components/home/DynamicBox";
 
 export default async function Home() {
   return (
-    <main className="min-h-[750px] bg-white text-black dark:bg-black dark:text-gray-200 pt-[50px]">
+    <main className="min-h-[750px] bg-white text-black dark:bg-black dark:text-gray-200">
+
+      <Introduction />
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-
-        <Introduction />
-
         <DynamicBox />
 
         {/* Notice Board */}

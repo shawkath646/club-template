@@ -3,6 +3,11 @@
     "slogan": "Exploring Science, Inspiring Excellence",
     "location": "Narsingdi Sadar, Narsingdi - 1601, Dhaka, Bangladesh",
     "social": {
-        "facebook": ""
-    }
+        "facebook": "https://facebook.com/narsingdibigganclub"
+    },
+    "contacts": {
+        "email": "info@narsingdibigganclub.com",
+        "phone": "+880 1234-567890"
+    },
+    "address": "West Brahmondi, Narsingdi Sadar - 1601, Narsingdi, Dhaka, Bangladesh"
 }

@@ -1,0 +1,73 @@
+"use client";
+import Image from "next/image";
+import { Dispatch, SetStateAction } from "react";
+import { Dialog, DialogPanel } from "@headlessui/react";
+import applicaitonInfo from "@/constant/applicaiton-info.json";
+import { DialogStateType } from "@/types";
+import { FaCheck, FaSpinner } from "react-icons/fa";
+import { RxCross1 } from "react-icons/rx";
+import headerLogo from "@/assets/headerLogo.png";
+
+
+
+interface SubmittingDialogType {
+    dialogState: DialogStateType,
+    setDialogState: Dispatch<SetStateAction<DialogStateType>>
+}
+
+export default function SubmittingDialog({ dialogState, setDialogState }: SubmittingDialogType) {
+    return (
+        <Dialog open={dialogState.isOpen} onClose={() => { }} className="relative z-10">
+            <div className="fixed inset-0 bg-black/50 dark:bg-black/70" aria-hidden="true" />
+
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+                <DialogPanel className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 transition-all">
+
+                    <div className="flex items-center justify-center mb-8 space-x-2">
+                        <Image
+                            src={headerLogo}
+                            height={48}
+                            width={48}
+                            alt={`${applicaitonInfo.name} Logo`}
+                            className="w-10 h-10 md:w-12 md:h-12"
+                        />
+                        <h3 className="text-lg lg:text-xl text-gray-800 dark:text-gray-200">
+                            {applicaitonInfo.name}
+                        </h3>
+                    </div>
+
+                    <div className="flex flex-shrink-0 items-center justify-center space-x-3">
+                        {dialogState.status === "success" && (
+                            <FaCheck size={32} className="text-green-500 h-8 w-8" />
+                        )}
+                        {dialogState.status === "loading" && (
+                            <FaSpinner size={32} className="text-blue-500 animate-spin h-8 w-8" />
+                        )}
+                        {dialogState.status === "failed" && (
+                            <RxCross1 size={32} className="text-red-500 flex-shrink-0" />
+                        )}
+                        <p className="font-medium lg:text-lg text-black dark:text-gray-200">
+                            {dialogState.message}
+                        </p>
+                    </div>
+
+                    {(dialogState.status === "loading" || dialogState.status === "success") && (
+                        <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mt-8 text-center">
+                            Thank you for applying to our family. You are going to unlock an opportunity to visit the science world with us. One of our admins will check your information and provide a result.
+                        </p>
+                    )}
+
+                    {dialogState.status === "failed" && (
+                        <button
+                            onClick={() => setDialogState({ ...dialogState, isOpen: false })}
+                            className="px-6 py-2 mt-10 block w-[150px] mx-auto text-sm md:text-base font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                            Got it
+                        </button>
+                    )}
+                </DialogPanel>
+            </div>
+        </Dialog>
+
+    );
+}
