@@ -6,14 +6,6 @@ const getTodayDate = (): string => {
     return `${year}-${month}-${day}`;
 };
 
-const formatDate = (date: Date): string => {
-    return new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-    }).format(date);
-};
-
 const fileToBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -34,6 +26,22 @@ function generateUniqueId(): string {
     const lastFourDigits = currentTime.slice(-4);
 
     return `NBC${lastTwoDigitsOfYear}${lastFourDigits}`;
+}
+
+
+
+function formatDate(input: Date | null, locale: string = 'en-US'): string {
+    if (!input) {
+        return 'Invalid Date';
+    }
+
+    const options: Intl.DateTimeFormatOptions = {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    };
+
+    return input.toLocaleDateString(locale, options);
 }
 
 

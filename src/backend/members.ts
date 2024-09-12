@@ -2,11 +2,19 @@
 import { db } from "@/firebase.config";
 import { MemberFormType, MemberProfileType } from "@/types";
 import { generateUniqueId } from "@/utils";
+import { timestampToDate } from "./utils.backend";
 import uploadFileToFirestore from "./uploadFileToFirestore";
 
-const getAllMembers = async (): Promise<MemberFormType[]> => {
+
+const getAllMembers = async (): Promise<MemberProfileType[]> => {
     const docCollection = await db.collection("members").get();
-    return docCollection.docs.map(doc => doc.data() as MemberFormType);
+    return docCollection.docs.map(doc => {
+        const memberData = doc.data() as MemberProfileType;
+        memberData.joinedOn = timestampToDate(memberData.joinedOn) as Date;
+        memberData.personal.dateOfBirth = timestampToDate(memberData.personal.dateOfBirth) as Date;
+
+        return memberData;
+    });
 };
 
 const submitMemberRequest = async (formData: MemberFormType) => {

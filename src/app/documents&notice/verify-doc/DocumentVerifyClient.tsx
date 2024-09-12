@@ -27,7 +27,7 @@ export default function DocumentVerifyClient({ defaultPageData, defaultDocId }: 
     }
 
     return (
-        <main className="min-h-[750px] bg-white text-black dark:bg-black dark:text-gray-200 pt-[100px]">
+        <main className="min-h-[750px] bg-white text-black dark:bg-black dark:text-gray-200 pt-[100px] pb-20">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <section className="grid lg:grid-cols-2 gap-5">
                     <div>
@@ -103,12 +103,12 @@ export default function DocumentVerifyClient({ defaultPageData, defaultDocId }: 
                             <tr className="border-b border-gray-200 dark:border-gray-700">
                                 <th className="text-left px-6 py-4 font-medium text-gray-700 dark:text-gray-300">Issued On</th>
                                 <td className="px-2 py-4 font-semibold text-gray-500 dark:text-gray-400">:</td>
-                                <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{formatDate(pageData.docInfo.issuedOn)}</td>
+                                <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{formatDate(pageData.docInfo.issuedOn as Date)}</td>
                             </tr>
                             <tr>
                                 <th className="text-left px-6 py-4 font-medium text-gray-700 dark:text-gray-300">Valid To</th>
                                 <td className="px-2 py-4 font-semibold text-gray-500 dark:text-gray-400">:</td>
-                                <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{formatDate(pageData.docInfo.validTo)}</td>
+                                <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{formatDate(pageData.docInfo.validTo as Date)}</td>
                             </tr>
                         </tbody>
                     </table>

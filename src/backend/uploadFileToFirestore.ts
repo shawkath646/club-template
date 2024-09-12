@@ -1,5 +1,5 @@
 "use server";
-import { db, storage } from '@/firebase.config';
+import { storage } from '@/firebase.config';
 import { v4 as uuidv4 } from 'uuid';
 
 const uploadFileToFirestore = async (
@@ -36,11 +36,6 @@ const uploadFileToFirestore = async (
         const downloadLink = await fileRef.getSignedUrl({
             action: 'read',
             expires: '01-01-2074',
-        });
-
-        await db.collection('files').add({
-            fileName,
-            uploadedAt: new Date(),
         });
 
         return downloadLink[0];

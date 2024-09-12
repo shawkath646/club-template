@@ -1,20 +1,28 @@
 "use server";
 import { db } from "@/firebase.config";
 import { DocumentVerificationType, DocumentType } from "@/types";
+import { timestampToDate } from "./utils.backend";
 
 const verifyDocument = async (docId: string): Promise<DocumentVerificationType> => {
-    const docRef = await db.collection("documents").doc(docId).get();
+    const docSnapshot = await db.collection("documents").doc(docId).get();
 
-    if (!docRef.exists) {
+    if (!docSnapshot.exists) {
         return {
             status: false,
             statusText: "Document does not exist!",
         };
     }
 
-    const docInfo = docRef.data() as DocumentType;
+    const docInfoAll = docSnapshot.data() as DocumentType;
 
-    if (docInfo.validTo < new Date()) {
+    const { id, issuedBy, issuedOn, issuedTo, status, validTo, title } = docInfoAll;
+
+    const validToDate = timestampToDate(validTo) as Date;
+    const issuedOnDate = timestampToDate(issuedOn) as Date;
+
+    const docInfo = { id, issuedBy, issuedOn: issuedOnDate, issuedTo, status, validTo: validToDate, title };
+
+    if (validToDate < new Date()) {
         return {
             status: false,
             statusText: "Document expired",
@@ -27,8 +35,8 @@ const verifyDocument = async (docId: string): Promise<DocumentVerificationType> 
         statusText: "Document verified",
         docInfo,
     };
-
 };
+
 
 interface GetDocumentsOptions {
     query?: string;
@@ -53,7 +61,12 @@ const getAllDocuments = async (options: GetDocumentsOptions = {}): Promise<Docum
 
     const docCollection = await collectionQuery.get();
 
-    return docCollection.docs.map(doc => doc.data() as DocumentType);
+    return docCollection.docs.map(doc => {
+        const docData = doc.data() as DocumentType;
+        docData.issuedOn = timestampToDate(docData.issuedOn) as Date;
+        docData.validTo = timestampToDate(docData.validTo) as Date;
+        return docData;
+    });
 };
 
 export { getAllDocuments, verifyDocument };

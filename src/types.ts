@@ -1,4 +1,14 @@
+import { Timestamp } from 'firebase-admin/firestore';
 import { ControllerRenderProps, FieldError } from 'react-hook-form';
+
+/**
+ * Makes selected fields of an interface optional while keeping the rest unchanged.
+ *
+ * @template T - The interface to modify
+ * @template K - Keys of the interface T to make optional
+ */
+export type PartialFields<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
 
 export interface PagePropsType {
     params: {
@@ -35,8 +45,8 @@ export interface DocumentType {
     title: string;
     issuedTo: string;
     issuedBy: string;
-    issuedOn: Date;
-    validTo: Date;
+    issuedOn: Date | Timestamp;
+    validTo: Date | Timestamp;
     format: string;
     fileName: string;
     downloadLink: string;
@@ -46,7 +56,7 @@ export interface DocumentType {
 export interface DocumentVerificationType {
     status?: boolean;
     statusText?: string;
-    docInfo?: DocumentType;
+    docInfo?: PartialFields<DocumentType, "downloadLink" | "fileName" | "scope" | "format">;
 }
 
 export interface MemberFormType {
@@ -78,7 +88,7 @@ export interface MemberProfileType {
     personal: {
         firstName: string;
         lastName: string;
-        dateOfBirth: Date;
+        dateOfBirth: Date | Timestamp;
         gender: "male" | "female" | "other";
         picture: string;
         signature: string;
@@ -107,5 +117,5 @@ export interface MemberProfileType {
     email: string;
     password: string;
     status: "approved" | "pending" | "rejected" | "cancelled" | "expired";
-    joinedOn: Date;
+    joinedOn: Date | Timestamp;
 }
