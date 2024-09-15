@@ -44,6 +44,7 @@ const validationSchema = yup.object().shape({
         .required('State / Province is required'),
     country: yup.string()
         .required('Country is required'),
+    position: yup.string().required(),
     identificationNo: yup.string()
         .min(3, 'Identification number must be at least 3 characters')
         .max(30, 'Identification number must be at most 30 characters')
@@ -79,6 +80,7 @@ const validationSchema = yup.object().shape({
         .test('fileType', 'Signature must be a valid type (File, ArrayBuffer, Base64 string)', (value) => {
             return value instanceof File || value instanceof ArrayBuffer || typeof value === 'string';
         }),
+
 });
 
 export default validationSchema;

@@ -1,14 +1,14 @@
 "use client";
-import React, { InputHTMLAttributes, forwardRef } from 'react';
+import React, { TextareaHTMLAttributes, forwardRef } from 'react';
 import { FieldError } from 'react-hook-form';
 
-interface InputFieldType extends InputHTMLAttributes<HTMLInputElement> {
+interface TextAreaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   fieldId: string;
   error?: FieldError;
 }
 
-const InputField = forwardRef<HTMLInputElement, InputFieldType>(
+const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
   ({ label, fieldId, error, ...rest }, ref) => {
     return (
       <div className="w-full">
@@ -18,7 +18,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldType>(
         >
           {label}:
         </label>
-        <input
+        <textarea
           id={fieldId}
           aria-label={label}
           aria-invalid={!!error}
@@ -32,6 +32,6 @@ const InputField = forwardRef<HTMLInputElement, InputFieldType>(
   }
 );
 
-InputField.displayName = 'InputField';
+TextAreaField.displayName = 'TextAreaField';
 
-export default InputField;
+export default TextAreaField;

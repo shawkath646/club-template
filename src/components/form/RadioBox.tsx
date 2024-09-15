@@ -1,9 +1,15 @@
 "use client";
 import { Radio, RadioGroup } from '@headlessui/react';
-import { FormOptionType } from '@/types';
+import { ControllerRenderProps, FieldError } from "react-hook-form";
 
+interface RadioBoxType {
+    label: string;
+    field: ControllerRenderProps<any, any>;
+    options: string[];
+    error?: FieldError;
+}
 
-export default function RadioBox({ label, field, options, error }: FormOptionType) {
+export default function RadioBox({ label, field, options, error }: RadioBoxType) {
 
     const fieldId = label.replace(" ", "-");
 

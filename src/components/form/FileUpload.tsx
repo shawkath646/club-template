@@ -1,7 +1,14 @@
 "use client";
-import { useRef, useState } from "react";
-import { FileUploadType } from "@/types";
+import { useRef } from "react";
+import { ControllerRenderProps, FieldError } from "react-hook-form";
 import { FiUploadCloud } from "react-icons/fi";
+
+interface FileUploadType {
+    label: string;
+    field: ControllerRenderProps<any, any>;
+    error?: FieldError;
+    setError: (errorText: string) => void
+}
 
 export default function FileUpload({ label, field, error, setError }: FileUploadType) {
     const inputRef = useRef<HTMLInputElement | null>(null);

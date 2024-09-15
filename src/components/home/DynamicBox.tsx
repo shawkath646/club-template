@@ -8,7 +8,7 @@ import dynamicBoxImage2 from "@/assets/DynamicBox/Screenshot (23).png";
 export default async function DynamicBox() {
     return (
         <section className="grid lg:grid-cols-2 gap-5">
-            <div className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 p-4 rounded-lg shadow-lg max-w-xl mx-auto mt-10">
+            <div className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 bg-opacity-75 dark:bg-opacity-75 p-4 rounded-lg shadow-lg max-w-xl mx-auto mt-10">
                 <div className="flex flex-col lg:flex-row items-center mb-4">
                     <div className="lg:w-2/3 lg:pr-4">
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 lg:mb-0">
@@ -37,7 +37,7 @@ export default async function DynamicBox() {
                 </Link>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 p-4 rounded-lg shadow-lg mt-10 mx-auto max-w-xl">
+            <div className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 bg-opacity-75 dark:bg-opacity-75 p-4 rounded-lg shadow-lg mt-10 mx-auto max-w-xl">
                 <div className="flex flex-col lg:flex-row items-center mb-4">
                     <div className="lg:w-2/3 lg:pr-4">
                         <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 lg:mb-0">

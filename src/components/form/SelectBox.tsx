@@ -1,8 +1,14 @@
 "use client";
-import { FormOptionType } from "@/types";
+import { ControllerRenderProps, FieldError } from "react-hook-form";
 
+interface SelectBoxType {
+    label: string;
+    field: ControllerRenderProps<any, any>;
+    options: string[];
+    error?: FieldError;
+}
 
-export default function SelectBox({ field, label, options, error }: FormOptionType) {
+export default function SelectBox({ field, label, options, error }: SelectBoxType) {
 
     const fieldId = label.replace(" ", "-");
 

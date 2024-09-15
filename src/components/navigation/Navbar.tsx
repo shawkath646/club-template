@@ -39,7 +39,7 @@ export default function Navbar() {
             <div className="container mx-auto flex justify-between items-center text-white dark:text-gray-200 px-2">
                 <Link
                     href="/"
-                    className="flex space-x-1 items-center text-white dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 transition-all"
+                    className={`flex space-x-1 items-center text-lg ${hasScrolled ? "text-white" : "text-black dark:text-gray-200"} dark:text-gray-200" font-medium hover:text-blue-500 dark:hover:text-blue-400 transition-all`}
                 >
                     <Image src={headerLogo} height={50} width={50} alt={`${applicationInfo.name} logo`} />
                     <p>{applicationInfo.name}</p>

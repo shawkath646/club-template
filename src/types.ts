@@ -1,14 +1,6 @@
 import { Timestamp } from 'firebase-admin/firestore';
-import { ControllerRenderProps, FieldError } from 'react-hook-form';
 
-/**
- * Makes selected fields of an interface optional while keeping the rest unchanged.
- *
- * @template T - The interface to modify
- * @template K - Keys of the interface T to make optional
- */
 export type PartialFields<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
 
 export interface PagePropsType {
     params: {
@@ -19,19 +11,6 @@ export interface PagePropsType {
     };
 }
 
-export interface FormOptionType {
-    label: string;
-    field: ControllerRenderProps<any, any>;
-    options: string[];
-    error?: FieldError;
-}
-
-export interface FileUploadType {
-    label: string;
-    field: ControllerRenderProps<any, any>;
-    error?: FieldError;
-    setError: (errorText: string) => void
-}
 
 export interface DialogStateType {
     isOpen: boolean;
@@ -51,12 +30,13 @@ export interface DocumentType {
     fileName: string;
     downloadLink: string;
     scope: string;
+    verifiable: boolean;
 }
 
 export interface DocumentVerificationType {
     status?: boolean;
     statusText?: string;
-    docInfo?: PartialFields<DocumentType, "downloadLink" | "fileName" | "scope" | "format">;
+    docInfo?: PartialFields<DocumentType, "downloadLink" | "fileName" | "scope" | "format" | "verifiable">;
 }
 
 export interface MemberFormType {
@@ -81,6 +61,7 @@ export interface MemberFormType {
     city: string;
     state: string;
     country: string;
+    position: string;
 }
 
 export interface MemberProfileType {
@@ -118,4 +99,12 @@ export interface MemberProfileType {
     password: string;
     status: "approved" | "pending" | "rejected" | "cancelled" | "expired";
     joinedOn: Date | Timestamp;
+    position: string;
+}
+
+export interface NoticeFormType {
+    title: string;
+    description: string;
+    attachment: File | string | ArrayBuffer | null;
+    isImportant: boolean;
 }

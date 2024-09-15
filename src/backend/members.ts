@@ -76,6 +76,7 @@ const submitMemberRequest = async (formData: MemberFormType) => {
         email: formData.email,
         password: "",
         status: "pending",
+        position: formData.position,
         joinedOn: new Date(),
     };
 

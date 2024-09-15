@@ -16,45 +16,43 @@ export default async function Page() {
     const documentsMembers: DocumentType[] = await getAllDocuments({ query: "members" });
 
     return (
-        <main className="min-h-[750px] bg-white text-black dark:bg-black dark:text-gray-200 pt-[100px]">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col sm:flex-row justify-between items-center bg-blue-500 bg-opacity-20 mb-8 py-5 px-3 rounded space-y-4 sm:space-y-0 sm:space-x-4">
-                    <h1 className="text-2xl sm:text-3xl font-semibold text-blue-500 dark:text-blue-400">
-                        Documents
-                    </h1>
-                    <Link
-                        href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/documents&notice/verify-doc`}
-                        className="inline-flex items-center space-x-2 sm:space-x-3 px-4 py-2 sm:px-6 sm:py-2.5 bg-blue-500 text-white font-medium text-xs sm:text-sm leading-tight uppercase rounded shadow-md hover:bg-blue-600 hover:shadow-lg focus:bg-blue-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-700 active:shadow-lg transition duration-150 ease-in-out dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:bg-blue-700 dark:active:bg-blue-800"
-                    >
-                        <p>Verify Document</p>
-                        <FaArrowRightLong size={16} />
-                    </Link>
-                </div>
-
-                {!!documentsPublic.length && (
-                    <section>
-                        <h2 className="text-2xl font-medium mb-4">Public Documents</h2>
-                        <DocumentList documents={documentsPublic} />
-                    </section>
-                )}
-
-                {!!documentsMembers.length && (
-                    <section className="mb-12">
-                        <h2 className="text-2xl font-medium mb-4">Members Documents</h2>
-                        <DocumentList documents={documentsMembers} />
-                    </section>
-                )}
-
-                {!!documentsProfile.length && (
-                    <section className="mb-12">
-                        <h2 className="text-2xl font-medium mb-4">Individual Profile Documents</h2>
-                        <DocumentList documents={documentsProfile} />
-                    </section>
-                )}
-
-                {!(documentsProfile.length && documentsPublic.length && documentsMembers.length) && <NoItemFound />}
+        <>
+            <div className="flex flex-col sm:flex-row justify-between items-center bg-blue-500 bg-opacity-20 mb-8 py-5 px-3 rounded space-y-4 sm:space-y-0 sm:space-x-4">
+                <h1 className="text-2xl sm:text-3xl font-semibold text-blue-500 dark:text-blue-400">
+                    Documents
+                </h1>
+                <Link
+                    href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/documents&notice/verify-doc`}
+                    className="inline-flex items-center space-x-2 sm:space-x-3 px-4 py-2 sm:px-6 sm:py-2.5 bg-blue-500 text-white font-medium text-xs sm:text-sm leading-tight uppercase rounded shadow-md hover:bg-blue-600 hover:shadow-lg focus:bg-blue-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-700 active:shadow-lg transition duration-150 ease-in-out dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:bg-blue-700 dark:active:bg-blue-800"
+                >
+                    <p>Verify Document</p>
+                    <FaArrowRightLong size={16} />
+                </Link>
             </div>
-        </main>
+
+            {!!documentsPublic.length && (
+                <section>
+                    <h2 className="text-2xl font-medium mb-4">Public Documents</h2>
+                    <DocumentList documents={documentsPublic} />
+                </section>
+            )}
+
+            {!!documentsMembers.length && (
+                <section className="mb-12">
+                    <h2 className="text-2xl font-medium mb-4">Members Documents</h2>
+                    <DocumentList documents={documentsMembers} />
+                </section>
+            )}
+
+            {!!documentsProfile.length && (
+                <section className="mb-12">
+                    <h2 className="text-2xl font-medium mb-4">Individual Profile Documents</h2>
+                    <DocumentList documents={documentsProfile} />
+                </section>
+            )}
+
+            {!(documentsProfile.length && documentsPublic.length && documentsMembers.length) && <NoItemFound />}
+        </>
     );
 }
 

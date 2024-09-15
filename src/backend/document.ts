@@ -15,12 +15,19 @@ const verifyDocument = async (docId: string): Promise<DocumentVerificationType> 
 
     const docInfoAll = docSnapshot.data() as DocumentType;
 
-    const { id, issuedBy, issuedOn, issuedTo, status, validTo, title } = docInfoAll;
+    const { id, issuedBy, issuedOn, issuedTo, status, validTo, title, verifiable } = docInfoAll;
 
     const validToDate = timestampToDate(validTo) as Date;
     const issuedOnDate = timestampToDate(issuedOn) as Date;
 
     const docInfo = { id, issuedBy, issuedOn: issuedOnDate, issuedTo, status, validTo: validToDate, title };
+
+    if (!verifiable) {
+        return {
+            status: false,
+            statusText: "Document is not verifiable",
+        };
+    }
 
     if (validToDate < new Date()) {
         return {
