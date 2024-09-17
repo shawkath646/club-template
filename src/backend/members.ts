@@ -1,13 +1,24 @@
 "use server";
 import { db } from "@/firebase.config";
 import { MemberFormType, MemberProfileType } from "@/types";
-import { generateUniqueId } from "@/utils";
+import { generateTemporaryId } from "./utils.backend";
 import { timestampToDate } from "./utils.backend";
 import uploadFileToFirestore from "./uploadFileToFirestore";
 
 
-const getAllMembers = async (): Promise<MemberProfileType[]> => {
-    const docCollection = await db.collection("members").get();
+// const getAllMembers = async (): Promise<MemberProfileType[]> => {
+//     const docCollection = await db.collection("members").get();
+//     return docCollection.docs.map(doc => {
+//         const memberData = doc.data() as MemberProfileType;
+//         memberData.joinedOn = timestampToDate(memberData.joinedOn) as Date;
+//         memberData.personal.dateOfBirth = timestampToDate(memberData.personal.dateOfBirth) as Date;
+
+//         return memberData;
+//     });
+// };
+
+const getPendingMembers = async (): Promise<MemberProfileType[]> => {
+    const docCollection = await db.collection("members").where("status", "==", "pending").get();
     return docCollection.docs.map(doc => {
         const memberData = doc.data() as MemberProfileType;
         memberData.joinedOn = timestampToDate(memberData.joinedOn) as Date;
@@ -38,19 +49,22 @@ const submitMemberRequest = async (formData: MemberFormType) => {
             status: false,
             errors,
         };
-    }
+    };
 
-    const userId = generateUniqueId();
+    const docRef = db.collection("members").doc();
 
     const memberProfile: MemberProfileType = {
-        id: userId,
+        id: docRef.id,
+        nbcId: "",
         personal: {
             firstName: formData.firstName,
             lastName: formData.lastName,
             dateOfBirth: formData.dateOfBirth,
             gender: formData.gender,
-            picture: await uploadFileToFirestore(formData.profilePic as string, `picture_${userId}`),
-            signature: await uploadFileToFirestore(formData.signature as string, `signature_${userId}`),
+            fatherName: formData.fatherName,
+            motherName: formData.motherName,
+            picture: await uploadFileToFirestore(formData.profilePic as string, `picture_${docRef.id}`),
+            signature: await uploadFileToFirestore(formData.signature as string, `signature_${docRef.id}`),
         },
         address: {
             address1: formData.address1,
@@ -60,7 +74,7 @@ const submitMemberRequest = async (formData: MemberFormType) => {
             country: formData.country,
         },
         identification: {
-            identificationDocument: await uploadFileToFirestore(formData.identificationDoc as string, `identification_document_${userId}`),
+            identificationDocument: await uploadFileToFirestore(formData.identificationDoc as string, `identification_document_${docRef.id}`),
             identificationNo: formData.identificationNo,
             phoneNumber: formData.phoneNumber,
         },
@@ -68,19 +82,25 @@ const submitMemberRequest = async (formData: MemberFormType) => {
             institute: formData.institute,
             presentClass: formData.presentClass,
             background: formData.educationalBackground,
+            instituteAddress: formData.instituteAddress,
+            studentID: formData.studentID
         },
         club: {
             interestedIn: formData.interestedIn,
             reason: formData.joiningReason || "",
+            extraCurricularActivities: formData.extraCurricularActivities || "",
+            fbProfileLink: formData.fbProfileLink
         },
         email: formData.email,
         password: "",
         status: "pending",
         position: formData.position,
         joinedOn: new Date(),
+        nbcID: "",
+        tempID: generateTemporaryId(),
     };
 
-    await db.collection("members").doc(userId).set(memberProfile);
+    await docRef.set(memberProfile);
 
     return {
         status: true,
@@ -89,4 +109,4 @@ const submitMemberRequest = async (formData: MemberFormType) => {
 
 
 
-export { getAllMembers, submitMemberRequest };
+export { submitMemberRequest, getPendingMembers };

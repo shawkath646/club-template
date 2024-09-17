@@ -1,8 +1,13 @@
+import { getPendingMembers } from "@/backend/members";
+
 export default async function Page() {
+
+    const pendingMembers = await getPendingMembers();
+
     return (
         <>
             {/* Title */}
-            <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400 mb-8">Member Management</h1>
+            <h1 className="text-2xl font-bold text-black dark:text-gray-200 mb-8">Member Management</h1>
 
             {/* New Requests Section */}
             <section className="mb-12">

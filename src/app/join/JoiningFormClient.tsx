@@ -19,7 +19,6 @@ import joiningFormOptions from "@/constant/joiningFormOptions.json";
 import countryList from "@/constant/countryList.json";
 
 
-
 export default function JoiningFormClient({ registrationPosition }: { registrationPosition: string }) {
 
   const [dialogState, setDialogState] = useState<DialogStateType>({
@@ -75,6 +74,8 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
           <InputField type="text" fieldId="firstName" label="First Name" {...register("firstName")} error={errors.firstName} />
           <InputField type="text" fieldId="lastName" label="Last Name" {...register("lastName")} error={errors.lastName} />
           <InputField type="date" fieldId="dateOfBirth" label="Date of Birth" defaultValue={getTodayDate()} {...register("dateOfBirth")} error={errors.dateOfBirth} />
+          <InputField type="text" fieldId="fatherName" label="Father's Name" {...register("fatherName")} error={errors.fatherName} />
+          <InputField type="text" fieldId="motherName" label="Mother's Name" {...register("motherName")} error={errors.motherName} />
           <Controller
             name="gender"
             control={control}
@@ -98,13 +99,15 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
         <hr className="h-px mb-3 mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
         <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
           <InputField type="email" fieldId="email" label="Email" {...register("email")} error={errors.email} />
-          <InputField type="tel" fieldId="phoneNumber" label="Phone Number" {...register("phoneNumber")} error={errors.phoneNumber} />
+          <InputField type="text" fieldId="phoneNumber" label="Phone Number" {...register("phoneNumber")} error={errors.phoneNumber} />
           <InputField type="text" fieldId="identificationNumber" label="NID/BRC/Passport No" {...register("identificationNo")} error={errors.identificationNo} />
         </section>
         <p className="text-gray-400 text-sm font-medium">Educational Information</p>
         <hr className="h-px mb-3 mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
         <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
           <InputField type="text" fieldId="institute" label="Institute / Workplace" {...register("institute")} error={errors.institute} />
+          <InputField type="text" fieldId="instituteAddress" label="Institute / Workplace Address" {...register("instituteAddress")} error={errors.instituteAddress} />
+          <InputField type="text" fieldId="studentID" label="Student ID" {...register("studentID")} error={errors.studentID} />
           <Controller
             name="educationalBackground"
             control={control}
@@ -125,6 +128,8 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
             control={control}
             render={({ field }) => <RadioBox label="Interested In" field={field} options={joiningFormOptions.interestedIn} error={errors.interestedIn} />}
           />
+          <InputField type="text" fieldId="extraCurricularActivities" label="Extra Curricular Activities (Optional)" {...register("extraCurricularActivities")} error={errors.extraCurricularActivities} />
+          <InputField type="text" fieldId="fbProfileLink" label="Facebook Profile URL" {...register("fbProfileLink")} error={errors.fbProfileLink} />
         </section>
         <Controller
           name="agreeRules"

@@ -17,17 +17,6 @@ const fileToBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
     });
 };
 
-function generateUniqueId(): string {
-    const currentYear = new Date().getFullYear();
-    const lastTwoDigitsOfYear = currentYear.toString().slice(-2);
-
-    const currentTime = new Date().getTime().toString();
-
-    const lastFourDigits = currentTime.slice(-4);
-
-    return `NBC${lastTwoDigitsOfYear}${lastFourDigits}`;
-}
-
 
 
 function formatDate(input: Date | null, locale: string = 'en-US'): string {
@@ -46,4 +35,4 @@ function formatDate(input: Date | null, locale: string = 'en-US'): string {
 
 
 
-export { getTodayDate, formatDate, fileToBase64, generateUniqueId };
+export { getTodayDate, formatDate, fileToBase64 };

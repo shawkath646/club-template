@@ -47,11 +47,11 @@ export interface MemberFormType {
     phoneNumber: string;
     dateOfBirth: Date;
     identificationNo: string;
-    gender: "male" | "female" | "other";
-    educationalBackground: "science" | "business studies" | "humanities" | "vocational";
+    gender: string;
+    educationalBackground: string;
     presentClass: string;
     joiningReason?: string;
-    interestedIn: "articles" | "olympiads" | "magazine" | "volunteering";
+    interestedIn: string;
     agreeRules: boolean;
     profilePic: File | string | ArrayBuffer;
     identificationDoc: File | string | ArrayBuffer;
@@ -62,17 +62,26 @@ export interface MemberFormType {
     state: string;
     country: string;
     position: string;
+    fatherName: string;
+    motherName: string;
+    instituteAddress: string;
+    studentID: string;
+    extraCurricularActivities?: string;
+    fbProfileLink: string
 }
 
 export interface MemberProfileType {
     id: string;
+    nbcId: string;
     personal: {
         firstName: string;
         lastName: string;
         dateOfBirth: Date | Timestamp;
-        gender: "male" | "female" | "other";
+        gender: string;
         picture: string;
         signature: string;
+        fatherName: string;
+        motherName: string;
     },
     address: {
         address1: string;
@@ -88,18 +97,24 @@ export interface MemberProfileType {
     }
     educational: {
         institute: string;
-        background: "science" | "business studies" | "humanities" | "vocational";
+        instituteAddress: string;
+        studentID: string;
+        background: string;
         presentClass: string;
     },
     club: {
         reason: string;
-        interestedIn: "articles" | "olympiads" | "magazine" | "volunteering";
+        interestedIn: string;
+        extraCurricularActivities: string;
+        fbProfileLink: string;
     },
     email: string;
     password: string;
     status: "approved" | "pending" | "rejected" | "cancelled" | "expired";
     joinedOn: Date | Timestamp;
     position: string;
+    nbcID: string;
+    tempID: string;
 }
 
 export interface NoticeFormType {
