@@ -1,16 +1,11 @@
 import * as yup from 'yup';
 import { subYears, isAfter, isBefore } from 'date-fns';
-import { MemberFormType } from '@/types';
 
 const validationSchema = yup.object().shape({
-    firstName: yup.string()
+    fullName: yup.string()
         .required('First name is required')
         .min(3, 'First name must be at least 3 characters')
-        .max(32, 'First name must be at most 32 characters'),
-    lastName: yup.string()
-        .required('Last name is required')
-        .min(3, 'Last name must be at least 3 characters')
-        .max(32, 'Last name must be at most 32 characters'),
+        .max(64, 'First name must be at most 64 characters'),
     dateOfBirth: yup.date()
         .required('Date of birth is required')
         .test('age', 'You must be between 13 and 40 years old', (value) => {
@@ -40,22 +35,10 @@ const validationSchema = yup.object().shape({
         .required('Identification number is required')
         .min(3, 'Identification number must be at least 3 characters')
         .max(30, 'Identification number must be at most 30 characters'),
-    address1: yup.string()
+    address: yup.string()
         .required('Address 1 is required')
         .min(3, 'Address 1 must be at least 3 characters')
-        .max(100, 'Address 1 must be at most 100 characters'),
-    address2: yup.string()
-        .max(200, 'Address 2 must be at most 200 characters'),
-    city: yup.string()
-        .required('City / Town is required')
-        .min(3, 'City / Town must be at least 3 characters')
-        .max(32, 'City / Town must be at most 32 characters'),
-    state: yup.string()
-        .required('State / Province is required')
-        .min(3, 'State / Province must be at least 3 characters')
-        .max(32, 'State / Province must be at most 32 characters'),
-    country: yup.string()
-        .required('Country is required'),
+        .max(150, 'Address 1 must be at most 150 characters'),
     institute: yup.string()
         .required('Institute is required')
         .min(3, 'Institute name must be at least 3 characters')
@@ -63,7 +46,7 @@ const validationSchema = yup.object().shape({
     instituteAddress: yup.string()
         .required('Institute address is required')
         .min(3, 'Institute address must be at least 3 characters')
-        .max(120, 'Institute address must be at most 120 characters'),
+        .max(150, 'Institute address must be at most 150 characters'),
     studentID: yup.string()
         .required('Student ID is required')
         .min(3, 'Student ID must be at least 3 characters')
@@ -92,16 +75,6 @@ const validationSchema = yup.object().shape({
     profilePic: yup.mixed<File | ArrayBuffer | string>()
         .required('Profile picture is required')
         .test('fileType', 'Profile picture must be a valid type (File, ArrayBuffer, Base64 string)', (value) => {
-            return value instanceof File || value instanceof ArrayBuffer || typeof value === 'string';
-        }),
-    identificationDoc: yup.mixed<File | ArrayBuffer | string>()
-        .required('Identification document is required')
-        .test('fileType', 'Identification document must be a valid type (File, ArrayBuffer, Base64 string)', (value) => {
-            return value instanceof File || value instanceof ArrayBuffer || typeof value === 'string';
-        }),
-    signature: yup.mixed<File | ArrayBuffer | string>()
-        .required('Signature is required')
-        .test('fileType', 'Signature must be a valid type (File, ArrayBuffer, Base64 string)', (value) => {
             return value instanceof File || value instanceof ArrayBuffer || typeof value === 'string';
         }),
 });

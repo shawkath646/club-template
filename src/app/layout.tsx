@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { auth } from "@/config/auth.config";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import applicationInfo from "@/constant/applicaiton-info.json";
+
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -23,15 +25,14 @@ export const metadata: Metadata = {
   publisher: "CloudBurst Lab <https://cloudburstlab.vercel.app>",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
+
+  const session = await auth();
+
   return (
     <html lang="en">
       <body className={`${inter.className} transition-colors duration-300 ease-in-out`}>
-        <Navbar />
+        <Navbar session={session} />
         <main className="bg-gradient-to-tr from-blue-500 via-teal-400 to-emerald-500 text-black dark:text-gray-200">
           <div className="min-h-[750px] bg-white dark:bg-black bg-opacity-75 dark:bg-opacity-90 transition-all duration-300 ease-in-out backdrop-blur-md pt-[120px]">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-10">

@@ -1,29 +1,37 @@
 "use server";
-import { db } from "@/firebase.config";
+import { db } from "@/config/firebase.config";
 import { MemberFormType, MemberProfileType } from "@/types";
 import { generateTemporaryId } from "./utils.backend";
 import { timestampToDate } from "./utils.backend";
 import uploadFileToFirestore from "./uploadFileToFirestore";
 
+interface GetDocumentsOptions {
+    query?: string;
+    lastDocId?: string;
+}
 
-// const getAllMembers = async (): Promise<MemberProfileType[]> => {
-//     const docCollection = await db.collection("members").get();
-//     return docCollection.docs.map(doc => {
-//         const memberData = doc.data() as MemberProfileType;
-//         memberData.joinedOn = timestampToDate(memberData.joinedOn) as Date;
-//         memberData.personal.dateOfBirth = timestampToDate(memberData.personal.dateOfBirth) as Date;
+const getMembersProfile = async (options: GetDocumentsOptions = {}): Promise<MemberProfileType[]> => {
+    const { query, lastDocId } = options;
 
-//         return memberData;
-//     });
-// };
+    let collectionQuery = db.collection("members").orderBy("club.joinedOn").limit(10);
 
-const getPendingMembers = async (): Promise<MemberProfileType[]> => {
-    const docCollection = await db.collection("members").where("status", "==", "pending").get();
+    if (query) {
+        collectionQuery = collectionQuery.where("club.position", "==", query);
+    }
+
+    if (lastDocId) {
+        const lastDocRef = await db.collection("members").doc(lastDocId).get();
+        if (lastDocRef.exists) {
+            collectionQuery = collectionQuery.startAfter(lastDocRef);
+        }
+    }
+
+    const docCollection = await collectionQuery.get();
+
     return docCollection.docs.map(doc => {
         const memberData = doc.data() as MemberProfileType;
-        memberData.joinedOn = timestampToDate(memberData.joinedOn) as Date;
+        memberData.club.joinedOn = timestampToDate(memberData.club.joinedOn) as Date;
         memberData.personal.dateOfBirth = timestampToDate(memberData.personal.dateOfBirth) as Date;
-
         return memberData;
     });
 };
@@ -55,28 +63,20 @@ const submitMemberRequest = async (formData: MemberFormType) => {
 
     const memberProfile: MemberProfileType = {
         id: docRef.id,
-        nbcId: "",
         personal: {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
+            fullName: formData.fullName,
             dateOfBirth: formData.dateOfBirth,
             gender: formData.gender,
             fatherName: formData.fatherName,
             motherName: formData.motherName,
             picture: await uploadFileToFirestore(formData.profilePic as string, `picture_${docRef.id}`),
-            signature: await uploadFileToFirestore(formData.signature as string, `signature_${docRef.id}`),
-        },
-        address: {
-            address1: formData.address1,
-            address2: formData.address2 || "",
-            city: formData.city,
-            state: formData.state,
-            country: formData.country,
+            address: formData.address
         },
         identification: {
-            identificationDocument: await uploadFileToFirestore(formData.identificationDoc as string, `identification_document_${docRef.id}`),
+            email: formData.email,
             identificationNo: formData.identificationNo,
             phoneNumber: formData.phoneNumber,
+            fbProfileLink: formData.fbProfileLink
         },
         educational: {
             institute: formData.institute,
@@ -86,18 +86,17 @@ const submitMemberRequest = async (formData: MemberFormType) => {
             studentID: formData.studentID
         },
         club: {
+            tempID: generateTemporaryId(),
+            nbcId: "",
+            password: "",
             interestedIn: formData.interestedIn,
             reason: formData.joiningReason || "",
+            permissions: [],
             extraCurricularActivities: formData.extraCurricularActivities || "",
-            fbProfileLink: formData.fbProfileLink
-        },
-        email: formData.email,
-        password: "",
-        status: "pending",
-        position: formData.position,
-        joinedOn: new Date(),
-        nbcID: "",
-        tempID: generateTemporaryId(),
+            position: formData.position,
+            status: "pending",
+            joinedOn: new Date(),
+        }, 
     };
 
     await docRef.set(memberProfile);
@@ -109,4 +108,4 @@ const submitMemberRequest = async (formData: MemberFormType) => {
 
 
 
-export { submitMemberRequest, getPendingMembers };
+export { submitMemberRequest, getMembersProfile };

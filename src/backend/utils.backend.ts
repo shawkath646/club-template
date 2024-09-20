@@ -1,6 +1,6 @@
 "use server";
 import { firestore } from 'firebase-admin';
-import { db } from '@/firebase.config';
+import { db } from '@/config/firebase.config';
 
 function timestampToDate(input: firestore.Timestamp | Date): Date | null {
     if (input instanceof Date) {

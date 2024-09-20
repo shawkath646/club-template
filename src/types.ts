@@ -40,8 +40,7 @@ export interface DocumentVerificationType {
 }
 
 export interface MemberFormType {
-    firstName: string;
-    lastName: string;
+    fullName: string;
     institute: string;
     email: string;
     phoneNumber: string;
@@ -54,13 +53,7 @@ export interface MemberFormType {
     interestedIn: string;
     agreeRules: boolean;
     profilePic: File | string | ArrayBuffer;
-    identificationDoc: File | string | ArrayBuffer;
-    signature: File | string | ArrayBuffer;
-    address1: string;
-    address2?: string;
-    city: string;
-    state: string;
-    country: string;
+    address: string;
     position: string;
     fatherName: string;
     motherName: string;
@@ -72,28 +65,21 @@ export interface MemberFormType {
 
 export interface MemberProfileType {
     id: string;
-    nbcId: string;
+
     personal: {
-        firstName: string;
-        lastName: string;
+        fullName: string;
         dateOfBirth: Date | Timestamp;
         gender: string;
         picture: string;
-        signature: string;
         fatherName: string;
         motherName: string;
-    },
-    address: {
-        address1: string;
-        address2: string;
-        city: string;
-        state: string;
-        country: string;
+        address: string;
     },
     identification: {
+        email: string;
         phoneNumber: string;
         identificationNo: string;
-        identificationDocument: string;
+        fbProfileLink: string;
     }
     educational: {
         institute: string;
@@ -103,18 +89,17 @@ export interface MemberProfileType {
         presentClass: string;
     },
     club: {
+        nbcId: string;
+        password: string;
+        tempID: string;
         reason: string;
+        permissions: string[];
         interestedIn: string;
         extraCurricularActivities: string;
-        fbProfileLink: string;
+        position: string;
+        status: "approved" | "pending" | "rejected" | "cancelled" | "expired";
+        joinedOn: Date | Timestamp;
     },
-    email: string;
-    password: string;
-    status: "approved" | "pending" | "rejected" | "cancelled" | "expired";
-    joinedOn: Date | Timestamp;
-    position: string;
-    nbcID: string;
-    tempID: string;
 }
 
 export interface NoticeFormType {
@@ -122,4 +107,9 @@ export interface NoticeFormType {
     description: string;
     attachment: File | string | ArrayBuffer | null;
     isImportant: boolean;
+}
+
+export interface LoginFormType {
+    nbcId: string;
+    password: string;
 }

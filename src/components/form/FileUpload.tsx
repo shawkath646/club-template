@@ -18,7 +18,7 @@ export default function FileUpload({ label, field, error, setError }: FileUpload
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file && file.size <= MAX_FILE_SIZE) field.onChange(file);   
+        if (file && file.size <= MAX_FILE_SIZE) field.onChange(file);
         else setError("Select a valid file that is under 5MB.");
     };
 
@@ -64,8 +64,9 @@ export default function FileUpload({ label, field, error, setError }: FileUpload
                 type="file"
                 onChange={handleFileChange}
                 className="hidden"
-                accept=".pdf, .jpeg, .jpg, .png, .doc, .gdoc"
+                accept=".pdf, .jpeg, .jpg, .png, .doc, .gdoc, .docx, .xls"
             />
+            <p className="text-sm text-gray-400 mt-2">Note: Only PDF, JPEG, PNG, and DOC file formats are supported. The document must be clear and must not exceed 5MB. Unclear documents will result in rejection.</p>
             {error && <p className="mt-2 text-sm text-red-600">{error.message}</p>}
         </div>
     );

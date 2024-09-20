@@ -65,7 +65,7 @@ const StylistButton: React.FC<StylistButtonProps> = ({
     <button
       type={type}
       onClick={handleClick}
-      className={`block mt-5 col-span-3 ${getSizeClasses()} mx-auto font-medium text-white ${getColorSchemeClasses()} focus:ring-2 focus:ring-offset-2 rounded-lg shadow-lg transform hover:scale-105 focus:scale-105 transition-all duration-300 ease-out`}
+      className={`block mt-5 col-span-3 ${getSizeClasses()} mx-auto font-medium text-white dark:text-gray-200 ${getColorSchemeClasses()} focus:ring-2 focus:ring-offset-2 rounded-lg shadow-lg transform hover:scale-105 focus:scale-105 transition-all duration-300 ease-out`}
       style={{ pointerEvents: isDisabled || isLoading ? 'none' : 'auto', opacity: isDisabled ? 0.5 : 1 }}
     >
       {isLoading ? (

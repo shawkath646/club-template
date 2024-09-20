@@ -2,15 +2,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from 'next/navigation'
+import { Session } from "next-auth";
 import { useEffect, useState } from "react";
+import { signOut } from "next-auth/react";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { FaLock, FaUser, FaUserCircle, FaUserPlus, FaBars } from "react-icons/fa";
-import { IoMdSettings } from "react-icons/io";
+import { FaUser, FaUserCircle, FaUserPlus, FaBars } from "react-icons/fa";
+import { IoMdExit, IoMdSettings } from "react-icons/io";
 import applicationInfo from "@/constant/applicaiton-info.json";
 import navMenuRoutes from "@/constant/navMenuRoutes.json";
 import headerLogo from "@/assets/headerLogo.png";
 
-export default function Navbar() {
+
+export default function Navbar({ session }: { session: Session | null }) {
     const [hasScrolled, setHasScrolled] = useState(false);
     const pathname = usePathname();
 
@@ -57,33 +60,41 @@ export default function Navbar() {
                     ))}
                     <Menu as="div" className="relative">
                         <MenuButton className={`p-2 transition duration-200 ease-in-out rounded-md ${hasScrolled ? "text-blue-100 hover:text-white" : "bg-gray-200 dark:bg-gray-800 hover:bg-blue-500 hover:text-white dark:hover:bg-gray-700 text-blue-500 dark:text-gray-200"}`}>
-                            <FaUserCircle size={28} />
+                            {(session?.user?.image) ? <Image src={session.user.image} alt="user profile" height={28} width={28} className="w-[28px] h-[28px] rounded-full" /> : <FaUserCircle size={28} />}
                         </MenuButton>
                         <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800 bg-white">
-                            <MenuItem>
-                                <Link href="/join" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
-                                    <FaUserPlus size={17} />
-                                    <p>Join as member</p>
-                                </Link>
-                            </MenuItem>
-                            <MenuItem>
-                                <Link href="/login" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
-                                    <FaUser size={17} />
-                                    <p>Login as member</p>
-                                </Link>
-                            </MenuItem>
-                            <MenuItem>
-                                <Link href="/login-admin" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
-                                    <FaLock size={17} />
-                                    <p>Login as admin</p>
-                                </Link>
-                            </MenuItem>
-                            <MenuItem>
-                                <Link href="/admin-tools" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
-                                    <IoMdSettings size={17} />
-                                    <p>Admin tools</p>
-                                </Link>
-                            </MenuItem>
+                            {(!session?.user) && (
+                                <>
+                                    <MenuItem>
+                                        <Link href="/join" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                            <FaUserPlus size={17} />
+                                            <p>Join as member</p>
+                                        </Link>
+                                    </MenuItem>
+                                    <MenuItem>
+                                        <Link href="/login" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                            <FaUser size={17} />
+                                            <p>Login as member</p>
+                                        </Link>
+                                    </MenuItem>
+                                </>
+                            )}
+                            {(session?.user.permissions.length) && (
+                                <MenuItem>
+                                    <Link href="/admin-tools" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                        <IoMdSettings size={17} />
+                                        <p>Admin tools</p>
+                                    </Link>
+                                </MenuItem>
+                            )}
+                            {(session?.user) && (
+                                <MenuItem>
+                                    <button onClick={() => signOut({ redirectTo: "/" })} className="w-full px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                        <IoMdExit size={17} />
+                                        <p>Log out</p>
+                                    </button>
+                                </MenuItem>
+                            )}
                         </MenuItems>
                     </Menu>
                     <Menu as="div" className="relative lg:hidden">

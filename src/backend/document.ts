@@ -1,5 +1,5 @@
 "use server";
-import { db } from "@/firebase.config";
+import { db } from "@/config/firebase.config";
 import { DocumentVerificationType, DocumentType } from "@/types";
 import { timestampToDate } from "./utils.backend";
 

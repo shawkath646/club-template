@@ -1,5 +1,5 @@
 "use server";
-import { storage } from '@/firebase.config';
+import { storage } from '@/config/firebase.config';
 import { v4 as uuidv4 } from 'uuid';
 
 const uploadFileToFirestore = async (
