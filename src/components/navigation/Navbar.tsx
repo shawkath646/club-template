@@ -60,7 +60,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                     ))}
                     <Menu as="div" className="relative">
                         <MenuButton className={`p-2 transition duration-200 ease-in-out rounded-md ${hasScrolled ? "text-blue-100 hover:text-white" : "bg-gray-200 dark:bg-gray-800 hover:bg-blue-500 hover:text-white dark:hover:bg-gray-700 text-blue-500 dark:text-gray-200"}`}>
-                            {(session?.user?.image) ? <Image src={session.user.image} alt="user profile" height={28} width={28} className="w-[28px] h-[28px] rounded-full" /> : <FaUserCircle size={28} />}
+                            {(session?.user?.image) ? <Image src={session.user.image} alt="user profile" height={28} width={28} className="w-[28px] h-[28px] rounded-full object-cover" /> : <FaUserCircle size={28} />}
                         </MenuButton>
                         <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800 bg-white">
                             {(!session?.user) && (

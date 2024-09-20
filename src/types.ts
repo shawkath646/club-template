@@ -97,7 +97,7 @@ export interface MemberProfileType {
         interestedIn: string;
         extraCurricularActivities: string;
         position: string;
-        status: "approved" | "pending" | "rejected" | "cancelled" | "expired";
+        status: "approved" | "pending" | "rejected";
         joinedOn: Date | Timestamp;
     },
 }

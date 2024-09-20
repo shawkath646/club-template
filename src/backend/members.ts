@@ -10,13 +10,21 @@ interface GetDocumentsOptions {
     lastDocId?: string;
 }
 
+const getMemberProfile = async(docId: string): Promise<MemberProfileType> => {
+    const docRef = await db.collection("members").doc(docId).get();
+    const memberProfile = docRef.data() as MemberProfileType;
+    memberProfile.personal.dateOfBirth = timestampToDate(memberProfile.personal.dateOfBirth) as Date;
+    memberProfile.club.joinedOn = timestampToDate(memberProfile.club.joinedOn) as Date;
+    return memberProfile;
+};
+
 const getMembersProfile = async (options: GetDocumentsOptions = {}): Promise<MemberProfileType[]> => {
     const { query, lastDocId } = options;
 
-    let collectionQuery = db.collection("members").orderBy("club.joinedOn").limit(10);
+    let collectionQuery = db.collection("members").orderBy("club.joinedOn");
 
     if (query) {
-        collectionQuery = collectionQuery.where("club.position", "==", query);
+        collectionQuery = collectionQuery.where("club.status", "==", query);
     }
 
     if (lastDocId) {
@@ -26,7 +34,7 @@ const getMembersProfile = async (options: GetDocumentsOptions = {}): Promise<Mem
         }
     }
 
-    const docCollection = await collectionQuery.get();
+    const docCollection = await collectionQuery.limit(10).get();
 
     return docCollection.docs.map(doc => {
         const memberData = doc.data() as MemberProfileType;
@@ -108,4 +116,4 @@ const submitMemberRequest = async (formData: MemberFormType) => {
 
 
 
-export { submitMemberRequest, getMembersProfile };
+export { submitMemberRequest, getMembersProfile, getMemberProfile };

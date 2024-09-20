@@ -4,7 +4,7 @@ const nextConfig = {
         return [
             {
                 source: '/documents/verify',
-                destination: '/documents&notice/verify-doc',
+                destination: '/documents&notice/verify-doc?docId=:docId',
                 permanent: true,
                 has: [
                     {
@@ -12,7 +12,6 @@ const nextConfig = {
                         key: 'docId',
                     },
                 ],
-                destination: '/documents&notice/verify-doc?docId=:docId',
             },
         ]
     },
@@ -21,6 +20,8 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'storage.googleapis.com',
+                port: '',
+                pathname: '/**',
             },
         ],
     },
