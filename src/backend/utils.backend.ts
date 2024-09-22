@@ -33,7 +33,7 @@ async function generateNbcId(): Promise<string> {
     const membersRef = db.collection('members');
 
     const lastMemberSnapshot = await membersRef
-        .orderBy('nbcId', 'desc')
+        .orderBy('club.nbcId', 'desc')
         .limit(1)
         .get();
 
