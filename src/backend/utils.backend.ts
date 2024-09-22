@@ -41,7 +41,7 @@ async function generateNbcId(): Promise<string> {
         return 'NBC1000';
     }
 
-    const lastNbcId = lastMemberSnapshot.docs[0].get('nbcId') as string;
+    const lastNbcId = lastMemberSnapshot.docs[0].get('club.nbcId') as string;
     const numericPart = parseInt(lastNbcId.replace('NBC', ''), 10);
 
     return `NBC${numericPart + 1}`;
