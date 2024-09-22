@@ -1,9 +1,11 @@
 "use server";
+import { cache } from "react";
+import bcrypt from 'bcrypt';
 import { signIn } from "@/config/auth.config";
 import { db } from "@/config/firebase.config";
 import { LoginFormType, MemberProfileType } from "@/types";
 
-async function getUserSession(docId: string) {
+const getUserSession = cache(async (docId: string) => {
 
     const userRef = await db.collection("members").doc(docId).get();
     const userData = userRef.data() as MemberProfileType;
@@ -17,9 +19,9 @@ async function getUserSession(docId: string) {
         email: userData.identification.email,
         permissions: userData.club.permissions
     };
-};
+});
 
-async function userSignIn(credentials: LoginFormType) {
+const userSignIn = cache(async (credentials: LoginFormType) => {
     const userRef = await db.collection("members").where("club.nbcId", "==", credentials.nbcId).limit(1).get();
 
     if (userRef.empty) return {
@@ -32,11 +34,13 @@ async function userSignIn(credentials: LoginFormType) {
         nbcId: "NBC account is disabled by admin"
     };
 
-    if (userData.club.password !== credentials.password) return {
+    const comparePassword = await bcrypt.compare(credentials.password, userData.club.password);
+
+    if (!comparePassword) return {
         password: "Incorrect password"
     };
 
     await signIn("credentials", { docId: userData.id, redirectTo: "/" });
-}
+});
 
 export { getUserSession, userSignIn };

@@ -6,16 +6,15 @@ import { MemberProfileType } from "@/types";
 import { MdEmail } from "react-icons/md";
 import { FaUniversity } from "react-icons/fa";
 
+export default function ExistingMemberList({ preloadExistingMembers }: { preloadExistingMembers: MemberProfileType[] }) {
 
-export default function NonMemberList({ preloadPendingMembers }: { preloadPendingMembers: MemberProfileType[] }) {
-
-    const [pendingMemberList, setPendingMemberList] = useState(preloadPendingMembers);
+    const [existingMemberList, setExistingMemberList] = useState(preloadExistingMembers);
 
     return (
-        <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-blue-500 dark:text-blue-400 mb-6">New Requests</h2>
+        <section>
+            <h2 className="text-xl font-semibold text-blue-500 dark:text-blue-400 mb-4">Existing Members</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {pendingMemberList.map((item, key) => (
+                {existingMemberList.map((item, key) => (
                     <article
                         key={key}
                         className="bg-white/20 dark:bg-gray-800/20 rounded-lg shadow-lg p-6 flex flex-col justify-between"
@@ -30,8 +29,8 @@ export default function NonMemberList({ preloadPendingMembers }: { preloadPendin
                             />
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
-                                    Application ID:{" "}
-                                    <span className="font-semibold">{item.club.tempID}</span>
+                                    NBC ID:{" "}
+                                    <span className="font-semibold">{item.club.nbcId}</span>
                                 </p>
                                 <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
                                     {item.personal.fullName}
@@ -50,7 +49,7 @@ export default function NonMemberList({ preloadPendingMembers }: { preloadPendin
                         {/* Information below the image */}
                         <div className="mt-4 space-y-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Requesting Position:{" "}
+                                Position:{" "}
                                 <span className="font-semibold text-emerald-500">{item.club.position.replace("-", " ")}</span>
                             </p>
                         </div>
@@ -58,11 +57,11 @@ export default function NonMemberList({ preloadPendingMembers }: { preloadPendin
                             href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members/${item.id}`}
                             className="block mt-6 text-center text-white bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 py-2 px-4 w-full rounded-lg font-semibold text-sm shadow-md transition-colors"
                         >
-                            View Application
+                            View Profile
                         </Link>
                     </article>
                 ))}
             </div>
         </section>
     );
-};
+}

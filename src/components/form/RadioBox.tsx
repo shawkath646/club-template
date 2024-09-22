@@ -27,7 +27,7 @@ export default function RadioBox({ label, field, options, error }: RadioBoxType)
                     <div key={option} className="flex items-center gap-2">
                         <Radio
                             value={option}
-                            className="group flex items-center justify-center w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 data-[checked]:bg-blue-500 dark:data-[checked]:bg-blue-400 transition-all duration-200 ease-in-out"
+                            className="group flex items-center justify-center w-5 h-5 rounded-full border-2 border-gray-400 dark:border-gray-600 bg-white/20 dark:bg-gray-800/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 data-[checked]:bg-blue-500 dark:data-[checked]:bg-blue-400 transition-all duration-200 ease-in-out"
                         >
                             <span className="invisible w-2.5 h-2.5 rounded-full bg-blue-500 dark:bg-blue-400 group-data-[checked]:visible " />
                         </Radio>

@@ -44,9 +44,17 @@ async function generateNbcId(): Promise<string> {
     const lastNbcId = lastMemberSnapshot.docs[0].get('nbcId') as string;
     const numericPart = parseInt(lastNbcId.replace('NBC', ''), 10);
 
-    const nextNbcId = `NBC${numericPart + 1}`;
+    return `NBC${numericPart + 1}`;
+};
 
-    return nextNbcId;
+const generatePassword = () => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let password = '';
+    for (let i = 0; i < 8; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        password += characters[randomIndex];
+    }
+    return password;
 }
 
-export { timestampToDate, generateTemporaryId, generateNbcId };
+export { timestampToDate, generateTemporaryId, generateNbcId, generatePassword };

@@ -8,9 +8,10 @@ interface FileUploadType {
     field: ControllerRenderProps<any, any>;
     error?: FieldError;
     setError: (errorText: string) => void
+    accept?: string;
 }
 
-export default function FileUpload({ label, field, error, setError }: FileUploadType) {
+export default function FileUpload({ label, field, error, setError, accept }: FileUploadType) {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const fieldId = label.replace(" ", "-");
 
@@ -34,11 +35,11 @@ export default function FileUpload({ label, field, error, setError }: FileUpload
                     onClick={() => inputRef.current?.click()}
                     className="
             flex flex-col items-center justify-center 
-            w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 
+            w-full h-32 border-2 border-dashed
             rounded-lg cursor-pointer transition-all duration-300 
             hover:border-blue-500 dark:hover:border-blue-400 
-            bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700
-            text-gray-600 dark:text-gray-300 text-sm font-medium"
+            bg-white/20 dark:bg-gray-800/20 hover:bg-white/40 dark:hover:bg-gray-800/40
+            text-gray-600 dark:text-gray-300 text-sm font-medium border-gray-400 dark:border-gray-600"
                 >
                     <FiUploadCloud size={40} className="mb-2 text-gray-500 dark:text-gray-400" />
                     <p>Click to upload or drag and drop</p>
@@ -64,7 +65,7 @@ export default function FileUpload({ label, field, error, setError }: FileUpload
                 type="file"
                 onChange={handleFileChange}
                 className="hidden"
-                accept=".pdf, .jpeg, .jpg, .png, .doc, .gdoc, .docx, .xls"
+                accept={accept}
             />
             <p className="text-sm text-gray-400 mt-2">Note: Only PDF, JPEG, PNG, and DOC file formats are supported. The document must be clear and must not exceed 5MB. Unclear documents will result in rejection.</p>
             {error && <p className="mt-2 text-sm text-red-600">{error.message}</p>}

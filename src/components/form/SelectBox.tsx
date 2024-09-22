@@ -25,7 +25,7 @@ export default function SelectBox({ field, label, options, error }: SelectBoxTyp
                 {...field}
                 aria-label="Current Class"
                 aria-invalid={!!error}
-                className="block w-full px-3 py-2 text-gray-900 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-400 dark:focus:ring-blue-400 sm:text-sm"
+                className="block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white/20 dark:bg-gray-800/20 border rounded-md shadow-sm focus:outline-none transition-all duration-200 aria-invalid:border-red-500 aria-invalid:focus:ring-red-500 border-gray-400 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 sm:text-sm sm:leading-5"
             >
                 {options.map((option) => (
                     <option key={option} value={option}>

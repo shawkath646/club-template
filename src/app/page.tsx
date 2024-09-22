@@ -1,6 +1,10 @@
-import Image from "next/image";
+import { Metadata } from "next";
 import Introduction from "@/components/home/Introduction";
 import DynamicBox from "@/components/home/DynamicBox";
+
+export const metadata: Metadata = {
+  title: "Home"
+};
 
 
 export default async function Home() {
@@ -46,23 +50,6 @@ export default async function Home() {
             <p>🏅 Olympiad 2: International Chemistry Olympiad</p>
           </li>
         </ul>
-      </section>
-
-      {/* Admins */}
-      <section className="admins">
-        <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Admins</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="admin bg-white dark:bg-gray-800 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col items-center text-center">
-            <Image src="/admin1.jpg" alt="Admin 1" width={100} height={100} className="rounded-full mb-4" />
-            <h3 className="text-lg font-medium">Admin Name 1</h3>
-            <p className="text-gray-500 dark:text-gray-400">Position</p>
-          </div>
-          <div className="admin bg-white dark:bg-gray-800 dark:text-gray-200 p-4 rounded-lg shadow-md flex flex-col items-center text-center">
-            <Image src="/admin2.jpg" alt="Admin 2" width={100} height={100} className="rounded-full mb-4" />
-            <h3 className="text-lg font-medium">Admin Name 2</h3>
-            <p className="text-gray-500 dark:text-gray-400">Position</p>
-          </div>
-        </div>
       </section>
     </>
   );

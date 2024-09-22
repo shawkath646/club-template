@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import NoItemFound from "@/components/NoItemFound";
 import { getAllDocuments } from "@/backend/document";
@@ -6,7 +7,9 @@ import { formatDate } from "@/utils";
 import { FaArrowRightLong } from "react-icons/fa6";
 
 
-
+export const metadata: Metadata = {
+    title: "Documents & Notice"
+};
 
 
 export default async function Page() {
@@ -51,7 +54,7 @@ export default async function Page() {
                 </section>
             )}
 
-            {!(documentsProfile.length && documentsPublic.length && documentsMembers.length) && <NoItemFound />}
+            {!(documentsProfile.length && documentsPublic.length && documentsMembers.length) && <NoItemFound label="documents" />}
         </>
     );
 }

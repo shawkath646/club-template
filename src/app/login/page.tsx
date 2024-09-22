@@ -1,4 +1,5 @@
 "use client";
+import { Metadata } from "next";
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,6 +9,9 @@ import validationSchema from "./formValidation";
 import { userSignIn } from "@/backend/userAuth";
 import { LoginFormType } from "@/types";
 
+// export const metadata: Metadata = {
+//     title: "Login"
+// };
 
 
 export default function Page() {
@@ -36,7 +40,9 @@ export default function Page() {
 
                     <Link href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 block">Forgot your password?</Link>
 
-                    <StylistButton type="submit" size="md" isLoading={isSubmitting}>Login</StylistButton>
+                    <div className="text-center">
+                        <StylistButton type="submit" size="md" isLoading={isSubmitting}>Login</StylistButton>
+                    </div>
                 </form>
             </section>
         </div>

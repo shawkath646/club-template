@@ -18,7 +18,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldType>(
       <div className="w-full">
         <label
           htmlFor={fieldId}
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          className="block text-sm font-medium text-black dark:text-gray-300 mb-2"
         >
           {label}:
         </label>
@@ -30,7 +30,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldType>(
           type={type === 'password' && showPassword ? 'text' : type}
           {...rest}
           ref={ref}
-          className="block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border rounded-md shadow-sm focus:outline-none transition-all duration-200 aria-invalid:border-red-500 aria-invalid:focus:ring-red-500 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 sm:text-sm sm:leading-5"
+          className="block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white/20 dark:bg-gray-800/20 border rounded-md shadow-sm focus:outline-none transition-all duration-200 aria-invalid:border-red-500 aria-invalid:focus:ring-red-500 border-gray-400 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 sm:text-sm sm:leading-5"
         />
 
         {type === 'password' && (

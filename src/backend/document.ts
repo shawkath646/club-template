@@ -1,9 +1,10 @@
 "use server";
+import { cache } from "react";
 import { db } from "@/config/firebase.config";
 import { DocumentVerificationType, DocumentType } from "@/types";
 import { timestampToDate } from "./utils.backend";
 
-const verifyDocument = async (docId: string): Promise<DocumentVerificationType> => {
+const verifyDocument = cache(async (docId: string): Promise<DocumentVerificationType> => {
     const docSnapshot = await db.collection("documents").doc(docId).get();
 
     if (!docSnapshot.exists) {
@@ -42,7 +43,7 @@ const verifyDocument = async (docId: string): Promise<DocumentVerificationType> 
         statusText: "Document verified",
         docInfo,
     };
-};
+});
 
 
 interface GetDocumentsOptions {
@@ -50,7 +51,7 @@ interface GetDocumentsOptions {
     lastDocId?: string;
 }
 
-const getAllDocuments = async (options: GetDocumentsOptions = {}): Promise<DocumentType[]> => {
+const getAllDocuments = cache(async (options: GetDocumentsOptions = {}): Promise<DocumentType[]> => {
     const { query, lastDocId } = options;
 
     let collectionQuery = db.collection("documents").orderBy("addedDate").limit(10);
@@ -74,6 +75,6 @@ const getAllDocuments = async (options: GetDocumentsOptions = {}): Promise<Docum
         docData.validTo = timestampToDate(docData.validTo) as Date;
         return docData;
     });
-};
+});
 
 export { getAllDocuments, verifyDocument };

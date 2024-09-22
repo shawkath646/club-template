@@ -1,24 +1,29 @@
 "use server";
+import { cache } from "react";
+import bcrypt from 'bcrypt';
 import { db } from "@/config/firebase.config";
-import { MemberFormType, MemberProfileType } from "@/types";
-import { generateTemporaryId } from "./utils.backend";
-import { timestampToDate } from "./utils.backend";
+import { generateNbcId, generatePassword, generateTemporaryId, timestampToDate } from "./utils.backend";
 import uploadFileToFirestore from "./uploadFileToFirestore";
+import sendMail from "@/config/nodemailer.config";
+import approvedEmailTemplate from "@/constant/approvedEmail.template";
+import { MemberFormType, MemberProfileType } from "@/types";
+import applicaionInfo from "@/constant/applicaiton-info.json";
+
 
 interface GetDocumentsOptions {
     query?: string;
     lastDocId?: string;
 }
 
-const getMemberProfile = async(docId: string): Promise<MemberProfileType> => {
+const getMemberProfile = cache(async (docId: string): Promise<MemberProfileType> => {
     const docRef = await db.collection("members").doc(docId).get();
     const memberProfile = docRef.data() as MemberProfileType;
     memberProfile.personal.dateOfBirth = timestampToDate(memberProfile.personal.dateOfBirth) as Date;
     memberProfile.club.joinedOn = timestampToDate(memberProfile.club.joinedOn) as Date;
     return memberProfile;
-};
+});
 
-const getMembersProfile = async (options: GetDocumentsOptions = {}): Promise<MemberProfileType[]> => {
+const getMembersProfile = cache(async (options: GetDocumentsOptions = {}): Promise<MemberProfileType[]> => {
     const { query, lastDocId } = options;
 
     let collectionQuery = db.collection("members").orderBy("club.joinedOn");
@@ -42,7 +47,7 @@ const getMembersProfile = async (options: GetDocumentsOptions = {}): Promise<Mem
         memberData.personal.dateOfBirth = timestampToDate(memberData.personal.dateOfBirth) as Date;
         return memberData;
     });
-};
+});
 
 const submitMemberRequest = async (formData: MemberFormType) => {
     const errors: Array<{ field: keyof MemberFormType; message: string }> = [];
@@ -104,7 +109,7 @@ const submitMemberRequest = async (formData: MemberFormType) => {
             position: formData.position,
             status: "pending",
             joinedOn: new Date(),
-        }, 
+        },
     };
 
     await docRef.set(memberProfile);
@@ -114,6 +119,49 @@ const submitMemberRequest = async (formData: MemberFormType) => {
     };
 };
 
+const updatePermissions = async (docId: string, permissions: string[]) => {
+    const userRef = db.collection("members").doc(docId);
+    await userRef.set({ club: { permissions } }, { merge: true });
+};
+
+const updateStatus = async (docId: string, status: string) => {
+    const userRef = db.collection("members").doc(docId);
+
+    let clubObject;
+
+    if (status === "approved") {
+
+        const memberProfile = (await userRef.get()).data() as MemberProfileType;
+
+        const nbcId = memberProfile.club.nbcId || await generateNbcId();
+        const joinedOn = memberProfile.club.nbcId ? memberProfile.club.joinedOn : new Date();
+
+        const password = generatePassword();
+
+        clubObject = {
+            status,
+            nbcId,
+            password: await bcrypt.hash(password, 10),
+            joinedOn
+        };
+
+        await sendMail({
+            from: process.env.NODE_MAILER_ID,
+            to: memberProfile.identification.email,
+            subject: `🎉 Congratulations! Your Application to ${applicaionInfo.name} Has Been Approved`,
+            html: approvedEmailTemplate({
+                applicantName: memberProfile.personal.fullName,
+                applicantPosition: memberProfile.club.position,
+                applicationId: memberProfile.club.tempID,
+                nbcId,
+                password
+            })
+        });
+    } else clubObject = { status };
+
+    await userRef.set({ club: clubObject }, { merge: true });
+};
 
 
-export { submitMemberRequest, getMembersProfile, getMemberProfile };
+
+export { submitMemberRequest, getMembersProfile, getMemberProfile, updatePermissions, updateStatus };

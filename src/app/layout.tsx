@@ -7,12 +7,11 @@ import Footer from "@/components/navigation/Footer";
 import applicationInfo from "@/constant/applicaiton-info.json";
 
 
-
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    template: " | " + applicationInfo.name,
+    template: "%s | " + applicationInfo.name,
     default: applicationInfo.name
   },
   applicationName: "Club template",
@@ -20,6 +19,7 @@ export const metadata: Metadata = {
     name: "Shawkat Hossain Maruf",
     url: new URL("https://sh-portfolio-maker.vercel.app/p/shawkath646")
   },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_BASE_URL as string),
   category: "Science",
   creator: "Shawkat Hossain Maruf <https://sh-portfolio-maker.vercel.app/p/shawkath646>",
   publisher: "CloudBurst Lab <https://cloudburstlab.vercel.app>",

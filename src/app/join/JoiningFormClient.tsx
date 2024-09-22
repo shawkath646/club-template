@@ -65,8 +65,8 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
     <>
       <h2 className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-200 bg-blue-500 bg-opacity-20 rounded py-5">{applicaitonInfo.name} e-Registration Form ({registrationPosition})</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-10">
-        <p className="text-gray-400 text-sm font-medium">Personal Information</p>
-        <hr className="h-px mb-3 mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
+        <p className="text-gray-700 dark:text-gray-400 text-sm font-medium">Personal Information</p>
+        <hr className="h-px mb-3 mt-2 bg-gray-300 border-0 dark:bg-gray-700" />
         <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
           <InputField type="text" fieldId="ullName" label="Full Name" {...register("fullName")} error={errors.fullName} />
           <InputField type="date" fieldId="dateOfBirth" label="Date of Birth" defaultValue={getTodayDate()} {...register("dateOfBirth")} error={errors.dateOfBirth} />
@@ -81,19 +81,19 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
           <Controller
             name="profilePic"
             control={control}
-            render={({ field }) => <FileUpload label="Formal photo (Passport size)" field={field} error={errors.profilePic} setError={(errorText) => setError("profilePic", { message: errorText })} />}
+            render={({ field }) => <FileUpload label="Formal photo (Passport size)" accept="image/*" field={field} error={errors.profilePic} setError={(errorText) => setError("profilePic", { message: errorText })} />}
           />
         </section>
-        <p className="text-gray-400 text-sm font-medium">Identification Information</p>
-        <hr className="h-px mb-3 mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
+        <p className="text-gray-700 dark:text-gray-400 text-sm font-medium">Identification Information</p>
+        <hr className="h-px mb-3 mt-2 bg-gray-300 border-0 dark:bg-gray-700" />
         <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
           <InputField type="email" fieldId="email" label="Email" {...register("email")} error={errors.email} />
           <InputField type="text" fieldId="phoneNumber" label="Phone Number" {...register("phoneNumber")} error={errors.phoneNumber} />
           <InputField type="text" fieldId="identificationNumber" label="NID/BRC/Passport No" {...register("identificationNo")} error={errors.identificationNo} />
           <InputField type="text" fieldId="fbProfileLink" label="Facebook Profile URL" {...register("fbProfileLink")} error={errors.fbProfileLink} />
         </section>
-        <p className="text-gray-400 text-sm font-medium">Educational Information</p>
-        <hr className="h-px mb-3 mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
+        <p className="text-gray-700 dark:text-gray-400 text-sm font-medium">Educational Information</p>
+        <hr className="h-px mb-3 mt-2 bg-gray-300 border-0 dark:bg-gray-700" />
         <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
           <InputField type="text" fieldId="institute" label="Institute / Workplace" {...register("institute")} error={errors.institute} />
           <InputField type="text" fieldId="studentID" label="Student ID" {...register("studentID")} error={errors.studentID} />
@@ -109,8 +109,8 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
           />
           <InputField type="text" fieldId="instituteAddress" label="Institute / Workplace Address" {...register("instituteAddress")} error={errors.instituteAddress} />
         </section>
-        <p className="text-gray-400 text-sm font-medium">Club Information</p>
-        <hr className="h-px mb-3 mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
+        <p className="text-gray-700 dark:text-gray-400 text-sm font-medium">Club Information</p>
+        <hr className="h-px mb-3 mt-2 bg-gray-300 border-0 dark:bg-gray-700" />
         <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
           <Controller
             name="interestedIn"
@@ -126,10 +126,10 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
           render={({ field }) => <CheckBox field={field} text="I hereby certify that the information provided is accurate and original. I have thoroughly reviewed the club membership rules and privacy policy, and I agree to comply with them. I understand that any violation of these rules may result in the cancellation of my membership without prior notice." />}
         />
         {errors.agreeRules && <p className="mt-2 text-sm text-red-600 mb-3">{errors.agreeRules.message}</p>}
-        
-        <StylistButton type="submit" colorScheme="blue" isLoading={isSubmitting} loadingLabel="Submitting..." size="md">
-          Submit
-        </StylistButton>
+
+        <div className="text-center">
+          <StylistButton type="submit" colorScheme="blue" isLoading={isSubmitting} loadingLabel="Submitting..." size="md" className="mt-5 mx-auto">Submit</StylistButton>
+        </div>
       </form>
       <SubmittingDialog dialogState={dialogState} setDialogState={setDialogState} />
     </>

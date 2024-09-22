@@ -1,6 +1,11 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { FaUser, FaBlog, FaTasks, FaDonate, FaClipboardList, FaHistory } from 'react-icons/fa';
 import { HiDocumentText } from 'react-icons/hi';
+
+export const metadata: Metadata = {
+    title: "Admin Tools"
+};
 
 export default async function Page() {
 
@@ -24,7 +29,7 @@ export default async function Page() {
                     <Link
                         key={index}
                         href={process.env.NEXT_PUBLIC_APP_BASE_URL + tool.href}
-                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center text-center transform hover:scale-105 hover:bg-blue-100 dark:hover:bg-gray-700"
+                        className="bg-white/20 dark:bg-gray-800/20 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center text-center transform hover:scale-105 hover:bg-blue-100 dark:hover:bg-gray-700"
                     >
                         <div className="mb-4 text-blue-500 dark:text-blue-400">
                             {tool.icon}
