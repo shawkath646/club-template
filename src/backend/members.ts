@@ -23,7 +23,7 @@ const getMemberProfile = cache(async (docId: string): Promise<MemberProfileType>
     return memberProfile;
 });
 
-const getMembersProfile = cache(async (options: GetDocumentsOptions = {}): Promise<MemberProfileType[]> => {
+const getMembersProfile = cache(async (options: GetDocumentsOptions = {}) => {
     const { query, lastDocId } = options;
 
     let collectionQuery = db.collection("members").orderBy("club.joinedOn");
@@ -32,6 +32,10 @@ const getMembersProfile = cache(async (options: GetDocumentsOptions = {}): Promi
         collectionQuery = collectionQuery.where("club.status", "==", query);
     }
 
+    const totalCountQuery = collectionQuery;
+    const totalCountSnapshot = await totalCountQuery.get();
+    const totalCount = totalCountSnapshot.docs.length;
+
     if (lastDocId) {
         const lastDocRef = await db.collection("members").doc(lastDocId).get();
         if (lastDocRef.exists) {
@@ -39,15 +43,18 @@ const getMembersProfile = cache(async (options: GetDocumentsOptions = {}): Promi
         }
     }
 
-    const docCollection = await collectionQuery.limit(10).get();
+    const docCollection = await collectionQuery.limit(9).get();
 
-    return docCollection.docs.map(doc => {
+    const members = docCollection.docs.map(doc => {
         const memberData = doc.data() as MemberProfileType;
         memberData.club.joinedOn = timestampToDate(memberData.club.joinedOn) as Date;
         memberData.personal.dateOfBirth = timestampToDate(memberData.personal.dateOfBirth) as Date;
         return memberData;
     });
+
+    return { members, totalCount };
 });
+
 
 const submitMemberRequest = async (formData: MemberFormType) => {
     const errors: Array<{ field: keyof MemberFormType; message: string }> = [];
@@ -82,7 +89,7 @@ const submitMemberRequest = async (formData: MemberFormType) => {
             gender: formData.gender,
             fatherName: formData.fatherName,
             motherName: formData.motherName,
-            picture: await uploadFileToFirestore(formData.profilePic as string, `picture_${docRef.id}`),
+            picture: await uploadFileToFirestore(formData.profilePic as string, { fileName: `picture_${docRef.id}`, fileType: "image" }),
             address: formData.address
         },
         identification: {

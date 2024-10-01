@@ -10,14 +10,14 @@ export const metadata: Metadata = {
 
 export default async function Page() {
 
-    const pendingMembers = await getMembersProfile({ query: "pending" });
-    const existingMembers = await getMembersProfile({ query: "approved" });
+    const { members: pendingMembers, totalCount: totalPendingMembers } = await getMembersProfile({ query: "pending" });
+    const { members: existingMembers, totalCount: totalExistingMembers } = await getMembersProfile({ query: "approved" });
 
     return (
         <>
             <h1 className="text-2xl font-bold text-black dark:text-gray-200 mb-8">Member Management</h1>
-            {!!pendingMembers.length && <NonMemberList preloadPendingMembers={pendingMembers} />}
-            {!!existingMembers.length && <ExistingMemberList preloadExistingMembers={existingMembers} />}
+            {!!pendingMembers.length && <NonMemberList preloadPendingMembers={pendingMembers} totalPendingMembers={totalPendingMembers} />}
+            {!!existingMembers.length && <ExistingMemberList preloadExistingMembers={existingMembers} totalExistingMembers={totalExistingMembers} />}
 
             {(!pendingMembers.length && !existingMembers.length) && <NoItemFound label="member" />}
         </>

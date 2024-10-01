@@ -2,17 +2,30 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import StylistButton from "@/components/form/StylistButton";
+import { getMembersProfile } from "@/backend/members";
 import { MemberProfileType } from "@/types";
 import { MdEmail } from "react-icons/md";
 import { FaUniversity } from "react-icons/fa";
 
-export default function ExistingMemberList({ preloadExistingMembers }: { preloadExistingMembers: MemberProfileType[] }) {
+
+export default function ExistingMemberList({ preloadExistingMembers, totalExistingMembers }: { preloadExistingMembers: MemberProfileType[]; totalExistingMembers: number; }) {
 
     const [existingMemberList, setExistingMemberList] = useState(preloadExistingMembers);
 
+    const onLoadMore = async () => {
+        try {
+            const lastDocId = existingMemberList[existingMemberList.length - 1]?.id;
+            const response = await getMembersProfile({ lastDocId, query: "approved" });
+            setExistingMemberList(prev => [...prev, ...response.members]);
+        } catch (error) {
+            console.log(`Error: ${error}`);
+        }
+    };
+
     return (
         <section>
-            <h2 className="text-xl font-semibold text-blue-500 dark:text-blue-400 mb-4">Existing Members</h2>
+            <h2 className="text-xl font-semibold text-blue-500 dark:text-blue-400 mb-4">Existing Members ({totalExistingMembers})</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {existingMemberList.map((item, key) => (
                     <article
@@ -62,6 +75,11 @@ export default function ExistingMemberList({ preloadExistingMembers }: { preload
                     </article>
                 ))}
             </div>
+            {(existingMemberList.length < totalExistingMembers) && (
+                <div className="mt-10 text-center">
+                    <StylistButton size="sm" colorScheme="green" onClick={onLoadMore}>Load more...</StylistButton>
+                </div>
+            )}
         </section>
     );
 }

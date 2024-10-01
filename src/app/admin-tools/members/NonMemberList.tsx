@@ -2,18 +2,30 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import StylistButton from "@/components/form/StylistButton";
+import { getMembersProfile } from "@/backend/members";
 import { MemberProfileType } from "@/types";
 import { MdEmail } from "react-icons/md";
 import { FaUniversity } from "react-icons/fa";
 
 
-export default function NonMemberList({ preloadPendingMembers }: { preloadPendingMembers: MemberProfileType[] }) {
+export default function NonMemberList({ preloadPendingMembers, totalPendingMembers }: { preloadPendingMembers: MemberProfileType[]; totalPendingMembers: number }) {
 
     const [pendingMemberList, setPendingMemberList] = useState(preloadPendingMembers);
 
+    const onLoadMore = async () => {
+        try {
+            const lastDocId = preloadPendingMembers[preloadPendingMembers.length - 1]?.id;
+            const response = await getMembersProfile({ lastDocId, query: "approved" });
+            setPendingMemberList(prev => [...prev, ...response.members]);
+        } catch (error) {
+            console.log(`Error: ${error}`);
+        }
+    };
+
     return (
         <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-blue-500 dark:text-blue-400 mb-6">New Requests</h2>
+            <h2 className="text-2xl font-semibold text-blue-500 dark:text-blue-400 mb-6">New Requests ({totalPendingMembers})</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {pendingMemberList.map((item, key) => (
                     <article
@@ -63,6 +75,11 @@ export default function NonMemberList({ preloadPendingMembers }: { preloadPendin
                     </article>
                 ))}
             </div>
+            {(pendingMemberList.length < totalPendingMembers) && (
+                <div className="mt-10 text-center">
+                    <StylistButton size="sm" colorScheme="green" onClick={onLoadMore}>Load more...</StylistButton>
+                </div>
+            )}
         </section>
     );
 };

@@ -17,8 +17,6 @@ const fileToBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
     });
 };
 
-
-
 function formatDate(input: Date | null, locale: string = 'en-US'): string {
     if (!input) {
         return 'Invalid Date';
@@ -31,8 +29,6 @@ function formatDate(input: Date | null, locale: string = 'en-US'): string {
     };
 
     return input.toLocaleDateString(locale, options);
-}
-
-
+};
 
 export { getTodayDate, formatDate, fileToBase64 };

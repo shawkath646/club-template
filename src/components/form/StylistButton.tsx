@@ -38,11 +38,11 @@ const StylistButton: React.FC<StylistButtonProps> = ({
   const getSizeClasses = () => {
     switch (size) {
       case 'sm':
-        return 'w-[100px] py-1 text-sm';
+        return 'w-[120px] py-1.5 text-sm';
       case 'lg':
         return 'w-[250px] py-3';
       default:
-        return 'w-[200px] py-2'; // Default size 'md'
+        return 'w-[200px] py-2';
     }
   };
 

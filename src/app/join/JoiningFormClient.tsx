@@ -69,7 +69,7 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
         <hr className="h-px mb-3 mt-2 bg-gray-300 border-0 dark:bg-gray-700" />
         <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
           <InputField type="text" fieldId="ullName" label="Full Name" {...register("fullName")} error={errors.fullName} />
-          <InputField type="date" fieldId="dateOfBirth" label="Date of Birth" defaultValue={getTodayDate()} {...register("dateOfBirth")} error={errors.dateOfBirth} />
+          <InputField type="date" fieldId="dateOfBirth" label="Date of Birth (MM-DD-YYYY)" defaultValue={getTodayDate()} {...register("dateOfBirth")} error={errors.dateOfBirth} />
           <Controller
             name="gender"
             control={control}
@@ -81,7 +81,15 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
           <Controller
             name="profilePic"
             control={control}
-            render={({ field }) => <FileUpload label="Formal photo (Passport size)" accept="image/*" field={field} error={errors.profilePic} setError={(errorText) => setError("profilePic", { message: errorText })} />}
+            render={({ field }) => (
+              <FileUpload
+                label="Formal photo (Passport size)"
+                accept=".jpg, .jpeg, .png, .gif, .webp"
+                field={field}
+                error={errors.profilePic}
+                setError={(errorText) => setError("profilePic", { message: errorText })}
+              />
+            )}
           />
         </section>
         <p className="text-gray-700 dark:text-gray-400 text-sm font-medium">Identification Information</p>

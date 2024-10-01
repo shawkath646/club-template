@@ -1,23 +1,23 @@
-import { storage } from "@/config/firebase.config";
+import uploadFileToFirestore from "@/backend/uploadFileToFirestore";
 import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 export async function GET() {
+  const filePath = path.join("C:/Users/Shawkat Hossain/Downloads", "picture_XCH7oGMGpUytmj71rLdl");
+  
+  const fileBuffer = fs.readFileSync(filePath);
+  
+  const base64Image = Buffer.from(fileBuffer).toString('base64');
+  
+  const mimeType = "image/jpeg"; 
+  
+  const base64ImageData = `data:${mimeType};base64,${base64Image}`;
 
-  // const fileName = "picture_YYazznq7mrW3CxCC2I1x";
+  const downloadUrl = await uploadFileToFirestore(base64ImageData, {
+    fileName: "picture_XCH7oGMGpUytmj71rLdl",
+    fileType: "image",
+  });
 
-  // const fileRef = storage.bucket().file(fileName)
-
-  // const [fileExists] = await fileRef.exists();
-
-  // if (!fileExists) return NextResponse.json({ message: "File not found" }, { status: 404 });
-
-  // //await fileRef.rename("picture_xwnV6XZKPRa6421qdK9y");
-
-  // const [downloadLink] = await fileRef.getSignedUrl({
-  //   action: 'read',
-  //   expires: '01-01-2074',
-  // });
-
-
-  return NextResponse.json({ message: "Hi! This is test api" }, { status: 200 });
+  return NextResponse.json({ downloadUrl }, { status: 200 });
 }
