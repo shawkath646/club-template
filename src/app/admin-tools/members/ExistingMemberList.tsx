@@ -3,20 +3,20 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import StylistButton from "@/components/form/StylistButton";
-import { getMembersProfile } from "@/backend/members";
-import { MemberProfileType } from "@/types";
+import { getMembersPartialProfile } from "@/backend/members";
+import { MemberPartialProfileType } from "@/types";
 import { MdEmail } from "react-icons/md";
 import { FaUniversity } from "react-icons/fa";
 
 
-export default function ExistingMemberList({ preloadExistingMembers, totalExistingMembers }: { preloadExistingMembers: MemberProfileType[]; totalExistingMembers: number; }) {
+export default function ExistingMemberList({ preloadExistingMembers, totalExistingMembers }: { preloadExistingMembers: MemberPartialProfileType[]; totalExistingMembers: number; }) {
 
     const [existingMemberList, setExistingMemberList] = useState(preloadExistingMembers);
 
     const onLoadMore = async () => {
         try {
             const lastDocId = existingMemberList[existingMemberList.length - 1]?.id;
-            const response = await getMembersProfile({ lastDocId, query: "approved" });
+            const response = await getMembersPartialProfile({ lastDocId, query: "approved" });
             setExistingMemberList(prev => [...prev, ...response.members]);
         } catch (error) {
             console.log(`Error: ${error}`);

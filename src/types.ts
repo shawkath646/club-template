@@ -63,6 +63,24 @@ export interface MemberFormType {
     fbProfileLink: string
 }
 
+export interface MemberPartialProfileType {
+    id: string;
+    personal: {
+        fullName: string;
+        picture: string;
+    },
+    identification: {
+        email: string;
+    },
+    educational: {
+        institute: string;
+    },
+    club: {
+        nbcId: number;
+        position: string;
+    }
+}
+
 export interface MemberProfileType {
     id: string;
 
@@ -89,9 +107,8 @@ export interface MemberProfileType {
         presentClass: string;
     },
     club: {
-        nbcId: string;
+        nbcId: number;
         password: string;
-        tempID: string;
         reason: string;
         permissions: string[];
         interestedIn: string;

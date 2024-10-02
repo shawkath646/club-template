@@ -45,7 +45,7 @@ export default async function Page({ params }: PagePropsType) {
                     className="rounded-full border-4 border-yellow-500 dark:border-yellow-400 object-cover w-[120px] h-[120px] mx-auto"
                 />
                 <h1 className="text-2xl font-semibold">{memberProfile.personal.fullName}</h1>
-                <p className="text-gray-500 dark:text-gray-400">Application ID: {memberProfile.club.tempID}</p>
+                <p className="text-gray-500 dark:text-gray-400">Application ID: {memberProfile.id}</p>
             </section>
 
             {/* Personal Information Section */}

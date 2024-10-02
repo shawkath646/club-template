@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import NonMemberList from "./NonMemberList";
 import ExistingMemberList from "./ExistingMemberList";
-import { getMembersProfile } from "@/backend/members";
+import { getMembersPartialProfile } from "@/backend/members";
 import NoItemFound from "@/components/NoItemFound";
 
 export const metadata: Metadata = {
@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 export default async function Page() {
 
-    const { members: pendingMembers, totalCount: totalPendingMembers } = await getMembersProfile({ query: "pending" });
-    const { members: existingMembers, totalCount: totalExistingMembers } = await getMembersProfile({ query: "approved" });
+    const { members: pendingMembers, totalCount: totalPendingMembers } = await getMembersPartialProfile({ query: "pending" });
+    const { members: existingMembers, totalCount: totalExistingMembers } = await getMembersPartialProfile({ query: "approved" });
 
     return (
         <>

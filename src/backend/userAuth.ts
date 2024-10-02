@@ -22,7 +22,7 @@ const getUserSession = cache(async (docId: string) => {
 });
 
 const userSignIn = cache(async (credentials: LoginFormType) => {
-    const userRef = await db.collection("members").where("club.nbcId", "==", credentials.nbcId).limit(1).get();
+    const userRef = await db.collection("members").where("club.nbcId", "==", Number(credentials.nbcId)).limit(1).get();
 
     if (userRef.empty) return {
         nbcId: "NBC ID not exist"

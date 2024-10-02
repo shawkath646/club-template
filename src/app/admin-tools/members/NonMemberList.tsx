@@ -3,20 +3,20 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import StylistButton from "@/components/form/StylistButton";
-import { getMembersProfile } from "@/backend/members";
-import { MemberProfileType } from "@/types";
+import { getMembersPartialProfile } from "@/backend/members";
+import { MemberProfileType, MemberPartialProfileType } from "@/types";
 import { MdEmail } from "react-icons/md";
 import { FaUniversity } from "react-icons/fa";
 
 
-export default function NonMemberList({ preloadPendingMembers, totalPendingMembers }: { preloadPendingMembers: MemberProfileType[]; totalPendingMembers: number }) {
+export default function NonMemberList({ preloadPendingMembers, totalPendingMembers }: { preloadPendingMembers: MemberPartialProfileType[]; totalPendingMembers: number }) {
 
     const [pendingMemberList, setPendingMemberList] = useState(preloadPendingMembers);
 
     const onLoadMore = async () => {
         try {
             const lastDocId = preloadPendingMembers[preloadPendingMembers.length - 1]?.id;
-            const response = await getMembersProfile({ lastDocId, query: "approved" });
+            const response = await getMembersPartialProfile({ lastDocId, query: "approved" });
             setPendingMemberList(prev => [...prev, ...response.members]);
         } catch (error) {
             console.log(`Error: ${error}`);
@@ -43,19 +43,18 @@ export default function NonMemberList({ preloadPendingMembers, totalPendingMembe
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
                                     Application ID:{" "}
-                                    <span className="font-semibold">{item.club.tempID}</span>
+                                    <span className="font-semibold">{item.id}</span>
                                 </p>
                                 <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
                                     {item.personal.fullName}
                                 </p>
-                                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-2 truncate">
+                                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-2 overflow-hidden whitespace-nowrap truncate">
                                     <FaUniversity className="mr-2 text-blue-500 dark:text-blue-400" />
-                                    <span>{item.educational.institute}</span>
+                                    <span className="truncate">{item.educational.institute}</span>
                                 </div>
-
-                                <Link href={`mailto:${item.identification.email}`} className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-2 truncate">
+                                <Link href={`mailto:${item.identification.email}`} className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-2 overflow-hidden whitespace-nowrap truncate">
                                     <MdEmail className="mr-2 text-blue-500 dark:text-blue-400" />
-                                    <span>{item.identification.email}</span>
+                                    <span className="truncate">{item.identification.email}</span>
                                 </Link>
                             </div>
                         </div>

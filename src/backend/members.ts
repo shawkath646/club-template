@@ -2,13 +2,12 @@
 import { cache } from "react";
 import bcrypt from 'bcrypt';
 import { db } from "@/config/firebase.config";
-import { generateNbcId, generatePassword, generateTemporaryId, timestampToDate } from "./utils.backend";
-import uploadFileToFirestore from "./uploadFileToFirestore";
 import sendMail from "@/config/nodemailer.config";
-import approvedEmailTemplate from "@/constant/approvedEmail.template";
-import { MemberFormType, MemberProfileType } from "@/types";
+import { generateNbcId, generatePassword, generateMemberId, timestampToDate } from "./utils.backend";
+import uploadFileToFirestore from "./uploadFileToFirestore";
 import applicaionInfo from "@/constant/applicaiton-info.json";
-
+import approvedEmailTemplate from "@/constant/approvedEmail.template";
+import { MemberFormType, MemberProfileType, MemberPartialProfileType } from "@/types";
 
 interface GetDocumentsOptions {
     query?: string;
@@ -23,37 +22,55 @@ const getMemberProfile = cache(async (docId: string): Promise<MemberProfileType>
     return memberProfile;
 });
 
-const getMembersProfile = cache(async (options: GetDocumentsOptions = {}) => {
+const getMembersPartialProfile = cache(async (options: GetDocumentsOptions = {}) => {
     const { query, lastDocId } = options;
 
     let collectionQuery = db.collection("members").orderBy("club.joinedOn");
 
     if (query) {
         collectionQuery = collectionQuery.where("club.status", "==", query);
-    }
-
-    const totalCountQuery = collectionQuery;
-    const totalCountSnapshot = await totalCountQuery.get();
-    const totalCount = totalCountSnapshot.docs.length;
+    };
 
     if (lastDocId) {
         const lastDocRef = await db.collection("members").doc(lastDocId).get();
         if (lastDocRef.exists) {
             collectionQuery = collectionQuery.startAfter(lastDocRef);
         }
-    }
+    };
 
-    const docCollection = await collectionQuery.limit(9).get();
+    const [docCollection, totalCountSnapshot] = await Promise.all([
+        collectionQuery.limit(9).get(),
+        collectionQuery.get()
+    ]);
 
-    const members = docCollection.docs.map(doc => {
+    const totalCount = totalCountSnapshot.docs.length;
+    const mapToPartialProfile = (doc: FirebaseFirestore.DocumentSnapshot): MemberPartialProfileType => {
         const memberData = doc.data() as MemberProfileType;
-        memberData.club.joinedOn = timestampToDate(memberData.club.joinedOn) as Date;
-        memberData.personal.dateOfBirth = timestampToDate(memberData.personal.dateOfBirth) as Date;
-        return memberData;
-    });
+
+        return {
+            club: {
+                nbcId: memberData.club.nbcId,
+                position: memberData.club.position
+            },
+            educational: {
+                institute: memberData.educational.institute
+            },
+            id: memberData.id,
+            identification: {
+                email: memberData.identification.email
+            },
+            personal: {
+                fullName: memberData.personal.fullName,
+                picture: memberData.personal.picture
+            }
+        };
+    };
+
+    const members = docCollection.docs.map(mapToPartialProfile);
 
     return { members, totalCount };
 });
+
 
 
 const submitMemberRequest = async (formData: MemberFormType) => {
@@ -82,7 +99,7 @@ const submitMemberRequest = async (formData: MemberFormType) => {
     const docRef = db.collection("members").doc();
 
     const memberProfile: MemberProfileType = {
-        id: docRef.id,
+        id: generateMemberId(),
         personal: {
             fullName: formData.fullName,
             dateOfBirth: formData.dateOfBirth,
@@ -106,8 +123,7 @@ const submitMemberRequest = async (formData: MemberFormType) => {
             studentID: formData.studentID
         },
         club: {
-            tempID: generateTemporaryId(),
-            nbcId: "",
+            nbcId: 0,
             password: "",
             interestedIn: formData.interestedIn,
             reason: formData.joiningReason || "",
@@ -159,7 +175,7 @@ const updateStatus = async (docId: string, status: string) => {
             html: approvedEmailTemplate({
                 applicantName: memberProfile.personal.fullName,
                 applicantPosition: memberProfile.club.position,
-                applicationId: memberProfile.club.tempID,
+                applicationId: memberProfile.id,
                 nbcId,
                 password
             })
@@ -171,4 +187,4 @@ const updateStatus = async (docId: string, status: string) => {
 
 
 
-export { submitMemberRequest, getMembersProfile, getMemberProfile, updatePermissions, updateStatus };
+export { submitMemberRequest, getMembersPartialProfile, getMemberProfile, updatePermissions, updateStatus };

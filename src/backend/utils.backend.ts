@@ -13,23 +13,24 @@ function timestampToDate(input: firestore.Timestamp | Date): Date | null {
     }
 };
 
-function generateTemporaryId(): string {
+function generateMemberId(): string {
     const now = new Date();
-    const year = now.getFullYear();
+    const year = String(now.getFullYear()).slice(-2);
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const datePart = `${year}${month}${day}`;
 
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let randomPart = '';
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
         randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
     return `${datePart}${randomPart}`;
-};
+}
 
-async function generateNbcId(): Promise<string> {
+
+async function generateNbcId(): Promise<number> {
     const membersRef = db.collection('members');
 
     const lastMemberSnapshot = await membersRef
@@ -38,14 +39,13 @@ async function generateNbcId(): Promise<string> {
         .get();
 
     if (lastMemberSnapshot.empty) {
-        return 'NBC1000';
+        return 100000;
     }
 
-    const lastNbcId = lastMemberSnapshot.docs[0].get('club.nbcId') as string;
-    const numericPart = parseInt(lastNbcId.replace('NBC', ''), 10);
+    const lastNbcId = lastMemberSnapshot.docs[0].get('club.nbcId') as number;
 
-    return `NBC${numericPart + 1}`;
-};
+    return lastNbcId + 1;
+}
 
 const generatePassword = () => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -57,4 +57,4 @@ const generatePassword = () => {
     return password;
 }
 
-export { timestampToDate, generateTemporaryId, generateNbcId, generatePassword };
+export { timestampToDate, generateMemberId, generateNbcId, generatePassword };
