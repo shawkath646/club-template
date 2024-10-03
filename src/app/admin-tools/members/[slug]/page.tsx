@@ -6,7 +6,9 @@ import { formatDate } from "@/utils";
 import { PagePropsType } from "@/types";
 import ButtonContainer from "./ButtonsContainer";
 import MemberPermissions from "./MemberPermissions";
-import DownloadButtons from "./DownloadButtons";
+import DownloadButtons from "./ProfilePictureDownloadButton";
+import PDFDownloadButton from "./PDFDownloadButton";
+import ProfilePictureDownloadButton from "./ProfilePictureDownloadButton";
 
 export async function generateMetadata(
     { params: { slug } }: PagePropsType,
@@ -49,7 +51,10 @@ export default async function Page({ params }: PagePropsType) {
                     <h1 className="text-2xl font-semibold">{memberProfile.personal.fullName}</h1>
                     <p className="text-gray-500 dark:text-gray-400">Application ID: {memberProfile.id}</p>
                 </div>
-                <DownloadButtons applicationId={memberProfile.id} profilePictureUrl={memberProfile.personal.picture} />
+                <div className="flex flex-col items-center justify-center text-center gap-2">
+                    <PDFDownloadButton applicationId={memberProfile.id} />
+                    {!!memberProfile.personal.picture && <ProfilePictureDownloadButton applicationId={memberProfile.id} profilePictureUrl={memberProfile.personal.picture} />}
+                </div>
             </section>
 
             {/* Personal Information Section */}
