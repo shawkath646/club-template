@@ -6,9 +6,10 @@ import { formatDate } from "@/utils";
 import { PagePropsType } from "@/types";
 import ButtonContainer from "./ButtonsContainer";
 import MemberPermissions from "./MemberPermissions";
+import DownloadButtons from "./DownloadButtons";
 
 export async function generateMetadata(
-    {params: { slug }}: PagePropsType,
+    { params: { slug } }: PagePropsType,
 ): Promise<Metadata> {
     const memberProfile = await getMemberProfile(slug);
     return {
@@ -36,16 +37,19 @@ export default async function Page({ params }: PagePropsType) {
     return (
         <>
             {/* Header */}
-            <section className="text-center space-y-4 mb-8">
-                <Image
-                    src={memberProfile.personal.picture}
-                    alt={`${memberProfile.personal.fullName} profile picture`}
-                    height={120}
-                    width={120}
-                    className="rounded-full border-4 border-yellow-500 dark:border-yellow-400 object-cover w-[120px] h-[120px] mx-auto"
-                />
-                <h1 className="text-2xl font-semibold">{memberProfile.personal.fullName}</h1>
-                <p className="text-gray-500 dark:text-gray-400">Application ID: {memberProfile.id}</p>
+            <section className="mb-8 grid lg:grid-cols-2 gap-5">
+                <div className="text-center space-y-4">
+                    <Image
+                        src={memberProfile.personal.picture}
+                        alt={`${memberProfile.personal.fullName} profile picture`}
+                        height={120}
+                        width={120}
+                        className="rounded-full border-4 border-yellow-500 dark:border-yellow-400 object-cover w-[120px] h-[120px] mx-auto"
+                    />
+                    <h1 className="text-2xl font-semibold">{memberProfile.personal.fullName}</h1>
+                    <p className="text-gray-500 dark:text-gray-400">Application ID: {memberProfile.id}</p>
+                </div>
+                <DownloadButtons applicationId={memberProfile.id} profilePictureUrl={memberProfile.personal.picture} />
             </section>
 
             {/* Personal Information Section */}

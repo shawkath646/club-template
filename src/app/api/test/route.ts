@@ -71,49 +71,49 @@ export async function POST() {
 
   // await Promise.all(updatePromises);
 
-  return NextResponse.json({ message: `Action done.` }, { status: 200 });
+  // return NextResponse.json({ message: `Action done.` }, { status: 200 });
 
 
 
-  // const dirName = "C:/Users/Shawkat Hossain/Desktop/NBC Backup/profile";
+  const dirName = "C:/Users/Shawkat Hossain/Desktop/NBC Backup/profile";
 
-  // if (!fs.existsSync(dirName)) {
-  //   fs.mkdirSync(dirName, { recursive: true });
-  // }
+  if (!fs.existsSync(dirName)) {
+    fs.mkdirSync(dirName, { recursive: true });
+  }
 
-  // const [files] = await storage.bucket().getFiles({ prefix: 'profile_' });
+  const [files] = await storage.bucket().getFiles({ prefix: 'profile_' });
 
-  // for (const file of files) {
-  //   const [metadata] = await file.getMetadata();
-  //   const contentType = metadata.contentType;
+  for (const file of files) {
+    const [metadata] = await file.getMetadata();
+    const contentType = metadata.contentType;
 
-  //   let extension = '';
-  //   if (contentType) {
-  //     switch (contentType) {
-  //       case 'image/jpeg':
-  //         extension = '.jpg';
-  //         break;
-  //       case 'image/png':
-  //         extension = '.png';
-  //         break;
-  //       case 'image/gif':
-  //         extension = '.gif';
-  //         break;
-  //       case 'image/webp':
-  //         extension = '.webp';
-  //         break;
-  //       default:
-  //         extension = '.bin';
-  //     }
-  //   }
+    let extension = '';
+    if (contentType) {
+      switch (contentType) {
+        case 'image/jpeg':
+          extension = '.jpg';
+          break;
+        case 'image/png':
+          extension = '.png';
+          break;
+        case 'image/gif':
+          extension = '.gif';
+          break;
+        case 'image/webp':
+          extension = '.webp';
+          break;
+        default:
+          extension = '.bin';
+      }
+    }
 
-  //   const fileName = file.name + extension;
-  //   const localFilePath = path.join(dirName, fileName);
+    const fileName = file.name + extension;
+    const localFilePath = path.join(dirName, fileName);
 
-  //   await file.download({ destination: localFilePath });
+    await file.download({ destination: localFilePath });
 
-  //   console.log(`Downloaded file: ${fileName}`);
-  // }
+    console.log(`Downloaded file: ${fileName}`);
+  }
 
-  // return NextResponse.json({ message: `Action done. backup saved to ${dirName}` }, { status: 200 });
+  return NextResponse.json({ message: `Action done. backup saved to ${dirName}` }, { status: 200 });
 }

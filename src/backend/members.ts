@@ -6,7 +6,7 @@ import sendMail from "@/config/nodemailer.config";
 import { generateNbcId, generatePassword, generateMemberId, timestampToDate } from "./utils.backend";
 import uploadFileToFirestore from "./uploadFileToFirestore";
 import applicaionInfo from "@/constant/applicaiton-info.json";
-import approvedEmailTemplate from "@/constant/approvedEmail.template";
+import approvedEmailTemplate from "@/components/templates/approvedEmail.template";
 import { MemberFormType, MemberProfileType, MemberPartialProfileType } from "@/types";
 
 interface GetDocumentsOptions {

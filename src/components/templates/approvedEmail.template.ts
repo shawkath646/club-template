@@ -1,7 +1,18 @@
 import applicationInfo from "@/constant/applicaiton-info.json";
 
-export default function approvedEmailTemplate({ applicantName, applicationId, applicantPosition, nbcId, password }: { applicantName: string; applicationId: string; applicantPosition: string; nbcId: number; password: string; }) {
-    return `
+const approvedEmailTemplate = ({
+  applicantName,
+  applicationId,
+  applicantPosition,
+  nbcId, password
+}: {
+  applicantName: string;
+  applicationId: string;
+  applicantPosition: string;
+  nbcId: number;
+  password: string;
+}) => {
+  return `
     <!DOCTYPE html>
 <html>
 <head>
@@ -110,4 +121,6 @@ export default function approvedEmailTemplate({ applicantName, applicationId, ap
 </html>
 
     `;
-}
+};
+
+export default approvedEmailTemplate;
