@@ -15,7 +15,7 @@ export default async function Page() {
         { name: 'Documents', icon: <HiDocumentText size={28} />, href: "/admin-tools/documents" },
         { name: 'Members', icon: <FaUser size={28} />, href: "/admin-tools/members" },
         { name: 'Tasks', icon: <FaTasks size={28} />, href: "/admin-tools/tasks" },
-        { name: 'Donation', icon: <FaDonate size={28} />, href: "/admin-tools/donation" },
+        { name: 'Payments', icon: <FaDonate size={28} />, href: "/admin-tools/payments" },
         { name: 'History', icon: <FaHistory size={28} />, href: "/admin-tools/history" },
     ];
 

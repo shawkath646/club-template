@@ -11,15 +11,19 @@ import { FaUniversity } from "react-icons/fa";
 
 export default function ExistingMemberList({ preloadExistingMembers, totalExistingMembers }: { preloadExistingMembers: MemberPartialProfileType[]; totalExistingMembers: number; }) {
 
+    const [isLoading, setLoading] = useState(false);
     const [existingMemberList, setExistingMemberList] = useState(preloadExistingMembers);
 
     const onLoadMore = async () => {
+        setLoading(true);
         try {
             const lastDocId = existingMemberList[existingMemberList.length - 1]?.id;
             const response = await getMembersPartialProfile({ lastDocId, query: "approved" });
             setExistingMemberList(prev => [...prev, ...response.members]);
         } catch (error) {
             console.log(`Error: ${error}`);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -59,7 +63,6 @@ export default function ExistingMemberList({ preloadExistingMembers, totalExisti
                                 </Link>
                             </div>
                         </div>
-                        {/* Information below the image */}
                         <div className="mt-4 space-y-2">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Position:{" "}
@@ -77,7 +80,7 @@ export default function ExistingMemberList({ preloadExistingMembers, totalExisti
             </div>
             {(existingMemberList.length < totalExistingMembers) && (
                 <div className="mt-10 text-center">
-                    <StylistButton size="sm" colorScheme="green" onClick={onLoadMore}>Load more...</StylistButton>
+                    <StylistButton size="sm" colorScheme="green" onClick={onLoadMore} isLoading={isLoading}>Load more...</StylistButton>
                 </div>
             )}
         </section>

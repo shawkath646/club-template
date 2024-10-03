@@ -38,7 +38,19 @@ export async function POST() {
 
 
 
+  // const docs = await db.collection("members").where("club.status", "==", "pending").get();
+  // for (const doc of docs.docs) {
+  //   const docId = doc.id;
 
+  //   const [signedUrl] = await storage.bucket().file(`profile_${docId}`).getSignedUrl({
+  //     action: 'read',
+  //     expires: expireOn
+  //   });
+
+  //   await doc.ref.set({ personal: { picture: signedUrl } }, { merge: true });
+
+  //   console.log(`Done ${docId}`);
+  // }
 
 
 
@@ -69,7 +81,7 @@ export async function POST() {
   //   fs.mkdirSync(dirName, { recursive: true });
   // }
 
-  // const [files] = await storage.bucket().getFiles({ prefix: 'picture_' });
+  // const [files] = await storage.bucket().getFiles({ prefix: 'profile_' });
 
   // for (const file of files) {
   //   const [metadata] = await file.getMetadata();

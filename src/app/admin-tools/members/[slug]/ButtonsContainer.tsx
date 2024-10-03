@@ -14,7 +14,6 @@ export default function ButtonContainer({ docId, status }: { docId: string; stat
     const changeStatus = async(status: string) => {
         setLoading(true);
         await updateStatus(docId, status);
-        setLoading(false);
         router.push(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members`);
     };
 

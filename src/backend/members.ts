@@ -96,17 +96,17 @@ const submitMemberRequest = async (formData: MemberFormType) => {
         };
     };
 
-    const docRef = db.collection("members").doc();
+    const applicationId = generateMemberId()
 
     const memberProfile: MemberProfileType = {
-        id: generateMemberId(),
+        id: applicationId,
         personal: {
             fullName: formData.fullName,
             dateOfBirth: formData.dateOfBirth,
             gender: formData.gender,
             fatherName: formData.fatherName,
             motherName: formData.motherName,
-            picture: await uploadFileToFirestore(formData.profilePic as string, { fileName: `picture_${docRef.id}`, fileType: "image" }),
+            picture: await uploadFileToFirestore(formData.profilePic as string, { fileName: `profile_${applicationId}`, fileType: "image" }),
             address: formData.address
         },
         identification: {
@@ -135,7 +135,7 @@ const submitMemberRequest = async (formData: MemberFormType) => {
         },
     };
 
-    await docRef.set(memberProfile);
+    await db.collection("members").doc(applicationId).set(memberProfile);
 
     return {
         status: true,

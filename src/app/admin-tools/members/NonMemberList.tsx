@@ -4,22 +4,26 @@ import Image from "next/image";
 import { useState } from "react";
 import StylistButton from "@/components/form/StylistButton";
 import { getMembersPartialProfile } from "@/backend/members";
-import { MemberProfileType, MemberPartialProfileType } from "@/types";
+import { MemberPartialProfileType } from "@/types";
 import { MdEmail } from "react-icons/md";
 import { FaUniversity } from "react-icons/fa";
 
 
 export default function NonMemberList({ preloadPendingMembers, totalPendingMembers }: { preloadPendingMembers: MemberPartialProfileType[]; totalPendingMembers: number }) {
 
+    const [isLoading, setLoading] = useState(false);
     const [pendingMemberList, setPendingMemberList] = useState(preloadPendingMembers);
 
     const onLoadMore = async () => {
+        setLoading(true);
         try {
             const lastDocId = preloadPendingMembers[preloadPendingMembers.length - 1]?.id;
             const response = await getMembersPartialProfile({ lastDocId, query: "approved" });
             setPendingMemberList(prev => [...prev, ...response.members]);
         } catch (error) {
             console.log(`Error: ${error}`);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -76,7 +80,7 @@ export default function NonMemberList({ preloadPendingMembers, totalPendingMembe
             </div>
             {(pendingMemberList.length < totalPendingMembers) && (
                 <div className="mt-10 text-center">
-                    <StylistButton size="sm" colorScheme="green" onClick={onLoadMore}>Load more...</StylistButton>
+                    <StylistButton size="sm" colorScheme="green" onClick={onLoadMore} isLoading={isLoading}>Load more...</StylistButton>
                 </div>
             )}
         </section>
