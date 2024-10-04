@@ -13,12 +13,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import validationSchema from './formValidation';
 import { submitMemberRequest } from '@/backend/members';
 import { fileToBase64, getTodayDate } from '@/utils';
-import { DialogStateType, MemberFormType } from '@/types';
-import applicaitonInfo from "@/constant/applicaiton-info.json";
+import { ClubInfoType, DialogStateType, MemberFormType } from '@/types';
 import joiningFormOptions from "@/constant/joiningFormOptions.json";
 
 
-export default function JoiningFormClient({ registrationPosition }: { registrationPosition: string }) {
+export default function JoiningFormClient({ clubInfo, registrationPosition }: { clubInfo: ClubInfoType; registrationPosition: string }) {
 
   const [dialogState, setDialogState] = useState<DialogStateType>({
     isOpen: false,
@@ -63,7 +62,7 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
 
   return (
     <>
-      <h2 className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-200 bg-blue-500 bg-opacity-20 rounded py-5">{applicaitonInfo.name} e-Registration Form ({registrationPosition})</h2>
+      <h2 className="text-center text-2xl font-semibold text-gray-800 dark:text-gray-200 bg-blue-500 bg-opacity-20 rounded py-5">{clubInfo.name} e-Registration Form ({registrationPosition})</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-10">
         <p className="text-gray-700 dark:text-gray-400 text-sm font-medium">Personal Information</p>
         <hr className="h-px mb-3 mt-2 bg-gray-300 border-0 dark:bg-gray-700" />
@@ -139,7 +138,7 @@ export default function JoiningFormClient({ registrationPosition }: { registrati
           <StylistButton type="submit" colorScheme="blue" isLoading={isSubmitting} loadingLabel="Submitting..." size="md" className="mt-5 mx-auto">Submit</StylistButton>
         </div>
       </form>
-      <SubmittingDialog dialogState={dialogState} setDialogState={setDialogState} />
+      <SubmittingDialog dialogState={dialogState} setDialogState={setDialogState} clubInfo={clubInfo} />
     </>
   );
 };

@@ -5,13 +5,12 @@ import InputField from "@/components/form/InputField";
 import StylistButton from "@/components/form/StylistButton";
 import { verifyDocument } from "@/backend/document";
 import { formatDate } from "@/utils";
-import { DocumentVerificationType } from "@/types";
-import applicationInfo from "@/constant/applicaiton-info.json";
+import { ClubInfoType, DocumentVerificationType } from "@/types";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FaFileCircleCheck } from "react-icons/fa6";
 
 
-export default function DocumentVerifyClient({ defaultPageData, defaultDocId }: { defaultPageData: DocumentVerificationType; defaultDocId?: string }) {
+export default function DocumentVerifyClient({ clubInfo, defaultPageData, defaultDocId }: { clubInfo: ClubInfoType; defaultPageData: DocumentVerificationType; defaultDocId?: string }) {
 
     const [pageData, setPageData] = useState<DocumentVerificationType>(defaultPageData);
 
@@ -38,7 +37,7 @@ export default function DocumentVerifyClient({ defaultPageData, defaultDocId }: 
                         {errors.docId && <p className="mt-2 text-xs text-red-500 dark:text-red-400">{errors.docId.message}</p>}
                     </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400 my-5 max-w-[400px]">
-                        Note: The document verification ID can be found at the top right corner beside the QR code on documents issued by {applicationInfo.name}. Alternatively, scanning the QR code will automatically redirect you to the verification page.
+                        Note: The document verification ID can be found at the top right corner beside the QR code on documents issued by {clubInfo.name}. Alternatively, scanning the QR code will automatically redirect you to the verification page.
                     </p>
                 </div>
                 {!!pageData.statusText && (

@@ -1,6 +1,7 @@
-import applicationInfo from "@/constant/applicaiton-info.json";
+"use server";
+import getClubInfo from "@/constant/getClubInfo";
 
-const approvedEmailTemplate = ({
+const approvedEmailTemplate = async ({
   applicantName,
   applicationId,
   applicantPosition,
@@ -12,6 +13,9 @@ const approvedEmailTemplate = ({
   nbcId: number;
   password: string;
 }) => {
+
+  const clubInfo = await getClubInfo();
+
   return `
     <!DOCTYPE html>
 <html>
@@ -78,15 +82,15 @@ const approvedEmailTemplate = ({
   <div class="container">
     <!-- Header Section -->
     <div class="header">
-      <h1>${applicationInfo.name}</h1>
+      <h1>${clubInfo.name}</h1>
     </div>
 
     <!-- Content Section -->
     <div class="content">
-      <h2>Welcome to ${applicationInfo.name}!</h2>
+      <h2>Welcome to ${clubInfo.name}!</h2>
       <p>Dear ${applicantName},</p>
       <p>
-        We are excited to inform you that your application to join ${applicationInfo.name} has been approved! Your journey with us begins now, and we are thrilled to have you as part of our team.
+        We are excited to inform you that your application to join ${clubInfo.name} has been approved! Your journey with us begins now, and we are thrilled to have you as part of our team.
       </p>
       <p>
         <strong>Application ID:</strong> ${applicationId}<br>
@@ -107,12 +111,12 @@ const approvedEmailTemplate = ({
 
     <!-- Footer Section -->
     <div class="footer">
-      <p>&copy; 2024 ${applicationInfo.name}. All rights reserved.</p>
+      <p>&copy; 2024 ${clubInfo.name}. All rights reserved.</p>
       <p>
-        Facebook: <a href="${applicationInfo.social.facebook}" class="link">${applicationInfo.social.facebook}</a><br>
+        Facebook: <a href="${clubInfo.social.facebookPage}" class="link">${clubInfo.social.facebookPage}</a><br>
         Website: <a href="${process.env.NEXT_PUBLIC_APP_BASE_URL}" class="link">${process.env.NEXT_PUBLIC_APP_BASE_URL}</a><br>
-        Phone: ${applicationInfo.contacts.phone}<br>
-        Email: <a href="mailto:${applicationInfo.contacts.email}" class="link">${applicationInfo.contacts.email}</a>
+        Phone: ${clubInfo.contacts.phoneNumber}<br>
+        Email: <a href="mailto:${clubInfo.contacts.email}" class="link">${clubInfo.contacts.email}</a>
       </p>
       <p>This email is created by CloudBurst Lab Application.</p>
     </div>

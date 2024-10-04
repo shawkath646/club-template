@@ -6,14 +6,13 @@ import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import navMenuRoutes from "@/constant/navMenuRoutes.json";
+import { ClubInfoType } from "@/types";
 import { FaUser, FaUserCircle, FaUserPlus, FaBars } from "react-icons/fa";
 import { IoMdExit, IoMdSettings } from "react-icons/io";
-import applicationInfo from "@/constant/applicaiton-info.json";
-import navMenuRoutes from "@/constant/navMenuRoutes.json";
-import headerLogo from "@/assets/headerLogo.png";
 
 
-export default function Navbar({ session }: { session: Session | null }) {
+export default function Navbar({ clubInfo, session }: { clubInfo: ClubInfoType; session: Session | null }) {
     const [hasScrolled, setHasScrolled] = useState(false);
     const pathname = usePathname();
 
@@ -44,8 +43,8 @@ export default function Navbar({ session }: { session: Session | null }) {
                     href="/"
                     className={`flex space-x-1 items-center text-lg ${hasScrolled ? "text-white" : "text-black dark:text-gray-200"} dark:text-gray-200" font-medium hover:text-blue-500 dark:hover:text-blue-400 transition-all`}
                 >
-                    <Image src={headerLogo} height={50} width={50} alt={`${applicationInfo.name} logo`} />
-                    <p>{applicationInfo.name}</p>
+                    <Image src={clubInfo.logo} height={50} width={50} alt={`${clubInfo.name} logo`} />
+                    <p>{clubInfo.name}</p>
                 </Link>
 
                 <div className="flex items-center space-x-3 md:space-x-5">

@@ -1,6 +1,6 @@
 "use server";
 import { v4 as uuidv4 } from 'uuid';
-import { storage } from '@/config/firebase.config';
+import { bucket } from '@/config/firebase.config';
 
 const uploadFileToFirestore = async (
     data: string,
@@ -20,7 +20,7 @@ const uploadFileToFirestore = async (
         let imageBuffer = Buffer.from(base64Data, 'base64');
 
         const fileName = options?.fileName ?? `file_${uuidv4()}`;
-        const fileRef = storage.bucket().file(fileName);
+        const fileRef = bucket.file(fileName);
 
         const fileExists = await fileRef.exists();
         if (fileExists[0]) await fileRef.delete();

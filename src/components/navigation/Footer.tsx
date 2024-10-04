@@ -1,9 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import applicationInfo from "@/constant/applicaiton-info.json";
-import headerLogo from "@/assets/headerLogo.png";
+import getClubInfo from "@/constant/getClubInfo";
 
 export default async function Footer() {
+
+    const clubInfo = await getClubInfo();
+
     return (
         <footer className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-8">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,8 +13,8 @@ export default async function Footer() {
 
                     <section>
                         <div className="flex items-center space-x-4">
-                            <Image src={headerLogo} alt={`${applicationInfo.name} Logo`} className="h-12 w-12" />
-                            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{applicationInfo.name}</h1>
+                            <Image src={clubInfo.logo} alt={`${clubInfo.name} Logo`} height={48} width={48} className="h-12 w-12" />
+                            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{clubInfo.name}</h1>
                         </div>
 
                         <nav className="flex space-x-6 mt-8">
@@ -29,12 +31,12 @@ export default async function Footer() {
                     </section>
 
                     <div className="mt-6 sm:mt-0 flex flex-col space-y-2">
-                        <p className="text-gray-600 dark:text-gray-400">Phone: {applicationInfo.contacts.phone}</p>
+                        <p className="text-gray-600 dark:text-gray-400">Phone: {clubInfo.contacts.phoneNumber}</p>
                         <p className="text-gray-600 dark:text-gray-400">Email:&nbsp;
-                            <Link href={`mailto:${applicationInfo.contacts.email}`}>{applicationInfo.contacts.email}</Link>
+                            <Link href={`mailto:${clubInfo.contacts.email}`}>{clubInfo.contacts.email}</Link>
                         </p>
-                        <p className="text-gray-600 dark:text-gray-400 text-wrap">Address: {applicationInfo.address}</p>
-                        <Link href={applicationInfo.social.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
+                        <p className="text-gray-600 dark:text-gray-400 text-wrap">Address: {clubInfo.address}</p>
+                        <Link href={clubInfo.social.facebookPage} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
                             Follow us on Facebook
                         </Link>
                     </div>
@@ -46,7 +48,7 @@ export default async function Footer() {
                     </p>
 
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 sm:mt-0">
-                        © 2022 - 2024 All rights reserved by {applicationInfo.name}
+                        © 2022 - 2024 All rights reserved by {clubInfo.name}
                     </p>
                 </div>
             </div>

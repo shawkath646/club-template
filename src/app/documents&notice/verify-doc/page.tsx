@@ -1,5 +1,6 @@
 import DocumentVerifyClient from "@/app/documents&notice/verify-doc/DocumentVerifyClient";
 import { verifyDocument } from "@/backend/document";
+import getClubInfo from "@/constant/getClubInfo";
 import { DocumentVerificationType, PagePropsType } from "@/types";
 
 export default async function Page({ searchParams }: PagePropsType) {
@@ -7,5 +8,7 @@ export default async function Page({ searchParams }: PagePropsType) {
 
     const defaultPageData: DocumentVerificationType = paramsDocId ? await verifyDocument(paramsDocId) : {};
 
-    return <DocumentVerifyClient defaultPageData={defaultPageData} defaultDocId={paramsDocId} />;
+    const clubInfo = await getClubInfo();
+
+    return <DocumentVerifyClient defaultPageData={defaultPageData} defaultDocId={paramsDocId} clubInfo={clubInfo} />;
 }

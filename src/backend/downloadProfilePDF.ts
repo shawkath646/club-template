@@ -1,20 +1,20 @@
 "use server";
 import chromium from '@sparticuz/chromium-min';
 import puppeteer from 'puppeteer-core';
-import profileStatementTemplate from "@/components/templates/profileStatement.template";
+import profilePDFTemplate from "@/templates/profilePDF.template";
 
-const downloadProfileStatement = async (applicationId: string) => {
+const downloadProfilePDF = async (applicationId: string) => {
     const isLocal = !!process.env.CHROME_EXECUTABLE_PATH;
 
     const browser = await puppeteer.launch({
         args: isLocal ? puppeteer.defaultArgs() : chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: process.env.CHROME_EXECUTABLE_PATH,
+        executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath(),
         headless: chromium.headless,
     });
     const page = await browser.newPage();
 
-    const template = await profileStatementTemplate(applicationId);
+    const template = await profilePDFTemplate(applicationId);
 
     await page.setContent(template);
 
@@ -28,4 +28,4 @@ const downloadProfileStatement = async (applicationId: string) => {
     return pdfBuffer;
 };
 
-export default downloadProfileStatement;
+export default downloadProfilePDF;

@@ -1,24 +1,23 @@
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getMemberProfile } from "@/backend/members";
 import { formatDate } from "@/utils";
-import { PagePropsType } from "@/types";
 import ButtonContainer from "./ButtonsContainer";
 import MemberPermissions from "./MemberPermissions";
-import DownloadButtons from "./ProfilePictureDownloadButton";
 import PDFDownloadButton from "./PDFDownloadButton";
 import ProfilePictureDownloadButton from "./ProfilePictureDownloadButton";
+import { PagePropsType } from "@/types";
 
 export async function generateMetadata(
     { params: { slug } }: PagePropsType,
 ): Promise<Metadata> {
     const memberProfile = await getMemberProfile(slug);
     return {
-        title: memberProfile.personal.fullName
+        title: memberProfile?.personal.fullName ?? "Member not found"
     }
 };
-
 
 export default async function Page({ params }: PagePropsType) {
     const memberDocId = params.slug;
@@ -35,6 +34,8 @@ export default async function Page({ params }: PagePropsType) {
 
         return (statusColors[status] || "bg-gray-500/20 text-gray-500") + " inline-flex items-center w-fit px-3 py-1 text-sm font-semibold rounded-full";
     };
+
+    if (!memberProfile) return redirect(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/not-found`);
 
     return (
         <>
@@ -100,7 +101,15 @@ export default async function Page({ params }: PagePropsType) {
                             <tr>
                                 <td className="font-semibold py-2">Email</td>
                                 <td className="p-2">:</td>
-                                <td>{memberProfile.identification.email}</td>
+                                <td>
+                                    <Link
+                                        href={"mailto:" + memberProfile.identification.email}
+                                        target="_blank"
+                                        className="inline-block w-full text-blue-500 dark:text-blue-400 hover:text-blue-600 transition-colors truncate"
+                                    >
+                                        {memberProfile.identification.email}
+                                    </Link>
+                                </td>
                             </tr>
                             <tr>
                                 <td className="font-semibold py-2">Phone</td>

@@ -2,20 +2,19 @@
 import Image from "next/image";
 import { Dispatch, SetStateAction } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import applicaitonInfo from "@/constant/applicaiton-info.json";
-import { DialogStateType } from "@/types";
+import { ClubInfoType, DialogStateType } from "@/types";
 import { FaCheck, FaSpinner } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
-import headerLogo from "@/assets/headerLogo.png";
 
 
 
 interface SubmittingDialogType {
-    dialogState: DialogStateType,
-    setDialogState: Dispatch<SetStateAction<DialogStateType>>
+    dialogState: DialogStateType;
+    setDialogState: Dispatch<SetStateAction<DialogStateType>>;
+    clubInfo: ClubInfoType;
 }
 
-export default function SubmittingDialog({ dialogState, setDialogState }: SubmittingDialogType) {
+export default function SubmittingDialog({ clubInfo, dialogState, setDialogState }: SubmittingDialogType) {
     return (
         <Dialog open={dialogState.isOpen} onClose={() => { }} className="relative z-10">
             <div className="fixed inset-0 bg-black/50 dark:bg-black/70" aria-hidden="true" />
@@ -25,14 +24,14 @@ export default function SubmittingDialog({ dialogState, setDialogState }: Submit
 
                     <div className="flex items-center justify-center mb-8 space-x-2">
                         <Image
-                            src={headerLogo}
+                            src={clubInfo.logo}
                             height={48}
                             width={48}
-                            alt={`${applicaitonInfo.name} Logo`}
+                            alt={`${clubInfo.name} Logo`}
                             className="w-10 h-10 md:w-12 md:h-12"
                         />
                         <h3 className="text-lg lg:text-xl text-gray-800 dark:text-gray-200">
-                            {applicaitonInfo.name}
+                            {clubInfo.name}
                         </h3>
                     </div>
 

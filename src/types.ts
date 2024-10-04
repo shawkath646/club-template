@@ -130,3 +130,19 @@ export interface LoginFormType {
     nbcId: string;
     password: string;
 }
+
+export interface ClubInfoType {
+    name: string;
+    slogan: string;
+    address: string;
+    contacts: {
+        email: string;
+        phoneNumber: string;
+    }
+    establishedOn: Date;
+    logo: string;
+    social: {
+        facebookPage: string;
+        facebookGroup: string;
+    }
+}

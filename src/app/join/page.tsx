@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import JoiningFormClient from "./JoiningFormClient";
+import getClubInfo from '@/constant/getClubInfo';
 import { PagePropsType } from "@/types";
 
 export async function generateMetadata(
@@ -35,5 +36,7 @@ export default async function Page({ searchParams }: PagePropsType) {
       break;
   };
 
-  return <JoiningFormClient registrationPosition={registrationPosition} />;
+  const clubInfo = await getClubInfo();
+
+  return <JoiningFormClient clubInfo={clubInfo} registrationPosition={registrationPosition} />;
 }

@@ -5,8 +5,8 @@ import { db } from "@/config/firebase.config";
 import sendMail from "@/config/nodemailer.config";
 import { generateNbcId, generatePassword, generateMemberId, timestampToDate } from "./utils.backend";
 import uploadFileToFirestore from "./uploadFileToFirestore";
-import applicaionInfo from "@/constant/applicaiton-info.json";
-import approvedEmailTemplate from "@/components/templates/approvedEmail.template";
+import approvedEmailTemplate from "@/templates/approvedEmail.template";
+import getClubInfo from "@/constant/getClubInfo";
 import { MemberFormType, MemberProfileType, MemberPartialProfileType } from "@/types";
 
 interface GetDocumentsOptions {
@@ -14,8 +14,9 @@ interface GetDocumentsOptions {
     lastDocId?: string;
 }
 
-const getMemberProfile = cache(async (docId: string): Promise<MemberProfileType> => {
+const getMemberProfile = cache(async (docId: string) => {
     const docRef = await db.collection("members").doc(docId).get();
+    if (!docRef.exists) return null;
     const memberProfile = docRef.data() as MemberProfileType;
     memberProfile.personal.dateOfBirth = timestampToDate(memberProfile.personal.dateOfBirth) as Date;
     memberProfile.club.joinedOn = timestampToDate(memberProfile.club.joinedOn) as Date;
@@ -148,9 +149,10 @@ const updatePermissions = async (docId: string, permissions: string[]) => {
 };
 
 const updateStatus = async (docId: string, status: string) => {
-    const userRef = db.collection("members").doc(docId);
-
     let clubObject;
+
+    const clubInfo = await getClubInfo();
+    const userRef = db.collection("members").doc(docId);
 
     if (status === "approved") {
 
@@ -168,23 +170,36 @@ const updateStatus = async (docId: string, status: string) => {
             joinedOn
         };
 
-        await sendMail({
-            from: process.env.NODE_MAILER_ID,
-            to: memberProfile.identification.email,
-            subject: `🎉 Congratulations! Your Application to ${applicaionInfo.name} Has Been Approved`,
-            html: approvedEmailTemplate({
-                applicantName: memberProfile.personal.fullName,
-                applicantPosition: memberProfile.club.position,
-                applicationId: memberProfile.id,
-                nbcId,
-                password
-            })
-        });
+        try {
+            await sendMail({
+                from: process.env.NODE_MAILER_ID,
+                to: memberProfile.identification.email,
+                subject: `🎉 Congratulations! Your Application to ${clubInfo.name} Has Been Approved`,
+                html: await approvedEmailTemplate({
+                    applicantName: memberProfile.personal.fullName,
+                    applicantPosition: memberProfile.club.position,
+                    applicationId: memberProfile.id,
+                    nbcId,
+                    password
+                })
+            });
+        } catch (error) {
+            console.error(error)
+        }
     } else clubObject = { status };
 
     await userRef.set({ club: clubObject }, { merge: true });
 };
 
+const getAllMembersProfile = cache(async () => {
+    const docSnapshot = await db.collection("members").get();
 
+    return docSnapshot.docs.map(doc => {
+        const profile = doc.data() as MemberProfileType;
+        profile.personal.dateOfBirth = timestampToDate(profile.personal.dateOfBirth) as Date;
+        profile.club.joinedOn = timestampToDate(profile.club.joinedOn) as Date;
+        return profile;
+    });
+});
 
-export { submitMemberRequest, getMembersPartialProfile, getMemberProfile, updatePermissions, updateStatus };
+export { submitMemberRequest, getMembersPartialProfile, getMemberProfile, updatePermissions, updateStatus, getAllMembersProfile };

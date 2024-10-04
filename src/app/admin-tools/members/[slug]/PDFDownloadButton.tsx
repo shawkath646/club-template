@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import StylistButton from "@/components/form/StylistButton";
-import downloadProfileStatement from "@/backend/downloadProfileStatement";
+import downloadProfilePDF from "@/backend/downloadProfilePDF";
 
 export default function PDFDownloadButton({ applicationId }: { applicationId: string; }) {
 
@@ -10,7 +10,7 @@ export default function PDFDownloadButton({ applicationId }: { applicationId: st
     const handlePDFDownload = async () => {
         setLoading(true);
 
-        const pdfBuffer = await downloadProfileStatement(applicationId);
+        const pdfBuffer = await downloadProfilePDF(applicationId);
 
         const blob = new Blob([new Uint8Array(pdfBuffer).buffer]);
 

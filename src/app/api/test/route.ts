@@ -1,31 +1,33 @@
-import uploadFileToFirestore from "@/backend/uploadFileToFirestore";
-import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import uploadFileToFirestore from "@/backend/uploadFileToFirestore";
+import { NextResponse } from "next/server";
 import { generateNbcId } from "@/backend/utils.backend";
 import { MemberProfileType } from "@/types";
-import { db, storage } from "@/config/firebase.config";
+import { db, bucket } from "@/config/firebase.config";
 
 export async function POST() {
-  // const filePath = path.join("C:/Users/Shawkat Hossain/Downloads", "picture_uOShSDZ3dOHT6lh5MlB6");
+
+  // const today = new Date();
+  // const expireOn = new Date(today.setFullYear(today.getFullYear() + 50));
+
+  // const filePath = path.join("C:/Users/Shawkat Hossain/Downloads", `club_logo`);
 
   // const fileBuffer = fs.readFileSync(filePath);
 
   // const base64Image = Buffer.from(fileBuffer).toString('base64');
 
-  // const mimeType = "image/jpeg"; 
+  // const mimeType = "image/png"; 
 
   // const base64ImageData = `data:${mimeType};base64,${base64Image}`;
 
   // const downloadUrl = await uploadFileToFirestore(base64ImageData, {
-  //   fileName: "picture_uOShSDZ3dOHT6lh5MlB6",
   //   fileType: "image",
+  //   fileName: "club_logo"
   // });
 
   // return NextResponse.json({ downloadUrl }, { status: 200 });
 
-  // const today = new Date();
-  // const expireOn = new Date(today.setFullYear(today.getFullYear() + 50));
 
   // const fileRef = storage.bucket().file("profile_2410022QM9");
 
@@ -71,49 +73,5 @@ export async function POST() {
 
   // await Promise.all(updatePromises);
 
-  // return NextResponse.json({ message: `Action done.` }, { status: 200 });
-
-
-
-  const dirName = "C:/Users/Shawkat Hossain/Desktop/NBC Backup/profile";
-
-  if (!fs.existsSync(dirName)) {
-    fs.mkdirSync(dirName, { recursive: true });
-  }
-
-  const [files] = await storage.bucket().getFiles({ prefix: 'profile_' });
-
-  for (const file of files) {
-    const [metadata] = await file.getMetadata();
-    const contentType = metadata.contentType;
-
-    let extension = '';
-    if (contentType) {
-      switch (contentType) {
-        case 'image/jpeg':
-          extension = '.jpg';
-          break;
-        case 'image/png':
-          extension = '.png';
-          break;
-        case 'image/gif':
-          extension = '.gif';
-          break;
-        case 'image/webp':
-          extension = '.webp';
-          break;
-        default:
-          extension = '.bin';
-      }
-    }
-
-    const fileName = file.name + extension;
-    const localFilePath = path.join(dirName, fileName);
-
-    await file.download({ destination: localFilePath });
-
-    console.log(`Downloaded file: ${fileName}`);
-  }
-
-  return NextResponse.json({ message: `Action done. backup saved to ${dirName}` }, { status: 200 });
-}
+  return NextResponse.json({ message: `Action done.` }, { status: 200 });
+};
