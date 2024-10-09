@@ -22,8 +22,6 @@ export default function ProfilePictureDownloadButton({ applicationId }: { applic
         setLoading(false);
     };
 
-
-
     return (
         <StylistButton colorScheme="green" isLoading={isLoading} onClick={handleImageDownload} className="text-sm">
             Download Profile Picture

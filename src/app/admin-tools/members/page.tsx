@@ -8,7 +8,6 @@ import NoItemFound from "@/components/NoItemFound";
 import { getMembersPartialProfile } from "@/backend/members";
 import { PagePropsType } from "@/types";
 
-
 export const metadata: Metadata = {
     title: "Member Management"
 };

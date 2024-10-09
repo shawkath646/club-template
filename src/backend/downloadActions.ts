@@ -1,19 +1,24 @@
 "use server";
-import chromium from '@sparticuz/chromium-min';
 import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium-min';
 import { bucket } from '@/config/firebase.config';
 import profilePDFTemplate from "@/templates/profilePDF.template";
 
 
 const downloadProfilePDF = async (applicationId: string) => {
-    const isLocal = !!process.env.CHROME_EXECUTABLE_PATH;
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
+    const executablePath = isDevelopment
+        ? process.env.CHROME_EXECUTABLE_PATH
+        : await chromium.executablePath();
 
     const browser = await puppeteer.launch({
-        args: isLocal ? puppeteer.defaultArgs() : chromium.args,
+        args: isDevelopment ? puppeteer.defaultArgs() : chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath(),
+        executablePath,
         headless: chromium.headless,
     });
+
     const page = await browser.newPage();
 
     const template = await profilePDFTemplate(applicationId);
@@ -21,8 +26,8 @@ const downloadProfilePDF = async (applicationId: string) => {
     await page.setContent(template);
 
     const pdfBuffer = await page.pdf({
-        format: "A4",
-        printBackground: true
+        format: 'A4',
+        printBackground: true,
     });
 
     await browser.close();
