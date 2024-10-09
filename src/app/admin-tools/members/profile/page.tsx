@@ -11,17 +11,27 @@ import ProfilePictureDownloadButton from "./ProfilePictureDownloadButton";
 import { PagePropsType } from "@/types";
 
 export async function generateMetadata(
-    { params: { slug } }: PagePropsType,
+    { searchParams }: PagePropsType,
 ): Promise<Metadata> {
-    const memberProfile = await getMemberProfile(slug);
+    let userId = searchParams.id;
+
+    if (Array.isArray(userId)) userId = userId[0];
+    if (!userId) return { title: "Invalid ID provided" };
+
+    const memberProfile = await getMemberProfile(userId);
     return {
-        title: memberProfile?.personal.fullName ?? "Member not found"
-    }
+        title: memberProfile?.personal?.fullName || "Member not found"
+    };
 };
 
-export default async function Page({ params }: PagePropsType) {
-    const memberDocId = params.slug;
-    const memberProfile = await getMemberProfile(memberDocId);
+
+export default async function Page({ searchParams }: PagePropsType) {
+
+    let userId = searchParams.id;
+    if (Array.isArray(userId)) userId = userId[0];
+    if (!userId) return redirect(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/not-found`);
+
+    const memberProfile = await getMemberProfile(userId);
 
     const getStatusLabel = (status: string): string => {
         const statusColors: { [key: string]: string } = {
@@ -39,7 +49,6 @@ export default async function Page({ params }: PagePropsType) {
 
     return (
         <>
-            {/* Header */}
             <section className="mb-8 grid lg:grid-cols-2 gap-5">
                 <div className="text-center space-y-4">
                     <Image
@@ -54,11 +63,10 @@ export default async function Page({ params }: PagePropsType) {
                 </div>
                 <div className="flex flex-col items-center justify-center text-center gap-2">
                     <PDFDownloadButton applicationId={memberProfile.id} />
-                    {!!memberProfile.personal.picture && <ProfilePictureDownloadButton applicationId={memberProfile.id} profilePictureUrl={memberProfile.personal.picture} />}
+                    {!!memberProfile.personal.picture && <ProfilePictureDownloadButton applicationId={memberProfile.id} />}
                 </div>
             </section>
 
-            {/* Personal Information Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <section className="bg-gray-100 dark:bg-black/20 p-4 rounded-lg shadow-sm">
                     <h2 className="font-semibold text-lg mb-4">Personal Information</h2>
@@ -93,7 +101,6 @@ export default async function Page({ params }: PagePropsType) {
                     </table>
                 </section>
 
-                {/* Identification Section */}
                 <section className="bg-gray-100 dark:bg-black/20 p-4 rounded-lg shadow-sm">
                     <h2 className="font-semibold text-lg mb-4">Identification</h2>
                     <table className="min-w-full table-auto text-left">
@@ -139,7 +146,6 @@ export default async function Page({ params }: PagePropsType) {
                 </section>
             </div>
 
-            {/* Educational Information Section */}
             <section className="bg-gray-100 dark:bg-black/20 p-4 rounded-lg shadow-sm mb-8">
                 <h2 className="font-semibold text-lg mb-4">Educational Information</h2>
                 <table className="min-w-full table-auto text-left">
@@ -173,7 +179,6 @@ export default async function Page({ params }: PagePropsType) {
                 </table>
             </section>
 
-            {/* Club Information Section */}
             <section className="bg-gray-100 dark:bg-black/20 p-4 rounded-lg shadow-sm">
                 <h2 className="font-semibold text-lg mb-4">Club Information</h2>
                 <table className="min-w-full table-auto text-left">

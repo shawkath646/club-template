@@ -1,7 +1,9 @@
 "use server";
 import chromium from '@sparticuz/chromium-min';
 import puppeteer from 'puppeteer-core';
+import { bucket } from '@/config/firebase.config';
 import profilePDFTemplate from "@/templates/profilePDF.template";
+
 
 const downloadProfilePDF = async (applicationId: string) => {
     const isLocal = !!process.env.CHROME_EXECUTABLE_PATH;
@@ -28,4 +30,11 @@ const downloadProfilePDF = async (applicationId: string) => {
     return pdfBuffer;
 };
 
-export default downloadProfilePDF;
+const downloadProfilePicture = async (applicationId: string) => {
+    const fileRef = bucket.file(`profile_${applicationId}`);
+    const [buffer] = await fileRef.download();
+    const base64Image = buffer.toString('base64');
+    return base64Image;
+};
+
+export { downloadProfilePDF, downloadProfilePicture };

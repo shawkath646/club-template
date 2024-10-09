@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import StylistButton from "@/components/form/StylistButton";
-import downloadProfilePDF from "@/backend/downloadProfilePDF";
+import { downloadProfilePDF } from "@/backend/downloadActions";
 
 export default function PDFDownloadButton({ applicationId }: { applicationId: string; }) {
 

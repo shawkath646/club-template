@@ -41,9 +41,7 @@ const profilePDFTemplate = async (applicationId: string) => {
 
           header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #ddd;
+            margin-bottom: 45px;
           }
 
           .header-title {
@@ -76,6 +74,10 @@ const profilePDFTemplate = async (applicationId: string) => {
             text-align: right;
           }
 
+          .mt-2 {
+            margin-top: 10px;
+          }
+
           .info h2 {
             font-size: 22px;
             margin-bottom: 15px;
@@ -94,8 +96,15 @@ const profilePDFTemplate = async (applicationId: string) => {
             border: 1px solid #ddd;
           }
 
+          .td-center {
+            text-align: center;
+            vertical-align: middle;
+            width: 100%;
+          }
+
           .info th {
             background-color: #f4f4f4;
+            white-space: nowrap;
           }
 
           footer {
@@ -135,23 +144,37 @@ const profilePDFTemplate = async (applicationId: string) => {
             </div>
             <p class="header-slogan">${clubInfo.slogan}</p>
             <p class="text">
-              Address | Email:
+              Email:
               <a href="mailto:${clubInfo.contacts.email}" target="_blank"
                 >${clubInfo.contacts.email}</a
               >
               | Phone: ${clubInfo.contacts.phoneNumber}
             </p>
-            <p class="text text-right">
+            <p class="text">
+              Address: ${clubInfo.address}
+            </p>
+            <p class="text text-right mt-2">
               <strong>Generated
                 at:</strong> ${today.toLocaleString()}
             </p>
-            <h3>Profile Summary</h3>
+            <h2>Profile Summary</h2>
           </header>
 
           <!-- Profile Information Section -->
           <div class="info page-break-after">
             <h2>Personal Information</h2>
             <table>
+              <tr>
+                <th>Picture</th>
+                <td class="td-center">
+                  <img 
+                    src="${memberProfile.personal.picture}" 
+                    alt="${memberProfile.personal.fullName} picture" 
+                    width="100" 
+                    style="display: block; margin: 0 auto;" 
+                  />
+                </td>
+              </tr>
               <tr>
                 <th>Full Name</th>
                 <td>${memberProfile.personal.fullName}</td>
@@ -283,7 +306,6 @@ const profilePDFTemplate = async (applicationId: string) => {
         </div>
       </body>
     </html>
-
   `);
 };
 

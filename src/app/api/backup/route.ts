@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { bucket } from "@/config/firebase.config";
 import { getAllMembersProfile } from "@/backend/members";
 
-export async function GET() {
+export async function POST() {
   try {
     const today = new Date();
     const formattedDate = today.toISOString().replace(/[:.]/g, "-");

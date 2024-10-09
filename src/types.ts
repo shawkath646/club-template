@@ -76,6 +76,7 @@ export interface MemberPartialProfileType {
         institute: string;
     },
     club: {
+        status: "approved" | "pending" | "rejected" | "suspended";
         nbcId: number;
         position: string;
     }
@@ -114,7 +115,7 @@ export interface MemberProfileType {
         interestedIn: string;
         extraCurricularActivities: string;
         position: string;
-        status: string;
+        status: "approved" | "pending" | "rejected" | "suspended";
         joinedOn: Date | Timestamp;
     },
 }

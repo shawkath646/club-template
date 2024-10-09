@@ -31,4 +31,11 @@ function formatDate(input: Date | null, locale: string = 'en-US'): string {
     return input.toLocaleDateString(locale, options);
 };
 
-export { getTodayDate, formatDate, fileToBase64 };
+const wordCapitalizer = (baseWord: string) => (
+    baseWord.replace("-", " ")
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+);
+
+export { getTodayDate, formatDate, fileToBase64, wordCapitalizer };

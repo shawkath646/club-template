@@ -10,8 +10,9 @@ import getClubInfo from "@/constant/getClubInfo";
 import { MemberFormType, MemberProfileType, MemberPartialProfileType } from "@/types";
 
 interface GetDocumentsOptions {
-    query?: string;
-    lastDocId?: string;
+    query: "approved" | "pending" | "suspended" | "rejected";
+    pageNumber: number;
+    filterBy?: string;
 }
 
 const getMemberProfile = cache(async (docId: string) => {
@@ -23,40 +24,37 @@ const getMemberProfile = cache(async (docId: string) => {
     return memberProfile;
 });
 
-const getMembersPartialProfile = cache(async (options: GetDocumentsOptions = {}) => {
-    const { query, lastDocId } = options;
+const getMembersPartialProfile = cache(async (options: GetDocumentsOptions) => {
+    const { query, pageNumber, filterBy } = options;
 
-    let collectionQuery = db.collection("members").orderBy("club.joinedOn");
+    let collectionQuery = db.collection("members")
+        .orderBy("club.joinedOn", "desc")
+        .where("club.status", "==", query);
 
-    if (query) {
-        collectionQuery = collectionQuery.where("club.status", "==", query);
-    };
-
-    if (lastDocId) {
-        const lastDocRef = await db.collection("members").doc(lastDocId).get();
-        if (lastDocRef.exists) {
-            collectionQuery = collectionQuery.startAfter(lastDocRef);
-        }
-    };
+    if (filterBy && filterBy !== "all") {
+        collectionQuery = collectionQuery.where("club.position", "==", filterBy);
+    }
 
     const [docCollection, totalCountSnapshot] = await Promise.all([
-        collectionQuery.limit(9).get(),
+        collectionQuery.limit(12).offset((pageNumber - 1) * 12).get(),
         collectionQuery.get()
     ]);
 
-    const totalCount = totalCountSnapshot.docs.length;
+    const totalMembers = totalCountSnapshot.docs.length;
+
     const mapToPartialProfile = (doc: FirebaseFirestore.DocumentSnapshot): MemberPartialProfileType => {
         const memberData = doc.data() as MemberProfileType;
 
         return {
             club: {
+                status: memberData.club.status,
                 nbcId: memberData.club.nbcId,
                 position: memberData.club.position
             },
             educational: {
                 institute: memberData.educational.institute
             },
-            id: memberData.id,
+            id: doc.id,
             identification: {
                 email: memberData.identification.email
             },
@@ -69,8 +67,10 @@ const getMembersPartialProfile = cache(async (options: GetDocumentsOptions = {})
 
     const members = docCollection.docs.map(mapToPartialProfile);
 
-    return { members, totalCount };
+    return { members, totalMembers };
 });
+
+
 
 
 
