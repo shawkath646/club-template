@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { auth } from "@/config/auth.config";
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import getClubInfo from "@/constant/getClubInfo";
@@ -43,9 +44,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             </div>
           </div>
         </main>
+        <Analytics />
         <Footer />
       </body>
     </html>
-
   );
 }

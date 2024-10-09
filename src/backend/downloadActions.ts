@@ -10,7 +10,7 @@ const downloadProfilePDF = async (applicationId: string) => {
 
     const executablePath = isDevelopment
         ? process.env.CHROME_EXECUTABLE_PATH
-        : await chromium.executablePath();
+        : await chromium.executablePath("https://github.com/Sparticuz/chromium/releases/download/v129.0.0/chromium-v129.0.0-pack.tar");
 
     const browser = await puppeteer.launch({
         args: isDevelopment ? puppeteer.defaultArgs() : chromium.args,
