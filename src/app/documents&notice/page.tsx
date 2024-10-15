@@ -3,7 +3,7 @@ import Link from "next/link";
 import NoItemFound from "@/components/NoItemFound";
 import { getAllDocuments } from "@/backend/document";
 import { DocumentType } from "@/types";
-import { formatDate } from "@/utils";
+import { formatDate } from "@/utils/utils.frontend";
 import { FaArrowRightLong } from "react-icons/fa6";
 
 
@@ -83,7 +83,7 @@ function DocumentList({ documents }: { documents: DocumentType[] }) {
                             </td>
                             <td className="py-2 px-4">{doc.title}</td>
                             <td className="py-2 px-4">{doc.fileName}</td>
-                            <td className="py-2 px-4">{formatDate(doc.issuedOn as Date)}</td>
+                            <td className="py-2 px-4">{formatDate(doc.issuedOn)}</td>
                             <td className="py-2 px-4 text-center">
                                 <Link href={doc.downloadLink} download className="text-blue-500 hover:underline dark:text-blue-400">Download</Link>
                             </td>

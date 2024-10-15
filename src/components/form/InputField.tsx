@@ -12,8 +12,7 @@ interface InputFieldType extends InputHTMLAttributes<HTMLInputElement> {
 const InputField = forwardRef<HTMLInputElement, InputFieldType>(
   ({ label, fieldId, error, type, ...rest }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
-
-
+    
     return (
       <div className="w-full">
         <label

@@ -2,13 +2,16 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { getMemberProfile } from "@/backend/members";
-import { formatDate } from "@/utils";
-import ButtonContainer from "./ButtonsContainer";
 import MemberPermissions from "./MemberPermissions";
 import PDFDownloadButton from "./PDFDownloadButton";
+import ButtonContainer from "./ButtonsContainer";
 import ProfilePictureDownloadButton from "./ProfilePictureDownloadButton";
+import { getMemberProfile } from "@/backend/members";
+import { formatDate } from "@/utils/utils.frontend";
+import getClubInfo from "@/constant/getClubInfo";
 import { PagePropsType } from "@/types";
+
+
 
 export async function generateMetadata(
     { searchParams }: PagePropsType,
@@ -31,6 +34,7 @@ export default async function Page({ searchParams }: PagePropsType) {
     if (Array.isArray(userId)) userId = userId[0];
     if (!userId) return redirect(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/not-found`);
 
+    const clubInfo = await getClubInfo();
     const memberProfile = await getMemberProfile(userId);
 
     const getStatusLabel = (status: string): string => {
@@ -75,7 +79,7 @@ export default async function Page({ searchParams }: PagePropsType) {
                             <tr>
                                 <td className="font-semibold py-2">Date of Birth</td>
                                 <td className="p-2">:</td>
-                                <td>{formatDate(memberProfile.personal.dateOfBirth as Date)}</td>
+                                <td>{formatDate(memberProfile.personal.dateOfBirth)}</td>
                             </tr>
                             <tr>
                                 <td className="font-semibold py-2">Gender</td>
@@ -205,7 +209,7 @@ export default async function Page({ searchParams }: PagePropsType) {
                         <tr>
                             <td className="font-semibold py-2">Joined On</td>
                             <td className="p-2">:</td>
-                            <td>{formatDate(memberProfile.club.joinedOn as Date)}</td>
+                            <td>{formatDate(memberProfile.club.joinedOn)}</td>
                         </tr>
                         <tr>
                             <td className="font-semibold py-2">Interested In</td>
@@ -223,7 +227,13 @@ export default async function Page({ searchParams }: PagePropsType) {
             {(memberProfile.club.status === "approved") && (
                 <MemberPermissions docId={memberProfile.id} preloadPermissions={memberProfile.club.permissions} />
             )}
-            <ButtonContainer docId={memberProfile.id} status={memberProfile.club.status} />
+            <ButtonContainer
+                clubInfo={clubInfo}
+                currentStatus={memberProfile.club.status}
+                docId={memberProfile.id}
+                position={memberProfile.club.position}
+                specialNote={memberProfile.club.specialNote}
+            />
         </>
     );
 }

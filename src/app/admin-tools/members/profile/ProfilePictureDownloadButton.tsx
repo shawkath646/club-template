@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import StylistButton from "@/components/form/StylistButton";
-import { downloadProfilePicture } from "@/backend/downloadActions";
+import { downloadProfilePicture } from "@/backend/members";
 
 export default function ProfilePictureDownloadButton({ applicationId }: { applicationId: string; }) {
 

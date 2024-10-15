@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import InputField from '@/components/form/InputField';
@@ -12,7 +11,7 @@ import SubmittingDialog from './SubmittingDialog';
 import { yupResolver } from '@hookform/resolvers/yup';
 import validationSchema from './formValidation';
 import { submitMemberRequest } from '@/backend/members';
-import { fileToBase64, getTodayDate } from '@/utils';
+import { fileToBase64, getTodayDate } from '@/utils/utils.frontend';
 import { ClubInfoType, DialogStateType, MemberFormType } from '@/types';
 import joiningFormOptions from "@/constant/joiningFormOptions.json";
 
@@ -25,14 +24,12 @@ export default function JoiningFormClient({ clubInfo, registrationPosition }: { 
     message: "",
   });
 
-  const { register, handleSubmit, control, setError, formState: { errors, isSubmitting } } = useForm<MemberFormType>({
+  const { register, handleSubmit, control, reset, setError, formState: { errors, isSubmitting } } = useForm<MemberFormType>({
     defaultValues: {
       position: registrationPosition.toLowerCase().replace(" ", "-")
     },
     resolver: yupResolver(validationSchema),
   });
-
-  const router = useRouter();
 
   const onSubmit: SubmitHandler<MemberFormType> = async (data) => {
     setDialogState({ isOpen: true, status: "loading", message: "Submitting your request..." });
@@ -46,8 +43,8 @@ export default function JoiningFormClient({ clubInfo, registrationPosition }: { 
       const response = await submitMemberRequest(resolvedData);
 
       if (response.status) {
+        reset();
         setDialogState({ isOpen: true, status: "success", message: "Form submitted successfully!" });
-        setTimeout(() => router.push("/"), 3000);
       } else if (!response.status && response.errors) {
         response.errors.forEach((err: { field: keyof MemberFormType; message: string }) => {
           setError(err.field, { type: "manual", message: err.message });

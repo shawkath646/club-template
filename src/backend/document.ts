@@ -2,7 +2,7 @@
 import { cache } from "react";
 import { db } from "@/config/firebase.config";
 import { DocumentVerificationType, DocumentType } from "@/types";
-import { timestampToDate } from "./utils.backend";
+import { timestampToDate } from "../utils/utils.backend";
 
 const verifyDocument = cache(async (docId: string): Promise<DocumentVerificationType> => {
     const docSnapshot = await db.collection("documents").doc(docId).get();
@@ -18,8 +18,8 @@ const verifyDocument = cache(async (docId: string): Promise<DocumentVerification
 
     const { id, issuedBy, issuedOn, issuedTo, status, validTo, title, verifiable } = docInfoAll;
 
-    const validToDate = timestampToDate(validTo) as Date;
-    const issuedOnDate = timestampToDate(issuedOn) as Date;
+    const validToDate = timestampToDate(validTo);
+    const issuedOnDate = timestampToDate(issuedOn);
 
     const docInfo = { id, issuedBy, issuedOn: issuedOnDate, issuedTo, status, validTo: validToDate, title };
 
@@ -71,8 +71,8 @@ const getAllDocuments = cache(async (options: GetDocumentsOptions = {}): Promise
 
     return docCollection.docs.map(doc => {
         const docData = doc.data() as DocumentType;
-        docData.issuedOn = timestampToDate(docData.issuedOn) as Date;
-        docData.validTo = timestampToDate(docData.validTo) as Date;
+        docData.issuedOn = timestampToDate(docData.issuedOn) ;
+        docData.validTo = timestampToDate(docData.validTo) ;
         return docData;
     });
 });

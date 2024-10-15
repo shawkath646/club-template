@@ -2,16 +2,15 @@
 import Link from "next/link";
 import { Fragment } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { wordCapitalizer } from "@/utils";
+import { capitalizeWords } from "@/utils/utils.frontend";
+import joiningFormOption from "@/constant/joiningFormOptions.json";
 import { FaChevronDown } from "react-icons/fa";
-
-const positions = ["president", "co-ordinator", "campus-representative", "member"];
 
 export default function DropdownPosition({ selected, filterByPrefix }: { selected?: string, filterByPrefix: string; }) {
     return (
         <Menu as="div" className="relative inline-block my-5">
             <MenuButton className="inline-flex items-center justify-between w-full rounded-md bg-black/20 dark:bg-black/30 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-black/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
-                {!!selected ? wordCapitalizer(selected) : "Filter"}
+                {!!selected ? capitalizeWords(selected) : "Filter"}
                 <FaChevronDown className="ml-2" />
             </MenuButton>
             <MenuItems className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none">
@@ -28,7 +27,7 @@ export default function DropdownPosition({ selected, filterByPrefix }: { selecte
                             All
                         </Link>
                     </MenuItem>
-                    {positions.map((item, index) => (
+                    {joiningFormOption.positions.map((item, index) => (
                         <MenuItem as={Fragment} key={index}>
                             <Link
                                 href={filterByPrefix + item}
@@ -38,7 +37,7 @@ export default function DropdownPosition({ selected, filterByPrefix }: { selecte
                                     } group flex w-full items-center px-4 py-2 text-sm transition-all ${(selected === item) ? "bg-gray-100 dark:bg-gray-700" : ""
                                     }`}
                             >
-                                {wordCapitalizer(item)}
+                                {capitalizeWords(item)}
                             </Link>
                         </MenuItem>
                     ))}

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import StylistButton from "@/components/form/StylistButton";
-import { downloadProfilePDF } from "@/backend/downloadActions";
+import profilePDFTemplate from "@/templates/profilePDF.template";
 
 export default function PDFDownloadButton({ applicationId }: { applicationId: string; }) {
 
@@ -9,21 +9,13 @@ export default function PDFDownloadButton({ applicationId }: { applicationId: st
 
     const handlePDFDownload = async () => {
         setLoading(true);
-
-        const pdfBuffer = await downloadProfilePDF(applicationId);
-
-        const blob = new Blob([new Uint8Array(pdfBuffer).buffer]);
-
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.hidden = true;
-        link.href = url;
-        link.download = `profile_statement_${applicationId}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
+        const pdfTemplate = await profilePDFTemplate(applicationId);
+        const newTab = window.open();
+        if (newTab) {
+            newTab.document.write(pdfTemplate);
+            newTab.document.close();
+            newTab.onload = () => newTab.print();
+        };
         setLoading(false);
     };
 

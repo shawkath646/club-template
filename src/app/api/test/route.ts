@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import uploadFileToFirestore from "@/backend/uploadFileToFirestore";
 import { NextResponse } from "next/server";
-import { generateNbcId } from "@/backend/utils.backend";
+import { generateNbcId } from "@/utils/utils.backend";
 import { MemberProfileType } from "@/types";
 import { db, bucket } from "@/config/firebase.config";
 

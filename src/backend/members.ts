@@ -1,13 +1,15 @@
 "use server";
 import { cache } from "react";
 import bcrypt from 'bcrypt';
-import { db } from "@/config/firebase.config";
+import { db, bucket } from "@/config/firebase.config";
 import sendMail from "@/config/nodemailer.config";
-import { generateNbcId, generatePassword, generateMemberId, timestampToDate } from "./utils.backend";
+import { capitalizeWords, generateRandomId, generateNbcId, generatePassword, timestampToDate } from "@/utils/utils.backend";
+import { setHistory } from "./history";
 import uploadFileToFirestore from "./uploadFileToFirestore";
 import approvedEmailTemplate from "@/templates/approvedEmail.template";
 import getClubInfo from "@/constant/getClubInfo";
 import { MemberFormType, MemberProfileType, MemberPartialProfileType } from "@/types";
+
 
 interface GetDocumentsOptions {
     query: "approved" | "pending" | "suspended" | "rejected";
@@ -19,8 +21,8 @@ const getMemberProfile = cache(async (docId: string) => {
     const docRef = await db.collection("members").doc(docId).get();
     if (!docRef.exists) return null;
     const memberProfile = docRef.data() as MemberProfileType;
-    memberProfile.personal.dateOfBirth = timestampToDate(memberProfile.personal.dateOfBirth) as Date;
-    memberProfile.club.joinedOn = timestampToDate(memberProfile.club.joinedOn) as Date;
+    memberProfile.personal.dateOfBirth = timestampToDate(memberProfile.personal.dateOfBirth) ;
+    memberProfile.club.joinedOn = timestampToDate(memberProfile.club.joinedOn) ;
     return memberProfile;
 });
 
@@ -70,9 +72,12 @@ const getMembersPartialProfile = cache(async (options: GetDocumentsOptions) => {
     return { members, totalMembers };
 });
 
-
-
-
+const downloadProfilePicture = async (applicationId: string) => {
+    const fileRef = bucket.file(`profile_${applicationId}`);
+    const [buffer] = await fileRef.download();
+    const base64Image = buffer.toString('base64');
+    return base64Image;
+};
 
 const submitMemberRequest = async (formData: MemberFormType) => {
     const errors: Array<{ field: keyof MemberFormType; message: string }> = [];
@@ -97,17 +102,17 @@ const submitMemberRequest = async (formData: MemberFormType) => {
         };
     };
 
-    const applicationId = generateMemberId()
+    const docId = "MEM" + generateRandomId(4);
 
     const memberProfile: MemberProfileType = {
-        id: applicationId,
+        id: docId,
         personal: {
             fullName: formData.fullName,
             dateOfBirth: formData.dateOfBirth,
             gender: formData.gender,
             fatherName: formData.fatherName,
             motherName: formData.motherName,
-            picture: await uploadFileToFirestore(formData.profilePic as string, { fileName: `profile_${applicationId}`, fileType: "image" }),
+            picture: await uploadFileToFirestore(formData.profilePic as string, { fileName: `profile_${docId}`, fileType: "image" }),
             address: formData.address
         },
         identification: {
@@ -136,25 +141,27 @@ const submitMemberRequest = async (formData: MemberFormType) => {
         },
     };
 
-    await db.collection("members").doc(applicationId).set(memberProfile);
+    await db.collection("members").doc(docId).set(memberProfile);
 
     return {
         status: true,
+        docId
     };
 };
 
 const updatePermissions = async (docId: string, permissions: string[]) => {
     const userRef = db.collection("members").doc(docId);
     await userRef.set({ club: { permissions } }, { merge: true });
+    await setHistory(docId, `Member permissions updated to ${permissions}`);
 };
 
-const updateStatus = async (docId: string, status: string) => {
+const updateStatus = async (docId: string, options: { status: MemberProfileType["club"]["status"], position: MemberProfileType["club"]["position"], specialNote?: string }) => {
     let clubObject;
 
     const clubInfo = await getClubInfo();
     const userRef = db.collection("members").doc(docId);
 
-    if (status === "approved") {
+    if (options.status === "approved") {
 
         const memberProfile = (await userRef.get()).data() as MemberProfileType;
 
@@ -164,17 +171,17 @@ const updateStatus = async (docId: string, status: string) => {
         const password = generatePassword();
 
         clubObject = {
-            status,
             nbcId,
             password: await bcrypt.hash(password, 10),
-            joinedOn
+            joinedOn,
+            ...options
         };
 
         try {
             await sendMail({
                 from: process.env.NODE_MAILER_ID,
                 to: memberProfile.identification.email,
-                subject: `🎉 Congratulations! Your Application to ${clubInfo.name} Has Been Approved`,
+                subject: `${clubInfo.name}: Your Application as ${capitalizeWords(memberProfile.club.position)} Has Been Approved`,
                 html: await approvedEmailTemplate({
                     applicantName: memberProfile.personal.fullName,
                     applicantPosition: memberProfile.club.position,
@@ -186,8 +193,11 @@ const updateStatus = async (docId: string, status: string) => {
         } catch (error) {
             console.error(error)
         }
-    } else clubObject = { status };
-
+        await setHistory(docId, `[setBy] approved member [setTo] as ${memberProfile.club.position}`);
+    } else {
+        clubObject = options;
+        await setHistory(docId, `[setBy] updated status of [setTo] to ${options.status}`);
+    }
     await userRef.set({ club: clubObject }, { merge: true });
 };
 
@@ -196,10 +206,18 @@ const getAllMembersProfile = cache(async () => {
 
     return docSnapshot.docs.map(doc => {
         const profile = doc.data() as MemberProfileType;
-        profile.personal.dateOfBirth = timestampToDate(profile.personal.dateOfBirth) as Date;
-        profile.club.joinedOn = timestampToDate(profile.club.joinedOn) as Date;
+        profile.personal.dateOfBirth = timestampToDate(profile.personal.dateOfBirth) ;
+        profile.club.joinedOn = timestampToDate(profile.club.joinedOn) ;
         return profile;
     });
 });
 
-export { submitMemberRequest, getMembersPartialProfile, getMemberProfile, updatePermissions, updateStatus, getAllMembersProfile };
+export {
+    submitMemberRequest,
+    getMembersPartialProfile,
+    getMemberProfile,
+    updatePermissions,
+    updateStatus,
+    getAllMembersProfile,
+    downloadProfilePicture
+};

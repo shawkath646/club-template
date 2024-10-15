@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { wordCapitalizer } from "@/utils";
+import { capitalizeWords } from "@/utils/utils.frontend";
 import { MemberPartialProfileType } from "@/types";
 import { MdEmail } from "react-icons/md";
 import { FaUniversity } from "react-icons/fa";
@@ -50,7 +50,7 @@ export default function MemberCard({ data }: { data: MemberPartialProfileType })
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                     Position:{" "}
                     <span className="font-semibold text-emerald-500">
-                        {wordCapitalizer(data.club.position)}
+                        {capitalizeWords(data.club.position)}
                     </span>
                 </p>
             </div>

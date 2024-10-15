@@ -17,25 +17,28 @@ const fileToBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
     });
 };
 
-function formatDate(input: Date | null, locale: string = 'en-US'): string {
-    if (!input) {
-        return 'Invalid Date';
-    }
-
-    const options: Intl.DateTimeFormatOptions = {
+const formatDate = (input: Date, { locale = 'en-US', isTime = false } = {}) => {
+    const dateOptions: Intl.DateTimeFormatOptions = {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
+        ...(isTime && { hour: 'numeric', minute: 'numeric', second: 'numeric' })
     };
 
-    return input.toLocaleDateString(locale, options);
+    return input.toLocaleDateString(locale, dateOptions);
 };
 
-const wordCapitalizer = (baseWord: string) => (
+
+const capitalizeWords = (baseWord: string) => (
     baseWord.replace("-", " ")
         .split(" ")
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ")
 );
 
-export { getTodayDate, formatDate, fileToBase64, wordCapitalizer };
+export {
+    getTodayDate,
+    formatDate,
+    fileToBase64,
+    capitalizeWords
+};

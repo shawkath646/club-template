@@ -37,10 +37,6 @@ const nextConfig = {
             bodySizeLimit: '10MB',
         },
     },
-    webpack: (config) => {
-        config.externals.push('@sparticuz/chromium-min', 'puppeteer-core');
-        return config;
-    },
 };
 
 export default bundleAnalyzer(nextConfig);

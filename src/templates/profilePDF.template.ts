@@ -1,10 +1,11 @@
 "use server";
-import getClubInfo from "@/constant/getClubInfo";
+import { cache } from "react";
 import { getMemberProfile } from "@/backend/members";
-import { formatDate } from "@/utils";
+import { formatDate } from "@/utils/utils.frontend";
+import getClubInfo from "@/constant/getClubInfo";
 import { MemberProfileType } from "@/types";
 
-const profilePDFTemplate = async (applicationId: string) => {
+const profilePDFTemplate = cache(async (applicationId: string) => {
 
   const clubInfo = await getClubInfo();
   const memberProfile = await getMemberProfile(applicationId) as MemberProfileType;
@@ -17,7 +18,7 @@ const profilePDFTemplate = async (applicationId: string) => {
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Profile Statement</title>
+        <title>${memberProfile.personal.fullName} | Profile Summury</title>
         <style>
           body {
             font-family: Arial, sans-serif;
@@ -37,6 +38,16 @@ const profilePDFTemplate = async (applicationId: string) => {
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+          }
+
+          @media print {
+            .container {
+              max-width: 100%;
+              padding: 0;
+              background-color: none
+              border-radius: 0;
+              box-shadow: none;
+            }
           }
 
           header {
@@ -96,15 +107,23 @@ const profilePDFTemplate = async (applicationId: string) => {
             border: 1px solid #ddd;
           }
 
+          .info th {
+            white-space: nowrap;
+          }
+
           .td-center {
             text-align: center;
             vertical-align: middle;
             width: 100%;
           }
 
-          .info th {
-            background-color: #f4f4f4;
-            white-space: nowrap;
+          @media print {
+            .info th {
+              background-color: #f4f4f4;
+              white-space: nowrap;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
           }
 
           footer {
@@ -170,7 +189,7 @@ const profilePDFTemplate = async (applicationId: string) => {
                   <img 
                     src="${memberProfile.personal.picture}" 
                     alt="${memberProfile.personal.fullName} picture" 
-                    width="100" 
+                    height="100" 
                     style="display: block; margin: 0 auto;" 
                   />
                 </td>
@@ -181,7 +200,7 @@ const profilePDFTemplate = async (applicationId: string) => {
               </tr>
               <tr>
                 <th>Date of Birth</th>
-                <td>${formatDate(memberProfile.personal.dateOfBirth as Date)}</td>
+                <td>${formatDate(memberProfile.personal.dateOfBirth )}</td>
               </tr>
               <tr>
                 <th>Gender</th>
@@ -275,7 +294,7 @@ const profilePDFTemplate = async (applicationId: string) => {
               </tr>
               <tr>
                 <th>Joined On</th>
-                <td>${formatDate(memberProfile.club.joinedOn as Date)}</td>
+                <td>${formatDate(memberProfile.club.joinedOn )}</td>
               </tr>
               <tr>
                 <th>Permissions</th>
@@ -307,6 +326,6 @@ const profilePDFTemplate = async (applicationId: string) => {
       </body>
     </html>
   `);
-};
+});
 
 export default profilePDFTemplate;

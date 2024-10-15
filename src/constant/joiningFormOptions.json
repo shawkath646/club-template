@@ -2,5 +2,6 @@
     "gender": ["male", "female", "other"],
     "educationalBackground": ["science", "business studies", "humanities", "vocational", "not applicable"],
     "presentClass": ["--- Select Option ---", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "Undergraduate 1st year", "Undergraduate 2nd year", "Undergraduate 3rd year", "Undergraduate 4th year", "Graduated"],
-    "interestedIn": ["articles", "olympiads", "magazine", "volunteering"]
+    "interestedIn": ["articles", "olympiads", "magazine", "volunteering"],
+    "positions": ["president", "co-ordinator", "campus-representative", "member"]
 }

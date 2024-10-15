@@ -40,7 +40,7 @@ const userSignIn = cache(async (credentials: LoginFormType) => {
         password: "Incorrect password"
     };
 
-    await signIn("credentials", { docId: userData.id, redirectTo: "/" });
+    await signIn("credentials", { docId: userData.id, redirectTo: userData.club.permissions.length ? "/admin-tools" : "/" });
 });
 
 export { getUserSession, userSignIn };

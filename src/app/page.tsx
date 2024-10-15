@@ -1,11 +1,12 @@
 import { Metadata } from "next";
 import Introduction from "@/components/home/Introduction";
 import DynamicBox from "@/components/home/DynamicBox";
+import getClubInfo from "@/constant/getClubInfo";
 
-export const metadata: Metadata = {
-  title: "Home"
+export async function generateMetadata(): Promise<Metadata> {
+  const clubInfo = await getClubInfo();
+  return { title: "Home | " + clubInfo.name };
 };
-
 
 export default async function Home() {
   return (

@@ -1,4 +1,3 @@
-import { Timestamp } from 'firebase-admin/firestore';
 
 export type PartialFields<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -15,7 +14,7 @@ export interface PagePropsType {
 export interface DialogStateType {
     isOpen: boolean;
     status: "initial" | "loading" | "success" | "failed";
-    message: string
+    message: string;
 }
 
 export interface DocumentType {
@@ -24,8 +23,8 @@ export interface DocumentType {
     title: string;
     issuedTo: string;
     issuedBy: string;
-    issuedOn: Date | Timestamp;
-    validTo: Date | Timestamp;
+    issuedOn: Date;
+    validTo: Date;
     format: string;
     fileName: string;
     downloadLink: string;
@@ -84,10 +83,9 @@ export interface MemberPartialProfileType {
 
 export interface MemberProfileType {
     id: string;
-
     personal: {
         fullName: string;
-        dateOfBirth: Date | Timestamp;
+        dateOfBirth: Date;
         gender: string;
         picture: string;
         fatherName: string;
@@ -116,15 +114,26 @@ export interface MemberProfileType {
         extraCurricularActivities: string;
         position: string;
         status: "approved" | "pending" | "rejected" | "suspended";
-        joinedOn: Date | Timestamp;
+        joinedOn: Date;
+        specialNote?: string;
     },
 }
 
 export interface NoticeFormType {
     title: string;
     description: string;
-    attachment: File | string | ArrayBuffer | null;
+    attachment?: File | string | ArrayBuffer | null;
     isImportant: boolean;
+}
+
+export interface NoticeType {
+    id: string;
+    title: string;
+    description: string;
+    attachment: string;
+    isImportant: boolean;
+    timestamp: Date;
+    seenBy: string[];
 }
 
 export interface LoginFormType {
@@ -146,4 +155,20 @@ export interface ClubInfoType {
         facebookPage: string;
         facebookGroup: string;
     }
+}
+
+export interface HistoryType {
+    id: string;
+    setBy: string;
+    setTo: string;
+    message: string;
+    timestamp: Date
+}
+
+export interface PaymentType {
+    id: string;
+    paymentMethod: string;
+    paymentFor: string;
+    last4digit: string;
+    transactionId: string;
 }

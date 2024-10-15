@@ -6,8 +6,6 @@ import { ClubInfoType, DialogStateType } from "@/types";
 import { FaCheck, FaSpinner } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
 
-
-
 interface SubmittingDialogType {
     dialogState: DialogStateType;
     setDialogState: Dispatch<SetStateAction<DialogStateType>>;
@@ -67,6 +65,5 @@ export default function SubmittingDialog({ clubInfo, dialogState, setDialogState
                 </DialogPanel>
             </div>
         </Dialog>
-
     );
-}
+};

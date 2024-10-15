@@ -1,5 +1,6 @@
 "use client";
 import { ControllerRenderProps, FieldError } from "react-hook-form";
+import { capitalizeWords } from "@/utils/utils.frontend";
 
 interface SelectBoxType {
     label: string;
@@ -28,8 +29,8 @@ export default function SelectBox({ field, label, options, error }: SelectBoxTyp
                 className="block w-full px-3 py-2 text-gray-700 dark:text-gray-300 bg-white/20 dark:bg-gray-800/20 border rounded-md shadow-sm focus:outline-none transition-all duration-200 aria-invalid:border-red-500 aria-invalid:focus:ring-red-500 border-gray-400 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 sm:text-sm sm:leading-5"
             >
                 {options.map((option) => (
-                    <option key={option} value={option}>
-                        {option}
+                    <option key={option} value={option} className="text-black">
+                        {capitalizeWords(option)}
                     </option>
                 ))}
             </select>

@@ -9,7 +9,7 @@ const validationSchema = yup.object().shape({
         .required("Description is required")
         .min(10, "Description must be at least 10 characters long")
         .max(1000, "Description must be at most 1000 characters long"),
-    attachment: yup.mixed<File | ArrayBuffer | string>().defined().nullable(),
+    attachment: yup.mixed<File | ArrayBuffer | string>().nullable(),
     isImportant: yup.boolean().defined()
 });
 

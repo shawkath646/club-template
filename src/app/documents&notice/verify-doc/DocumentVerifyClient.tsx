@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import InputField from "@/components/form/InputField";
 import StylistButton from "@/components/form/StylistButton";
 import { verifyDocument } from "@/backend/document";
-import { formatDate } from "@/utils";
+import { formatDate } from "@/utils/utils.frontend";
 import { ClubInfoType, DocumentVerificationType } from "@/types";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FaFileCircleCheck } from "react-icons/fa6";
@@ -83,12 +83,12 @@ export default function DocumentVerifyClient({ clubInfo, defaultPageData, defaul
                         <tr className="border-b border-gray-200 dark:border-gray-700">
                             <th className="text-left px-6 py-4 font-medium text-gray-700 dark:text-gray-300">Issued On</th>
                             <td className="px-2 py-4 font-semibold text-gray-500 dark:text-gray-400">:</td>
-                            <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{formatDate(pageData.docInfo.issuedOn as Date)}</td>
+                            <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{formatDate(pageData.docInfo.issuedOn)}</td>
                         </tr>
                         <tr>
                             <th className="text-left px-6 py-4 font-medium text-gray-700 dark:text-gray-300">Valid To</th>
                             <td className="px-2 py-4 font-semibold text-gray-500 dark:text-gray-400">:</td>
-                            <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{formatDate(pageData.docInfo.validTo as Date)}</td>
+                            <td className="px-6 py-4 text-gray-800 dark:text-gray-200">{formatDate(pageData.docInfo.validTo)}</td>
                         </tr>
                     </tbody>
                 </table>
