@@ -221,6 +221,11 @@ export default async function Page({ searchParams }: PagePropsType) {
                             <td className="p-2">:</td>
                             <td className="text-sm">{memberProfile.club.extraCurricularActivities}</td>
                         </tr>
+                        <tr>
+                            <td className="font-semibold py-2">Special Note</td>
+                            <td className="p-2">:</td>
+                            <td className="text-sm">{memberProfile.club.specialNote}</td>
+                        </tr>
                     </tbody>
                 </table>
             </section>

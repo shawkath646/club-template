@@ -154,6 +154,7 @@ export interface ClubInfoType {
     social: {
         facebookPage: string;
         facebookGroup: string;
+        messengerGroupPublic: string;
     }
 }
 

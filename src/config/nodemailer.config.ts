@@ -1,23 +1,32 @@
 "use server";
 import nodemailer from "nodemailer";
 import { MailOptions } from "nodemailer/lib/json-transport";
+import { db } from "./firebase.config";
+
+interface GmailApiTokensType {
+  access_token: string;
+  refresh_token: string;
+  scope: string;
+  token_type: string;
+  expiry_date: number;
+};
 
 export default async function sendMail(mailOptions: MailOptions) {
+  const tokensDoc = await db.collection("metadata").doc("gmail-api-tokens").get();
+  const tokens = tokensDoc.data() as GmailApiTokensType;
+
   const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-          user: process.env.NODE_MAILER_ID,
-          pass: process.env.NODE_MAILER_PASSWORD
-      },
+    service: 'gmail',
+    secure: true,
+    auth: {
+      type: 'OAuth2',
+      user: 'shcloudburstlabs@gmail.com',
+      clientId: process.env.GMAIL_API_ID,
+      clientSecret: process.env.GMAIL_API_SECRET,
+      refreshToken: tokens.refresh_token,
+      accessToken: tokens.access_token
+    },
   });
 
-  await new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (err, response) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(response);
-      }
-    });
-  });
-}
+  return await transporter.sendMail(mailOptions);
+};

@@ -4,7 +4,6 @@ import StylistButton from "@/components/form/StylistButton";
 import { MemberProfileType, ClubInfoType } from "@/types";
 import ConfirmDialog from "./ConfirmDialog";
 
-
 export default function ButtonContainer({
     docId,
     clubInfo,
@@ -19,32 +18,31 @@ export default function ButtonContainer({
     currentStatus: MemberProfileType["club"]["status"]
 }) {
 
-    const [isConfirmDialog, setConfirmDialog] = useState(false);
-    const [statusChangeTo, setStatusChangeTo] = useState<MemberProfileType["club"]["status"]>(currentStatus);
-
+    const [dialogState, setDialogState] = useState<{ isOpen: boolean; changeStatus: MemberProfileType["club"]["status"] }>({
+        isOpen: false,
+        changeStatus: currentStatus
+    });
 
     return (
         <>
             <section className="mt-10 flex items-center justify-end space-x-3">
                 {(currentStatus === "pending" || currentStatus === "suspended" || currentStatus === "rejected") && (
-                    <StylistButton colorScheme="green" size="md" onClick={() => { setStatusChangeTo("approved"); setConfirmDialog(true); }}>Approve</StylistButton>
+                    <StylistButton colorScheme="green" size="md" onClick={() => setDialogState({ isOpen: true, changeStatus: "approved" })}>Approve</StylistButton>
                 )}
                 {(currentStatus === "pending") && (
-                    <StylistButton colorScheme="red" size="md" onClick={() => { setStatusChangeTo("rejected"); setConfirmDialog(true); }}>Reject</StylistButton>
+                    <StylistButton colorScheme="red" size="md" onClick={() => setDialogState({ isOpen: true, changeStatus: "rejected" })}>Reject</StylistButton>
                 )}
                 {(currentStatus === "approved") && (
-                    <StylistButton colorScheme="yellow" size="md" onClick={() => { setStatusChangeTo("suspended"); setConfirmDialog(true); }}>Suspend</StylistButton>
+                    <StylistButton colorScheme="yellow" size="md" onClick={() => setDialogState({ isOpen: true, changeStatus: "suspended" })}>Suspend</StylistButton>
                 )}
             </section>
             <ConfirmDialog
                 clubInfo={clubInfo}
-                currentStatus={currentStatus}
                 docId={docId}
                 position={position}
                 specialNote={specialNote}
-                statusChangeTo={statusChangeTo}
-                isConfirmDialog={isConfirmDialog}
-                setConfirmDialog={setConfirmDialog}
+                dialogState={dialogState}
+                setDialogState={setDialogState}
             />
         </>
     );

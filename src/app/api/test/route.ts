@@ -1,10 +1,10 @@
-import fs from "fs";
-import path from "path";
-import uploadFileToFirestore from "@/backend/uploadFileToFirestore";
+// import fs from "fs";
+// import path from "path";
+// import uploadFileToFirestore from "@/backend/uploadFileToFirestore";
 import { NextResponse } from "next/server";
-import { generateNbcId } from "@/utils/utils.backend";
-import { MemberProfileType } from "@/types";
-import { db, bucket } from "@/config/firebase.config";
+// import { generateNbcId } from "@/utils/utils.backend";
+// import { MemberProfileType } from "@/types";
+// import { db, bucket } from "@/config/firebase.config";
 
 export async function POST() {
 
@@ -73,5 +73,8 @@ export async function POST() {
 
   // await Promise.all(updatePromises);
 
-  return NextResponse.json({ message: `Action done.` }, { status: 200 });
+
+
+
+  return NextResponse.json({ message: "mail send" }, { status: 200 });
 };

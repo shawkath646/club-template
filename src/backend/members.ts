@@ -7,6 +7,8 @@ import { capitalizeWords, generateRandomId, generateNbcId, generatePassword, tim
 import { setHistory } from "./history";
 import uploadFileToFirestore from "./uploadFileToFirestore";
 import approvedEmailTemplate from "@/templates/approvedEmail.template";
+import suspendedEmailTemplate from "@/templates/suspendedEmail.template";
+import rejectionEmailTemplate from "@/templates/rejectionEmail.template";
 import getClubInfo from "@/constant/getClubInfo";
 import { MemberFormType, MemberProfileType, MemberPartialProfileType } from "@/types";
 
@@ -21,8 +23,8 @@ const getMemberProfile = cache(async (docId: string) => {
     const docRef = await db.collection("members").doc(docId).get();
     if (!docRef.exists) return null;
     const memberProfile = docRef.data() as MemberProfileType;
-    memberProfile.personal.dateOfBirth = timestampToDate(memberProfile.personal.dateOfBirth) ;
-    memberProfile.club.joinedOn = timestampToDate(memberProfile.club.joinedOn) ;
+    memberProfile.personal.dateOfBirth = timestampToDate(memberProfile.personal.dateOfBirth);
+    memberProfile.club.joinedOn = timestampToDate(memberProfile.club.joinedOn);
     return memberProfile;
 });
 
@@ -155,29 +157,35 @@ const updatePermissions = async (docId: string, permissions: string[]) => {
     await setHistory(docId, `Member permissions updated to ${permissions}`);
 };
 
-const updateStatus = async (docId: string, options: { status: MemberProfileType["club"]["status"], position: MemberProfileType["club"]["position"], specialNote?: string }) => {
+const updateStatus = async (
+    docId: string,
+    options: {
+        status: MemberProfileType["club"]["status"],
+        position: MemberProfileType["club"]["position"],
+        specialNote?: string
+    }
+) => {
     let clubObject;
 
     const clubInfo = await getClubInfo();
     const userRef = db.collection("members").doc(docId);
 
-    if (options.status === "approved") {
+    const memberProfile = (await userRef.get()).data() as MemberProfileType;
 
-        const memberProfile = (await userRef.get()).data() as MemberProfileType;
-
-        const nbcId = memberProfile.club.nbcId || await generateNbcId();
-        const joinedOn = memberProfile.club.nbcId ? memberProfile.club.joinedOn : new Date();
-
-        const password = generatePassword();
-
-        clubObject = {
-            nbcId,
-            password: await bcrypt.hash(password, 10),
-            joinedOn,
-            ...options
-        };
-
-        try {
+    try {
+        if (options.status === "approved" && !memberProfile.club.nbcId) {
+            const nbcId = await generateNbcId();
+            const joinedOn = memberProfile.club.nbcId ? memberProfile.club.joinedOn : new Date();
+    
+            const password = generatePassword();
+    
+            clubObject = {
+                nbcId,
+                password: await bcrypt.hash(password, 10),
+                joinedOn,
+                ...options
+            };
+    
             await sendMail({
                 from: process.env.NODE_MAILER_ID,
                 to: memberProfile.identification.email,
@@ -187,16 +195,46 @@ const updateStatus = async (docId: string, options: { status: MemberProfileType[
                     applicantPosition: memberProfile.club.position,
                     applicationId: memberProfile.id,
                     nbcId,
-                    password
+                    password,
+                    specialNote: memberProfile.club.specialNote
                 })
             });
-        } catch (error) {
-            console.error(error)
+            await setHistory(docId, `[setBy] approved member [setTo] as ${memberProfile.club.position}`);
+        } else if (options.status === "suspended") {
+            clubObject = options;
+    
+            await sendMail({
+                from: process.env.NODE_MAILER_ID,
+                to: memberProfile.identification.email,
+                subject: `${clubInfo.name}: Your Membership Has Been Suspended`,
+                html: await suspendedEmailTemplate({
+                    applicantName: memberProfile.personal.fullName,
+                    suspensionReason: memberProfile.club.specialNote || "Not mentioned",
+                    applicationId: memberProfile.id,
+                    nbcId: memberProfile.club.nbcId
+                })
+            });
+    
+            await setHistory(docId, `[setBy] suspended [setTo]'s membership.`);
+        } else if (options.status === "rejected") {
+            clubObject = options;
+    
+            await sendMail({
+                from: process.env.NODE_MAILER_ID,
+                to: memberProfile.identification.email,
+                subject: `${clubInfo.name}: Your Application as ${capitalizeWords(memberProfile.club.position)} Has Been Declined`,
+                html: await rejectionEmailTemplate({
+                    applicantName: memberProfile.personal.fullName,
+                    applicantPosition: memberProfile.club.position,
+                    applicationId: memberProfile.id,
+                    rejectionReason: memberProfile.club.specialNote
+                })
+            });
+    
+            await setHistory(docId, `[setBy] rejected [setTo]'s application.`);
         }
-        await setHistory(docId, `[setBy] approved member [setTo] as ${memberProfile.club.position}`);
-    } else {
-        clubObject = options;
-        await setHistory(docId, `[setBy] updated status of [setTo] to ${options.status}`);
+    } catch (error) {
+        console.error(error);
     }
     await userRef.set({ club: clubObject }, { merge: true });
 };
@@ -206,8 +244,8 @@ const getAllMembersProfile = cache(async () => {
 
     return docSnapshot.docs.map(doc => {
         const profile = doc.data() as MemberProfileType;
-        profile.personal.dateOfBirth = timestampToDate(profile.personal.dateOfBirth) ;
-        profile.club.joinedOn = timestampToDate(profile.club.joinedOn) ;
+        profile.personal.dateOfBirth = timestampToDate(profile.personal.dateOfBirth);
+        profile.club.joinedOn = timestampToDate(profile.club.joinedOn);
         return profile;
     });
 });

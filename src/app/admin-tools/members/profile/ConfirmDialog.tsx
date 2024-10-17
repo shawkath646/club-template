@@ -21,19 +21,15 @@ export default function ConfirmDialog({
     clubInfo,
     specialNote,
     position,
-    currentStatus,
-    isConfirmDialog,
-    setConfirmDialog,
-    statusChangeTo
+    dialogState,
+    setDialogState
 }: {
     docId: string;
     clubInfo: ClubInfoType;
     specialNote?: string,
     position: string;
-    currentStatus: MemberProfileType["club"]["status"];
-    statusChangeTo: MemberProfileType["club"]["status"];
-    isConfirmDialog: boolean;
-    setConfirmDialog: Dispatch<SetStateAction<boolean>>;
+    dialogState: { isOpen: boolean; changeStatus: MemberProfileType["club"]["status"] };
+    setDialogState: Dispatch<SetStateAction<{ isOpen: boolean; changeStatus: MemberProfileType["club"]["status"] }>>;
 }) {
 
     const { control, register, handleSubmit, formState: { errors, isSubmitting } } = useForm<UpdateStatusField>({
@@ -48,14 +44,14 @@ export default function ConfirmDialog({
     const onSubmit: SubmitHandler<UpdateStatusField> = async (data) => {
         await updateStatus(docId, {
             ...data,
-            status: statusChangeTo,
+            status: dialogState.changeStatus,
         });
-        setConfirmDialog(false)
+        setDialogState({ isOpen: false, changeStatus: dialogState.changeStatus });
         router.back();
     };
 
     return (
-        <Dialog open={isConfirmDialog} onClose={() => { }} className="relative z-10">
+        <Dialog open={dialogState.isOpen} onClose={() => { }} className="relative z-10">
             <div className="fixed inset-0 bg-black/50 dark:bg-black/70" aria-hidden="true" />
 
             <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -74,8 +70,8 @@ export default function ConfirmDialog({
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <h3 className="mb-4">Would you like to {statusChangeTo} this member?</h3>
-                        {(statusChangeTo === "approved") && (
+                        <h3 className="mb-4">Would you like to change status of this member to "{dialogState.changeStatus}"?</h3>
+                        {(dialogState.changeStatus === "approved") && (
                             <Controller
                                 name="position"
                                 control={control}
@@ -85,7 +81,7 @@ export default function ConfirmDialog({
                         <TextAreaField fieldId="specialNote" label="Special Note" {...register("specialNote", { maxLength: { value: 300, message: "Special note must be at most 300 characters long" } })} error={errors.specialNote} />
 
                         <div className="flex items-center justify-end gap-3 mt-5">
-                            <StylistButton isDisabled={isSubmitting} size="sm" colorScheme="red" onClick={() => setConfirmDialog(false)}>Dismiss</StylistButton>
+                            <StylistButton isDisabled={isSubmitting} size="sm" colorScheme="red" onClick={() => setDialogState({ isOpen: false, changeStatus: dialogState.changeStatus })}>Dismiss</StylistButton>
                             <StylistButton type="submit" isLoading={isSubmitting} size="sm">Update</StylistButton>
                         </div>
                     </form>
