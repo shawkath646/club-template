@@ -19,10 +19,9 @@ export default function DropdownPosition({ selected, filterByPrefix }: { selecte
                         <Link
                             href={filterByPrefix + "all"}
                             className={`${!selected
-                                ? "bg-blue-100 text-blue-900 dark:bg-blue-600 dark:text-white"
-                                : "text-gray-700 dark:text-gray-300"
-                                } group flex w-full items-center px-4 py-2 text-sm transition-all ${!selected ? "bg-gray-100 dark:bg-gray-700" : ""
-                                }`}
+                                    ? "bg-blue-100 text-blue-900 dark:bg-blue-600 dark:text-white"
+                                    : "text-gray-700 dark:text-gray-300"
+                                } group flex w-full items-center px-4 py-2 text-sm transition-all hover:bg-gray-100 dark:hover:bg-gray-700 ${!selected ? "bg-gray-100 dark:bg-gray-700" : ""}`}
                         >
                             All
                         </Link>
@@ -32,10 +31,9 @@ export default function DropdownPosition({ selected, filterByPrefix }: { selecte
                             <Link
                                 href={filterByPrefix + item}
                                 className={`${selected === item
-                                    ? "bg-blue-100 text-blue-900 dark:bg-blue-600 dark:text-white"
-                                    : "text-gray-700 dark:text-gray-300"
-                                    } group flex w-full items-center px-4 py-2 text-sm transition-all ${(selected === item) ? "bg-gray-100 dark:bg-gray-700" : ""
-                                    }`}
+                                        ? "bg-blue-100 text-blue-900 dark:bg-blue-600 dark:text-white"
+                                        : "text-gray-700 dark:text-gray-300"
+                                    } group flex w-full items-center px-4 py-2 text-sm transition-all hover:bg-gray-100 dark:hover:bg-gray-700 ${selected === item ? "bg-gray-100 dark:bg-gray-700" : ""}`}
                             >
                                 {capitalizeWords(item)}
                             </Link>

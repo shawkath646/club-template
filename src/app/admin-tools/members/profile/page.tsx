@@ -128,12 +128,12 @@ export default async function Page({ searchParams }: PagePropsType) {
                                 <td>{memberProfile.identification.phoneNumber}</td>
                             </tr>
                             <tr>
-                                <td className="font-semibold py-2">ID Number</td>
+                                <td className="font-semibold py-2 whitespace-nowrap">ID Number</td>
                                 <td className="p-2">:</td>
                                 <td>{memberProfile.identification.identificationNo}</td>
                             </tr>
                             <tr>
-                                <td className="font-semibold py-2">Facebook Profile</td>
+                                <td className="font-semibold py-2 whitespace-nowrap">Facebook Profile</td>
                                 <td className="p-2">:</td>
                                 <td className="w-full max-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
                                     <Link
@@ -187,11 +187,13 @@ export default async function Page({ searchParams }: PagePropsType) {
                 <h2 className="font-semibold text-lg mb-4">Club Information</h2>
                 <table className="min-w-full table-auto text-left">
                     <tbody>
-                        <tr>
-                            <td className="font-semibold py-2">NBC ID</td>
-                            <td className="p-2">:</td>
-                            <td>{memberProfile.club.nbcId}</td>
-                        </tr>
+                        {!!memberProfile.club.nbcId && (
+                            <tr>
+                                <td className="font-semibold py-2">NBC ID</td>
+                                <td className="p-2">:</td>
+                                <td>{memberProfile.club.nbcId}</td>
+                            </tr>
+                        )}
                         <tr>
                             <td className="font-semibold py-2">Position</td>
                             <td className="p-2">:</td>
@@ -207,7 +209,7 @@ export default async function Page({ searchParams }: PagePropsType) {
                             </td>
                         </tr>
                         <tr>
-                            <td className="font-semibold py-2">Joined On</td>
+                            <td className="font-semibold py-2">{memberProfile.club.nbcId ? "Joined On" : "Applied On"}</td>
                             <td className="p-2">:</td>
                             <td>{formatDate(memberProfile.club.joinedOn)}</td>
                         </tr>

@@ -7,7 +7,7 @@ import { capitalizeWords, generateRandomId, generateNbcId, generatePassword, tim
 import { setHistory } from "./history";
 import uploadFileToFirestore from "./uploadFileToFirestore";
 import approvedEmailTemplate from "@/templates/approvedEmail.template";
-import suspendedEmailTemplate from "@/templates/suspendedEmail.template";
+import suspensionEmailTemplate from "@/templates/suspensionEmail.template";
 import rejectionEmailTemplate from "@/templates/rejectionEmail.template";
 import getClubInfo from "@/constant/getClubInfo";
 import { MemberFormType, MemberProfileType, MemberPartialProfileType } from "@/types";
@@ -173,21 +173,20 @@ const updateStatus = async (
     const memberProfile = (await userRef.get()).data() as MemberProfileType;
 
     try {
-        if (options.status === "approved" && !memberProfile.club.nbcId) {
-            const nbcId = await generateNbcId();
+        if (options.status === "approved") {
+            const nbcId = memberProfile.club.nbcId ?? await generateNbcId();
             const joinedOn = memberProfile.club.nbcId ? memberProfile.club.joinedOn : new Date();
-    
+
             const password = generatePassword();
-    
+
             clubObject = {
                 nbcId,
                 password: await bcrypt.hash(password, 10),
                 joinedOn,
                 ...options
             };
-    
+
             await sendMail({
-                from: process.env.NODE_MAILER_ID,
                 to: memberProfile.identification.email,
                 subject: `${clubInfo.name}: Your Application as ${capitalizeWords(memberProfile.club.position)} Has Been Approved`,
                 html: await approvedEmailTemplate({
@@ -196,31 +195,31 @@ const updateStatus = async (
                     applicationId: memberProfile.id,
                     nbcId,
                     password,
-                    specialNote: memberProfile.club.specialNote
+                    specialNote: memberProfile.club.specialNote,
+                    isNewUser: !!memberProfile.club.nbcId
                 })
             });
             await setHistory(docId, `[setBy] approved member [setTo] as ${memberProfile.club.position}`);
         } else if (options.status === "suspended") {
             clubObject = options;
-    
+
             await sendMail({
-                from: process.env.NODE_MAILER_ID,
                 to: memberProfile.identification.email,
                 subject: `${clubInfo.name}: Your Membership Has Been Suspended`,
-                html: await suspendedEmailTemplate({
+                html: await suspensionEmailTemplate({
                     applicantName: memberProfile.personal.fullName,
                     suspensionReason: memberProfile.club.specialNote || "Not mentioned",
                     applicationId: memberProfile.id,
-                    nbcId: memberProfile.club.nbcId
+                    nbcId: memberProfile.club.nbcId,
+                    applicantPosition: memberProfile.club.position
                 })
             });
-    
+
             await setHistory(docId, `[setBy] suspended [setTo]'s membership.`);
         } else if (options.status === "rejected") {
             clubObject = options;
-    
+
             await sendMail({
-                from: process.env.NODE_MAILER_ID,
                 to: memberProfile.identification.email,
                 subject: `${clubInfo.name}: Your Application as ${capitalizeWords(memberProfile.club.position)} Has Been Declined`,
                 html: await rejectionEmailTemplate({
@@ -230,7 +229,7 @@ const updateStatus = async (
                     rejectionReason: memberProfile.club.specialNote
                 })
             });
-    
+
             await setHistory(docId, `[setBy] rejected [setTo]'s application.`);
         }
     } catch (error) {
@@ -250,6 +249,36 @@ const getAllMembersProfile = cache(async () => {
     });
 });
 
+const getMembersCount = cache(async () => {
+    const membersSnapshot = await db.collection("members").get();
+
+    let pendingMembers = 0;
+    let approvedMembers = 0;
+    let suspendedMembers = 0;
+    let rejectedMembers = 0;
+
+    membersSnapshot.forEach(doc => {
+        const status = doc.data().club.status;
+        if (status === "pending") {
+            pendingMembers++;
+        } else if (status === "approved") {
+            approvedMembers++;
+        } else if (status === "suspended") {
+            suspendedMembers++;
+        } else if (status === "rejected") {
+            rejectedMembers++;
+        }
+    });
+
+    return {
+        pendingMembers,
+        approvedMembers,
+        suspendedMembers,
+        rejectedMembers
+    };
+});
+
+
 export {
     submitMemberRequest,
     getMembersPartialProfile,
@@ -257,5 +286,6 @@ export {
     updatePermissions,
     updateStatus,
     getAllMembersProfile,
-    downloadProfilePicture
+    downloadProfilePicture,
+    getMembersCount
 };

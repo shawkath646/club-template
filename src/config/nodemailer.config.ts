@@ -18,9 +18,10 @@ export default async function sendMail(mailOptions: MailOptions) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     secure: true,
+    from: process.env.NODE_MAILER_ID,
     auth: {
       type: 'OAuth2',
-      user: 'shcloudburstlabs@gmail.com',
+      user: process.env.NODE_MAILER_ID,
       clientId: process.env.GMAIL_API_ID,
       clientSecret: process.env.GMAIL_API_SECRET,
       refreshToken: tokens.refresh_token,

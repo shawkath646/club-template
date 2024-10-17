@@ -5,7 +5,7 @@ import MemberCard from "./MemberCard";
 import DropdownPosition from "./DropdownPosition";
 import Pagination from "@/components/navigation/Pagination";
 import NoItemFound from "@/components/NoItemFound";
-import { getMembersPartialProfile } from "@/backend/members";
+import { getMembersCount, getMembersPartialProfile } from "@/backend/members";
 import { PagePropsType } from "@/types";
 
 export const metadata: Metadata = {
@@ -42,21 +42,23 @@ export default async function Page({ searchParams }: PagePropsType) {
         return redirect(pageURLPrefix + maximumPage);
     };
 
+    const membersCount = await getMembersCount();
+
     return (
         <div>
             <h2 className="text-white dark:text-gray-200 text-xl md:text-2xl lg:text-3xl text-center mb-2">Member Management</h2>
             <section className="flex flex-wrap items-center justify-center gap-5 py-6 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-800/40 dark:to-gray-900/40 rounded-lg shadow-lg">
                 <Link href={URLPrefix + "?tab=pending"} className={`px-4 py-2 rounded-full ${currentTab === "pending" ? "bg-blue-500 text-white" : "border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"} dark:hover:text-gray-200 transition-transform transform hover:scale-105 hover:shadow-md`}>
-                    Pending
+                    Pending ({membersCount.pendingMembers})
                 </Link>
                 <Link href={URLPrefix + "?tab=approved"} className={`px-4 py-2 rounded-full ${currentTab === "approved" ? "bg-green-500 text-white" : "border border-green-500 text-green-500 hover:bg-green-500 hover:text-white"} dark:hover:text-gray-200 transition-transform transform hover:scale-105 hover:shadow-md`}>
-                    Approved
+                    Approved ({membersCount.approvedMembers})
                 </Link>
                 <Link href={URLPrefix + "?tab=rejected"} className={`px-4 py-2 rounded-full ${currentTab === "rejected" ? "bg-red-500 text-white" : "border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"} dark:hover:text-gray-200 transition-transform transform hover:scale-105 hover:shadow-md`}>
-                    Rejected
+                    Rejected ({membersCount.rejectedMembers})
                 </Link>
                 <Link href={URLPrefix + "?tab=suspended"} className={`px-4 py-2 rounded-full ${currentTab === "suspended" ? "bg-yellow-500 text-white" : "border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white"} dark:hover:text-gray-200 transition-transform transform hover:scale-105 hover:shadow-md`}>
-                    Suspended
+                    Suspended ({membersCount.suspendedMembers})
                 </Link>
             </section>
 
