@@ -9,13 +9,15 @@ export default function ButtonContainer({
     clubInfo,
     specialNote,
     position,
-    currentStatus
+    currentStatus,
+    decodedCallbackUrl
 }: {
     docId: string;
     clubInfo: ClubInfoType;
     specialNote?: string,
     position: string;
-    currentStatus: MemberProfileType["club"]["status"]
+    currentStatus: MemberProfileType["club"]["status"];
+    decodedCallbackUrl: string;
 }) {
 
     const [dialogState, setDialogState] = useState<{ isOpen: boolean; changeStatus: MemberProfileType["club"]["status"] }>({
@@ -43,6 +45,7 @@ export default function ButtonContainer({
                 specialNote={specialNote}
                 dialogState={dialogState}
                 setDialogState={setDialogState}
+                decodedCallbackUrl={decodedCallbackUrl}
             />
         </>
     );

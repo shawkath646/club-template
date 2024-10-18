@@ -174,7 +174,7 @@ const updateStatus = async (
 
     try {
         if (options.status === "approved") {
-            const nbcId = memberProfile.club.nbcId ?? await generateNbcId();
+            const nbcId = memberProfile.club.nbcId || await generateNbcId();
             const joinedOn = memberProfile.club.nbcId ? memberProfile.club.joinedOn : new Date();
 
             const password = generatePassword();
@@ -196,7 +196,7 @@ const updateStatus = async (
                     nbcId,
                     password,
                     specialNote: memberProfile.club.specialNote,
-                    isNewUser: !!memberProfile.club.nbcId
+                    isNewUser: !memberProfile.club.nbcId
                 })
             });
             await setHistory(docId, `[setBy] approved member [setTo] as ${memberProfile.club.position}`);
@@ -250,31 +250,21 @@ const getAllMembersProfile = cache(async () => {
 });
 
 const getMembersCount = cache(async () => {
-    const membersSnapshot = await db.collection("members").get();
-
-    let pendingMembers = 0;
-    let approvedMembers = 0;
-    let suspendedMembers = 0;
-    let rejectedMembers = 0;
-
-    membersSnapshot.forEach(doc => {
-        const status = doc.data().club.status;
-        if (status === "pending") {
-            pendingMembers++;
-        } else if (status === "approved") {
-            approvedMembers++;
-        } else if (status === "suspended") {
-            suspendedMembers++;
-        } else if (status === "rejected") {
-            rejectedMembers++;
-        }
-    });
+    const membersCollection = db.collection("members");
+    const statuses = ["pending", "approved", "suspended", "rejected"];
+    const countPromises = statuses.map(status =>
+        membersCollection.where("club.status", "==", status).count().get()
+    );
+    const counts = await Promise.all(countPromises);
+    const [pendingMembers, approvedMembers, suspendedMembers, rejectedMembers] = counts.map(
+        count => count.data().count
+    );
 
     return {
         pendingMembers,
         approvedMembers,
         suspendedMembers,
-        rejectedMembers
+        rejectedMembers,
     };
 });
 

@@ -7,11 +7,10 @@ import PDFDownloadButton from "./PDFDownloadButton";
 import ButtonContainer from "./ButtonsContainer";
 import ProfilePictureDownloadButton from "./ProfilePictureDownloadButton";
 import { getMemberProfile } from "@/backend/members";
-import { formatDate } from "@/utils/utils.frontend";
+import { capitalizeWords, formatDate } from "@/utils/utils.frontend";
 import getClubInfo from "@/constant/getClubInfo";
 import { PagePropsType } from "@/types";
-
-
+import { IoIosArrowBack } from "react-icons/io";
 
 export async function generateMetadata(
     { searchParams }: PagePropsType,
@@ -31,9 +30,14 @@ export async function generateMetadata(
 export default async function Page({ searchParams }: PagePropsType) {
 
     let userId = searchParams.id;
+    let callbackUrl = searchParams.callbackUrl;
+
     if (Array.isArray(userId)) userId = userId[0];
+    if (Array.isArray(callbackUrl)) callbackUrl = callbackUrl[0];
+
     if (!userId) return redirect(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/not-found`);
 
+    const decodedCallbackUrl = decodeURIComponent(callbackUrl || `${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members`);
     const clubInfo = await getClubInfo();
     const memberProfile = await getMemberProfile(userId);
 
@@ -53,10 +57,21 @@ export default async function Page({ searchParams }: PagePropsType) {
 
     return (
         <>
+            <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
+                <Link
+                    href={decodedCallbackUrl}
+                    className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
+                >
+                    <IoIosArrowBack size={32} className="text-white drop-shadow-md" />
+                </Link>
+                <h2 className="text-xl md:text-2xl text-white font-semibold drop-shadow-md">
+                    View Profile
+                </h2>
+            </menu>
             <section className="mb-8 grid lg:grid-cols-2 gap-5">
                 <div className="text-center space-y-4">
                     <Image
-                        src={memberProfile.personal.picture}
+                        src={memberProfile.personal.picture || `https://eu.ui-avatars.com/api/?name=${memberProfile.personal.fullName}&size=120`}
                         alt={`${memberProfile.personal.fullName} profile picture`}
                         height={120}
                         width={120}
@@ -77,22 +92,22 @@ export default async function Page({ searchParams }: PagePropsType) {
                     <table className="min-w-full table-auto text-left">
                         <tbody>
                             <tr>
-                                <td className="font-semibold py-2">Date of Birth</td>
+                                <td className="font-semibold py-2 whitespace-nowrap">Date of Birth</td>
                                 <td className="p-2">:</td>
                                 <td>{formatDate(memberProfile.personal.dateOfBirth)}</td>
                             </tr>
                             <tr>
                                 <td className="font-semibold py-2">Gender</td>
                                 <td className="p-2">:</td>
-                                <td>{memberProfile.personal.gender}</td>
+                                <td>{capitalizeWords(memberProfile.personal.gender)}</td>
                             </tr>
                             <tr>
-                                <td className="font-semibold py-2">Father's Name</td>
+                                <td className="font-semibold py-2 whitespace-nowrap">Father's Name</td>
                                 <td className="p-2">:</td>
                                 <td>{memberProfile.personal.fatherName}</td>
                             </tr>
                             <tr>
-                                <td className="font-semibold py-2">Mother's Name</td>
+                                <td className="font-semibold py-2 whitespace-nowrap">Mother's Name</td>
                                 <td className="p-2">:</td>
                                 <td>{memberProfile.personal.motherName}</td>
                             </tr>
@@ -240,6 +255,7 @@ export default async function Page({ searchParams }: PagePropsType) {
                 docId={memberProfile.id}
                 position={memberProfile.club.position}
                 specialNote={memberProfile.club.specialNote}
+                decodedCallbackUrl={decodedCallbackUrl}
             />
         </>
     );

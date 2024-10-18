@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { FaUser, FaBlog, FaTasks, FaDonate, FaClipboardList, FaHistory } from 'react-icons/fa';
 import { HiDocumentText } from 'react-icons/hi';
+import { IoIosArrowBack } from "react-icons/io";
 
 export const metadata: Metadata = {
     title: "Admin Tools"
@@ -21,9 +22,18 @@ export default async function Page() {
 
     return (
         <>
-            <h1 className="text-4xl font-bold text-center text-black dark:text-gray-200 mb-12">
-                Admin Tools
-            </h1>
+            <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
+                <Link
+                    href={process.env.NEXT_PUBLIC_APP_BASE_URL as string}
+                    className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
+                >
+                    <IoIosArrowBack size={32} className="text-white drop-shadow-md" />
+                </Link>
+                <h2 className="text-xl md:text-2xl text-white font-semibold drop-shadow-md">
+                    Admin Tools
+                </h2>
+            </menu>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {tools.map((tool, index) => (
                     <Link

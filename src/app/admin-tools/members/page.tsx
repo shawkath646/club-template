@@ -7,6 +7,7 @@ import Pagination from "@/components/navigation/Pagination";
 import NoItemFound from "@/components/NoItemFound";
 import { getMembersCount, getMembersPartialProfile } from "@/backend/members";
 import { PagePropsType } from "@/types";
+import { IoIosArrowBack } from "react-icons/io";
 
 export const metadata: Metadata = {
     title: "Member Management"
@@ -45,8 +46,18 @@ export default async function Page({ searchParams }: PagePropsType) {
     const membersCount = await getMembersCount();
 
     return (
-        <div>
-            <h2 className="text-white dark:text-gray-200 text-xl md:text-2xl lg:text-3xl text-center mb-2">Member Management</h2>
+        <>
+            <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
+                <Link
+                    href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools`}
+                    className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
+                >
+                    <IoIosArrowBack size={32} className="text-white drop-shadow-md" />
+                </Link>
+                <h2 className="text-xl md:text-2xl text-white font-semibold drop-shadow-md">
+                    Member Management
+                </h2>
+            </menu>
             <section className="flex flex-wrap items-center justify-center gap-5 py-6 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-800/40 dark:to-gray-900/40 rounded-lg shadow-lg">
                 <Link href={URLPrefix + "?tab=pending"} className={`px-4 py-2 rounded-full ${currentTab === "pending" ? "bg-blue-500 text-white" : "border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"} dark:hover:text-gray-200 transition-transform transform hover:scale-105 hover:shadow-md`}>
                     Pending ({membersCount.pendingMembers})
@@ -75,6 +86,6 @@ export default async function Page({ searchParams }: PagePropsType) {
             )}
 
             {(maximumPage > 1 && !!members.length) && <Pagination URLPrefix={pageURLPrefix} currentPage={currentPage} maximumPage={maximumPage} />}
-        </div>
+        </>
     );
 }

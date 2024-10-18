@@ -262,7 +262,7 @@ const profilePDFTemplate = cache(async (applicationId: string) => {
               </tr>
               <tr>
                 <th>Institute Address</th>
-                <td>${memberProfile.educational.institute}</td>
+                <td>${memberProfile.educational.instituteAddress}</td>
               </tr>
               <tr>
                 <th>Student ID</th>

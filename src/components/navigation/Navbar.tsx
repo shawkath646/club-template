@@ -65,22 +65,30 @@ export default function Navbar({ clubInfo, session }: { clubInfo: ClubInfoType; 
                             {(!session?.user) && (
                                 <>
                                     <MenuItem>
-                                        <Link href="/join" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                        <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/join`} className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
                                             <FaUserPlus size={17} />
                                             <p>Join as member</p>
                                         </Link>
                                     </MenuItem>
                                     <MenuItem>
-                                        <Link href="/login" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                        <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/login`} className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
                                             <FaUser size={17} />
                                             <p>Login as member</p>
                                         </Link>
                                     </MenuItem>
                                 </>
                             )}
+                            {(session?.user) && (
+                                <MenuItem>
+                                    <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/profile`} className="w-full px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                        <FaUserCircle size={17} />
+                                        <p>Profile</p>
+                                    </Link>
+                                </MenuItem>
+                            )}
                             {(session?.user.permissions.length) && (
                                 <MenuItem>
-                                    <Link href="/admin-tools" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                    <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools`} className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
                                         <IoMdSettings size={17} />
                                         <p>Admin tools</p>
                                     </Link>

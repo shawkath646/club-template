@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import Link from "next/link";
 import Image from "next/image";
 import { capitalizeWords } from "@/utils/utils.frontend";
@@ -6,11 +7,16 @@ import { MdEmail } from "react-icons/md";
 import { FaUniversity } from "react-icons/fa";
 
 export default function MemberCard({ data }: { data: MemberPartialProfileType }) {
+
+    const headersList = headers();
+    const currentURL = headersList.get("referer") || '';
+    const encodedURL = encodeURIComponent(currentURL);
+
     return (
         <article className="bg-white/20 dark:bg-gray-800/20 rounded-lg shadow-lg p-6 flex flex-col justify-between overflow-hidden">
             <div className="flex space-x-6">
                 <Image
-                    src={data.personal.picture}
+                    src={data.personal.picture || `https://eu.ui-avatars.com/api/?name=${data.personal.fullName}&size=120`}
                     alt={`${data.personal.fullName} profile`}
                     height={128}
                     width={128}
@@ -55,7 +61,7 @@ export default function MemberCard({ data }: { data: MemberPartialProfileType })
                 </p>
             </div>
             <Link
-                href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members/profile?id=${data.id}`}
+                href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members/profile?id=${data.id}&callbackUrl=${encodedURL}`}
                 className="block mt-6 text-center text-white bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 py-2 px-4 w-full rounded-lg font-semibold text-sm shadow-md transition-colors"
             >
                 View Profile

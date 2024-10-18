@@ -21,7 +21,7 @@ const getUserSession = cache(async (docId: string) => {
     };
 });
 
-const userSignIn = cache(async (credentials: LoginFormType) => {
+const userSignIn = cache(async (credentials: LoginFormType, callbackUrl?: string) => {
     const userRef = await db.collection("members").where("club.nbcId", "==", Number(credentials.nbcId)).limit(1).get();
 
     if (userRef.empty) return {

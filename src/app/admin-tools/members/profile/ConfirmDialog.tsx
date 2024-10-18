@@ -22,7 +22,8 @@ export default function ConfirmDialog({
     specialNote,
     position,
     dialogState,
-    setDialogState
+    setDialogState,
+    decodedCallbackUrl
 }: {
     docId: string;
     clubInfo: ClubInfoType;
@@ -30,6 +31,7 @@ export default function ConfirmDialog({
     position: string;
     dialogState: { isOpen: boolean; changeStatus: MemberProfileType["club"]["status"] };
     setDialogState: Dispatch<SetStateAction<{ isOpen: boolean; changeStatus: MemberProfileType["club"]["status"] }>>;
+    decodedCallbackUrl: string;
 }) {
 
     const { control, register, handleSubmit, formState: { errors, isSubmitting } } = useForm<UpdateStatusField>({
@@ -47,7 +49,7 @@ export default function ConfirmDialog({
             status: dialogState.changeStatus,
         });
         setDialogState({ isOpen: false, changeStatus: dialogState.changeStatus });
-        router.back();
+        router.push(decodedCallbackUrl);
     };
 
     return (
