@@ -1,0 +1,65 @@
+{
+    "gender": [
+        "male",
+        "female",
+        "other"
+    ],
+    "educationalBackground": [
+        "science",
+        "business studies",
+        "humanities",
+        "vocational",
+        "not applicable"
+    ],
+    "presentClass": [
+        "VI",
+        "VII",
+        "VIII",
+        "IX",
+        "X",
+        "XI",
+        "XII",
+        "Undergraduate 1st year",
+        "Undergraduate 2nd year",
+        "Undergraduate 3rd year",
+        "Undergraduate 4th year",
+        "Graduated"
+    ],
+    "interestedIn": [
+        "articles",
+        "olympiads",
+        "magazine",
+        "volunteering"
+    ],
+    "positions": [
+        "president",
+        "general-secretary",
+        "treasurer",
+        "sponsorship-secretary",
+        "records-custodian",
+        "event-executive",
+        "olympiad-executive",
+        "assistant-olympiad-executive",
+        "cultural-secretary",
+        "venue-coordinator",
+        "hr-coordinator-(volunteer)",
+        "ambassador-programme-coordinator",
+        "head-of-recruitment",
+        "social-welfare-secretary",
+        "content-management",
+        "social-media-coordinator",
+        "content-strategist-regular",
+        "technology-coordinator",
+        "graphic-designer",
+        "project-coordinator",
+        "campus-representative",
+        "member",
+        "guest"
+    ],
+    "status": [
+        "approved",
+        "pending",
+        "rejected",
+        "suspended"
+    ]
+}

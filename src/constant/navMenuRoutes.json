@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Blogs",
+        "route": "/blogs"
+    },
+    {
+        "name": "Events",
+        "route": "/events"
+    },
+    {
+        "name": "Olympiads",
+        "route": "/olympiads"
+    },
+    {
+        "name": "Megazine",
+        "route": "/megazine"
+    },
+    {
+        "name": "Members",
+        "route": "/members"
+    }
+]
