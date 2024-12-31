@@ -1,16 +1,17 @@
 "use server";
 import { cookies, headers } from 'next/headers';
-import { forbidden, notFound, redirect } from 'next/navigation';
+import { forbidden, redirect } from 'next/navigation';
 import { cache } from 'react';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { authenticator } from 'otplib';
 import { getMemberProfile } from './members';
-import { generateRandomId, timestampToDate } from '@/utils/utils.backend';
+import { generatePassword, generateRandomId, timestampToDate } from '@/utils/utils.backend';
 import { db } from '@/config/firebase.config';
-import { MemberProfileType, UserSessionObject, SessionObject } from '@/types';
+import sendMail from '@/config/nodemailer.config';
+import resetPasswordEmailTemplate from '@/templates/resetPasswordEmail.template';
 import getClubInfo from '@/constant/getClubInfo';
-
+import { MemberProfileType, UserSessionObject, SessionObject } from '@/types';
 
 interface CookieObject extends JwtPayload {
   id: string;
@@ -27,7 +28,7 @@ interface SignOutOptions {
   redirectTo?: string;
 }
 
-interface AuthenticatorSecretKeyTempSessionType {
+interface TempSessionType {
   secretKey: string;
   createdAt: Date;
   expiresAt: Date;
@@ -225,10 +226,9 @@ const getAuthenticatorSecretKey = async () => {
   if (!session) forbidden();
 
   const secretKey = authenticator.generateSecret();
-
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-  const tempSessionData: AuthenticatorSecretKeyTempSessionType = {
+  const tempSessionData: TempSessionType = {
     secretKey,
     createdAt: new Date(),
     expiresAt,
@@ -254,7 +254,7 @@ const addAuthenticatorSecretKey = async (tempSessionId: string, token: string) =
   const tempSessionDoc = await db.collection("tempSession").doc(tempSessionId).get();
   if (!tempSessionDoc.exists) return { error: "Temporary session not found" };
 
-  const tempSession = tempSessionDoc.data() as AuthenticatorSecretKeyTempSessionType;
+  const tempSession = tempSessionDoc.data() as TempSessionType;
 
   if (new Date() > timestampToDate(tempSession.expiresAt)) {
     await tempSessionDoc.ref.delete();
@@ -307,6 +307,81 @@ const resetBackupCodes = async () => {
   return newBackupCodes;
 };
 
+const getResetPasswordCode = async (primaryEmail: string, nbcId: number) => {
+  const queryDoc = await db.collection("members").where("club.nbcId", "==", nbcId).get();
+  if (queryDoc.empty) return {
+    nbcId: "No user associated with the provided data.",
+    email: "No user associated with the provided data."
+  };
+
+  const userData = queryDoc.docs[0].data() as MemberProfileType;
+  if (userData.identification.primaryEmail !== primaryEmail) return {
+    nbcId: "No user associated with the provided data.",
+    email: "No user associated with the provided data."
+  };
+
+  const secretKey = generatePassword({ numberOnly: true, length: 6 });
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  const tempSessionData: TempSessionType = {
+    userId: userData.id,
+    createdAt: new Date(),
+    secretKey,
+    expiresAt
+  };
+
+  const clubInfo = await getClubInfo();
+
+  await sendMail({
+    to: userData.identification.primaryEmail,
+    subject: `${clubInfo.name}: Verification code for resetting password`,
+    html: await resetPasswordEmailTemplate({
+      applicantName: userData.personal.fullName,
+      nbcId,
+      verificationCode: secretKey
+    })
+  });
+
+  const tempSessionDoc = await db.collection("tempSession").add(tempSessionData);
+  return tempSessionDoc.id;
+};
+
+const resetPassword = async (sessionId: string, verificationCode: string, newPassword: string) => {
+  const sessionDoc = await db.collection("tempSession").doc(sessionId).get();
+  if (!sessionDoc.exists) {
+    return { verificationCode: "Invalid or expired session." };
+  }
+
+  const sessionData = sessionDoc.data() as TempSessionType;
+
+  const isCodeValid = sessionData.secretKey === verificationCode;
+  const isSessionValid = new Date() <= timestampToDate(sessionData.expiresAt);
+  if (!isCodeValid || !isSessionValid) {
+    return { verificationCode: "Invalid verification code." };
+  }
+
+  const userData = await getMemberProfile(sessionData.userId);
+
+  const isPasswordReused =
+    await bcrypt.compare(newPassword, userData.auth.password) ||
+    (userData.auth.previousPassword && await bcrypt.compare(newPassword, userData.auth.previousPassword));
+
+  if (isPasswordReused) {
+    return { newPassword: "New password can't be the same as the old password." };
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await db.collection("members").doc(sessionData.userId).update({
+    "auth.previousPassword": userData.auth.password,
+    "auth.password": hashedPassword,
+  });
+
+  await db.collection("tempSession").doc(sessionId).delete();
+  return true;
+};
+
+
 
 export {
   signIn,
@@ -319,5 +394,7 @@ export {
   addAuthenticatorSecretKey,
   removeAuthenticator,
   getBackupCodes,
-  resetBackupCodes
+  resetBackupCodes,
+  getResetPasswordCode,
+  resetPassword
 };

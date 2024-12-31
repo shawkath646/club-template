@@ -174,6 +174,14 @@ export interface LoginFormType {
     password: string;
 }
 
+export interface ResetPasswordFormType {
+    nbcId: number;
+    email: string;
+    verificationCode: string;
+    newPassword: string;
+    confirmNewPassword: string;
+}
+
 export interface ClubInfoType {
     name: string;
     slogan: string;

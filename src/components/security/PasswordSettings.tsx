@@ -67,7 +67,7 @@ export default function PasswordSettings({ lastPasswordChanged }: { lastPassword
                     error={errors.oldPassword}
                     {...register("oldPassword")}
                 />
-                <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/forgot-password`} className="text-sm text-blue-500 hover:text-blue-600 transition-colors">Forgot Passoword?</Link>
+                <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/reset-password`} className="text-sm text-blue-500 hover:text-blue-600 transition-colors">Forgot your passoword?</Link>
                 <InputField
                     label="New Password"
                     type="password"

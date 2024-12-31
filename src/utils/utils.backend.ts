@@ -3,7 +3,7 @@ import { firestore } from 'firebase-admin';
 import { db } from '@/config/firebase.config';
 
 const timestampToDate = (input: firestore.Timestamp | Date): Date => {
-    if (input instanceof Date) return input;    
+    if (input instanceof Date) return input;
     const { seconds, nanoseconds } = input as firestore.Timestamp;
     return new Date(seconds * 1000 + nanoseconds / 1_000_000);
 };
@@ -36,12 +36,16 @@ const generateNbcId = async (): Promise<number> => {
     return lastNbcId + 1;
 };
 
-const generatePassword = () => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const generatePassword = (options = { numberOnly: false, length: 8 }) => {
+    const numbers = `0123456789`;
+    const characters = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`;
+    const charSet = options.numberOnly ? numbers : characters;
+    const passwordLength = options.length || 8;
+
     let password = '';
-    for (let i = 0; i < 8; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        password += characters[randomIndex];
+    for (let i = 0; i < passwordLength; i++) {
+        const randomIndex = Math.floor(Math.random() * charSet.length);
+        password += charSet[randomIndex];
     }
     return password;
 };
