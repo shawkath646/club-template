@@ -8,7 +8,7 @@ import { authenticator } from 'otplib';
 import { getMemberProfile } from './members';
 import { generatePassword, generateRandomId, timestampToDate } from '@/utils/utils.backend';
 import { db } from '@/config/firebase.config';
-import sendMail from '@/config/nodemailer.config';
+import { sendMail } from './baseApp';
 import resetPasswordEmailTemplate from '@/templates/resetPasswordEmail.template';
 import getClubInfo from '@/constant/getClubInfo';
 import { MemberProfileType, UserSessionObject, SessionObject } from '@/types';
@@ -332,15 +332,18 @@ const getResetPasswordCode = async (primaryEmail: string, nbcId: number) => {
 
   const clubInfo = await getClubInfo();
 
-  await sendMail({
-    to: userData.identification.primaryEmail,
-    subject: `${clubInfo.name}: Verification code for resetting password`,
-    html: await resetPasswordEmailTemplate({
-      applicantName: userData.personal.fullName,
-      nbcId,
-      verificationCode: secretKey
-    })
-  });
+  await sendMail(
+    userData.identification.primaryEmail,
+    {
+      subject: `${clubInfo.name}: Verification code for resetting password`,
+      body: await resetPasswordEmailTemplate({
+        applicantName: userData.personal.fullName,
+        nbcId,
+        verificationCode: secretKey
+      }),
+      type: "html"
+    }
+  );
 
   const tempSessionDoc = await db.collection("tempSession").add(tempSessionData);
   return tempSessionDoc.id;

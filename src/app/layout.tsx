@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Head from "next/head";
 import { Inter } from "next/font/google";
 import { getSession } from "@/backend/auth";
 import { Analytics } from "@vercel/analytics/react";
@@ -35,6 +36,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html lang="en">
+      <head>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1412699582993020" crossOrigin="anonymous"></script>
+      </head>
       <body className={inter.className}>
         <Navbar clubInfo={clubInfo} session={session} />
         <main className="bg-gradient-to-tr from-blue-500 dark:from-blue-950 via-teal-500 dark:via-teal-950 to-emerald-500 dark:to-emerald-950 text-black dark:text-gray-200 overflow-x-hidden">

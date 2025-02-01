@@ -4,7 +4,7 @@ import { cache } from "react";
 import bcrypt from 'bcrypt';
 import { db, bucket } from "@/config/firebase.config";
 import { getSession } from "./auth";
-import sendMail from "@/config/nodemailer.config";
+import { sendMail } from "./baseApp";
 import {
     capitalizeWords,
     generateRandomId,
@@ -266,45 +266,54 @@ const updateStatus = async (
         const password = generatePassword();
         await db.collection("members").doc(docId).update("auth.password", await bcrypt.hash(password, 10));
 
-        await sendMail({
-            to: userData.identification.primaryEmail,
-            subject: `${clubInfo.name}: Your Application as ${capitalizeWords(userData.club.position[0])} Has Been Approved`,
-            html: await approvedEmailTemplate({
-                applicantName: userData.personal.fullName,
-                applicantPosition: userData.club.position,
-                applicationId: userData.id,
-                nbcId,
-                password,
-                specialNote: userData.club.specialNote,
-                isNewUser: !userData.club.nbcId
-            })
-        });
+        await sendMail(
+            userData.identification.primaryEmail,
+            {
+                subject: `${clubInfo.name}: Your Application as ${capitalizeWords(userData.club.position[0])} Has Been Approved`,
+                body: await approvedEmailTemplate({
+                    applicantName: userData.personal.fullName,
+                    applicantPosition: userData.club.position,
+                    applicationId: userData.id,
+                    nbcId,
+                    password,
+                    specialNote: userData.club.specialNote,
+                    isNewUser: !userData.club.nbcId
+                }),
+                type: "html"
+            }
+        );
         await setHistory(docId, `[setBy] approved member [setTo] as ${userData.club.position}`);
     } else if (options.status === "suspended") {
-        await sendMail({
-            to: userData.identification.primaryEmail,
-            subject: `${clubInfo.name}: Your Membership Has Been Suspended`,
-            html: await suspensionEmailTemplate({
-                applicantName: userData.personal.fullName,
-                suspensionReason: userData.club.specialNote || "Not mentioned",
-                applicationId: userData.id,
-                nbcId: userData.club.nbcId,
-                applicantPosition: userData.club.position
-            })
-        });
+        await sendMail(
+            userData.identification.primaryEmail,
+            {
+                subject: `${clubInfo.name}: Your Membership Has Been Suspended`,
+                body: await suspensionEmailTemplate({
+                    applicantName: userData.personal.fullName,
+                    suspensionReason: userData.club.specialNote || "Not mentioned",
+                    applicationId: userData.id,
+                    nbcId: userData.club.nbcId,
+                    applicantPosition: userData.club.position
+                }),
+                type: "html"
+            }
+        );
 
         await setHistory(docId, `[setBy] suspended [setTo]'s membership.`);
     } else if (options.status === "rejected") {
-        await sendMail({
-            to: userData.identification.primaryEmail,
-            subject: `${clubInfo.name}: Your Application as ${capitalizeWords(userData.club.position[0])} Has Been Declined`,
-            html: await rejectionEmailTemplate({
-                applicantName: userData.personal.fullName,
-                applicantPosition: userData.club.position,
-                applicationId: userData.id,
-                rejectionReason: userData.club.specialNote
-            })
-        });
+        await sendMail(
+            userData.identification.primaryEmail,
+            {
+                subject: `${clubInfo.name}: Your Application as ${capitalizeWords(userData.club.position[0])} Has Been Declined`,
+                body: await rejectionEmailTemplate({
+                    applicantName: userData.personal.fullName,
+                    applicantPosition: userData.club.position,
+                    applicationId: userData.id,
+                    rejectionReason: userData.club.specialNote
+                }),
+                type: "html"
+            }
+        );
 
         await setHistory(docId, `[setBy] rejected [setTo]'s application.`);
     }
