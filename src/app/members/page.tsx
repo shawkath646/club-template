@@ -6,6 +6,7 @@ import DropdownPosition from "../admin-tools/members/DropdownPosition";
 import SearchBar from "./MemberSearchBar";
 import Pagination from "@/components/navigation/Pagination";
 import NoItemFound from "@/components/NoItemFound";
+import AdBanner from "@/components/AdBanner";
 import { getPublicMembersPartialProfile } from "@/backend/members";
 import getClubInfo from "@/constant/getClubInfo";
 import { PagePropsType } from "@/types";
@@ -23,7 +24,6 @@ export async function generateMetadata(): Promise<Metadata> {
         title: clubShortName + " Team"
     }
 };
-
 
 export default async function Page({ searchParams: searchParamsPromise }: PagePropsType) {
 
@@ -47,6 +47,9 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
     if (currentPage > maximumPage) {
         return redirect(pageURLPrefix + maximumPage);
     };
+
+    const beforeAdMembers = members.slice(0, 6);
+    const afterAdMembers = members.slice(6);
 
     const clubInfo = await getClubInfo();
 
@@ -75,11 +78,28 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
             </section>
 
             {!!members.length ? (
-                <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {members.map((data, index) => <MemberCard key={index} data={data} />)}
-                </section>
+                <>
+                    <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {beforeAdMembers.map((data, index) => <MemberCard key={index} data={data} />)}
+                    </section>
+                    <AdBanner
+                        data-ad-slot="5910671376"
+                        data-ad-format="autorelaxed"
+                        data-full-width-responsive={false}
+                    />
+                    <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {afterAdMembers.map((data, index) => <MemberCard key={index} data={data} />)}
+                    </section>
+                </>
             ) : (
-                <NoItemFound label="members" />
+                <>
+                    <AdBanner
+                        data-ad-slot="5910671376"
+                        data-ad-format="autorelaxed"
+                        data-full-width-responsive={false}
+                    />
+                    <NoItemFound label="members" />
+                </>
             )}
 
             {(maximumPage > 1 && !!members.length) && <Pagination URLPrefix={pageURLPrefix} currentPage={currentPage} maximumPage={maximumPage} />}

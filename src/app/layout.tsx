@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Head from "next/head";
+import Script from "next/script";
 import { Inter } from "next/font/google";
 import { getSession } from "@/backend/auth";
 import { Analytics } from "@vercel/analytics/react";
@@ -7,6 +7,7 @@ import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import getClubInfo from "@/constant/getClubInfo";
 import "./globals.css";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,7 +38,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="en">
       <head>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1412699582993020" crossOrigin="anonymous"></script>
+        <Script
+          id="adsbygoogle-init"
+          strategy="afterInteractive"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT_ID}`}
+          crossOrigin="anonymous"
+        />
       </head>
       <body className={inter.className}>
         <Navbar clubInfo={clubInfo} session={session} />
@@ -46,8 +52,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             {children}
           </div>
         </main>
-        <Analytics />
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
