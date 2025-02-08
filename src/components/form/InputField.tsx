@@ -26,8 +26,7 @@ const InputField = ({
     <div className={`w-full ${singleLine ? "flex items-center space-x-4" : ""}`}>
       <label
         htmlFor={fieldId}
-        className={`text-sm font-medium text-gray-200 dark:text-gray-300 whitespace-nowrap ${singleLine ? "" : "block mb-2"
-          }`}
+        className={`text-sm font-medium text-gray-200 dark:text-gray-300 whitespace-nowrap ${singleLine ? "" : "block mb-2"}`}
       >
         {label}:
       </label>
@@ -61,7 +60,7 @@ const InputField = ({
         </div>
       )}
 
-      {error && <p className="mt-2 text-sm text-red-600">{error.message}</p>}
+      {error && <p className="mt-2 text-sm text-red-500">{error.message}</p>}
     </div>
   );
 };

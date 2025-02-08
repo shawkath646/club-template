@@ -25,7 +25,7 @@ export default function SignupForm({ clubInfo, registrationPosition }: { clubInf
 
   const [dialogState, setDialogState] = useState<DialogStateType>(initialSubmitingDialog);
 
-  const { register, handleSubmit, control, reset, setError, formState: { errors, isSubmitting }} = useForm<MemberFormType>({
+  const { register, clearErrors, handleSubmit, control, reset, setError, formState: { errors, isSubmitting } } = useForm<MemberFormType>({
     defaultValues: {
       position: [registrationPosition.toLowerCase().replace(" ", "-")],
       presentClass: "default",
@@ -46,10 +46,10 @@ export default function SignupForm({ clubInfo, registrationPosition }: { clubInf
 
     const response = await submitMemberRequest(resolvedData);
 
-    if (response.status) {
+    if (response.success) {
       reset();
       setDialogState({ isOpen: true, status: "success", message: "Form submitted successfully!" });
-    } else if (!response.status && response.errors) {
+    } else if (!response.success && response.errors) {
       response.errors.forEach((err: { field: keyof MemberFormType; message: string }) => {
         setError(err.field, { type: "manual", message: err.message });
       });
@@ -83,7 +83,8 @@ export default function SignupForm({ clubInfo, registrationPosition }: { clubInf
                 type="image"
                 field={field}
                 error={errors.profilePic}
-                setError={(errorText) => setError("profilePic", { message: errorText })}
+                setError={(message) => setError("profilePic", { message })}
+                clearError={() => clearErrors("profilePic")}
               />
             )}
           />

@@ -6,7 +6,7 @@ import PasswordSettings from '@/components/security/PasswordSettings';
 import TwoStepSecurity from '@/components/security/TwoStepSecurity';
 import DeviceItem from '@/components/security/DeviceItem';
 import { getSession, getAllSessions, getBackupCodes } from "@/backend/auth";
-import { getMemberProfile } from "@/backend/members";
+import { getMemberProfileById } from "@/backend/members";
 import { formatDate } from '@/utils/utils.backend';
 import { IoIosArrowBack } from "react-icons/io";
 
@@ -23,7 +23,7 @@ export default async function Page() {
     const session = await getSession();
     if (!session) forbidden();
 
-    const userData = await getMemberProfile(session.id);
+    const userData = await getMemberProfileById(session.id);
     const { auth, ...safeUserData } = userData;
 
     const allSessions = await getAllSessions();
@@ -35,7 +35,7 @@ export default async function Page() {
         <>
             <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
                 <Link
-                    href={process.env.NEXT_PUBLIC_APP_BASE_URL as string}
+                    href="/"
                     className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
                 >
                     <IoIosArrowBack size={32} className="text-white drop-shadow-md" />

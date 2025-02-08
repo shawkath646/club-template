@@ -5,10 +5,12 @@ import UpdatePositionDialogContent from "./UpdatePositionDialogContent";
 import UpdateStatusDialogContent from "./UpdateStatusDialogContent";
 import { formatDate, capitalizeWords } from "@/utils/utils.frontend";
 import { MemberProfileType } from "@/types";
+import UpdateNbcIdDialogContainer from "./UpdateNbcIdDialogContainer";
 
 
 export default function ClubInformations({ docId, memberProfileClub }: { docId: string, memberProfileClub: MemberProfileType["club"] }) {
 
+    const [isNbcIdDialogOpen, setNbcIdDialogOpen] = useState(false);
     const [isPositionDialogOpen, setPositionDialogOpen] = useState(false);
     const [isStatusDialogOpen, setStatusDialogOpen] = useState(false);
 
@@ -34,7 +36,13 @@ export default function ClubInformations({ docId, memberProfileClub }: { docId: 
                             <tr>
                                 <td className="font-semibold py-2">NBC ID</td>
                                 <td className="p-2">:</td>
-                                <td>{memberProfileClub.nbcId}</td>
+                                <td>
+                                    <button type="button" onClick={() => setNbcIdDialogOpen(true)} className="flex items-center flex-wrap gap-2 group">
+                                        <span className="text-white bg-white/20 px-3 py-1 rounded-full text-sm font-medium group-hover:bg-yellow-500/30 transition-all">
+                                            {memberProfileClub.nbcId}
+                                        </span>
+                                    </button>
+                                </td>
                             </tr>
                         )}
                         <tr>
@@ -82,6 +90,22 @@ export default function ClubInformations({ docId, memberProfileClub }: { docId: 
                     </tbody>
                 </table>
             </section>
+            <Dialog as="div" open={isNbcIdDialogOpen} onClose={() => { }}>
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
+                    <DialogPanel transition className="w-full max-w-lg rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
+                        <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                            Update NBC ID
+                        </DialogTitle>
+                        <p className="text-gray-700 dark:text-gray-300 mb-6">
+                            Current NBC ID: {memberProfileClub.nbcId}
+                        </p>
+                        <UpdateNbcIdDialogContainer
+                            docId={docId}
+                            setDialogOpen={setNbcIdDialogOpen}
+                        />
+                    </DialogPanel>
+                </div>
+            </Dialog>
             <Dialog as="div" open={isPositionDialogOpen} onClose={() => { }}>
                 <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
                     <DialogPanel transition className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">

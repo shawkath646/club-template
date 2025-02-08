@@ -43,10 +43,10 @@ export default function PasswordSettings({ lastPasswordChanged }: { lastPassword
 
         const response = await changePassword(data.oldPassword, data.newPassword, data.logoutAllDevice);
 
-        if (response !== true) {
-            if (response.oldPassword) {
+        if (!response.success) {
+            if ("oldPassword" in response) {
                 setError("oldPassword", { message: response.oldPassword });
-            } else if (response.newPassword) {
+            } else if ("newPassword" in response) {
                 setError("newPassword", { message: response.newPassword });
             }
         } else {
@@ -54,6 +54,7 @@ export default function PasswordSettings({ lastPasswordChanged }: { lastPassword
             reset();
         }
     };
+
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white/20 dark:bg-black/20 rounded-xl p-8 shadow-xl backdrop-blur-lg space-y-6 h-fit">
@@ -67,7 +68,7 @@ export default function PasswordSettings({ lastPasswordChanged }: { lastPassword
                     error={errors.oldPassword}
                     {...register("oldPassword")}
                 />
-                <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/reset-password`} className="text-sm text-blue-500 hover:text-blue-600 transition-colors">Forgot your passoword?</Link>
+                <Link href="/reset-password" className="text-sm text-blue-500 hover:text-blue-600 transition-colors">Forgot your passoword?</Link>
                 <InputField
                     label="New Password"
                     type="password"

@@ -8,12 +8,13 @@ interface FileUploadType {
     field: ControllerRenderProps<any, any>;
     error?: FieldError;
     setError: (errorText: string) => void;
+    clearError: () => void;
     type?: "image" | "video" | "audio" | "document" | "all";
     maxFileSize?: number;
     isBase64?: boolean;
 }
 
-export default function FileUpload({ label, field, error, setError, type = "all", maxFileSize = 1, isBase64 }: FileUploadType) {
+export default function FileUpload({ label, field, clearError, error, setError, type = "all", maxFileSize = 1, isBase64 }: FileUploadType) {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const fieldId = label.replace(/ /g, "-").toLowerCase();
 
@@ -57,7 +58,7 @@ export default function FileUpload({ label, field, error, setError, type = "all"
             reader.readAsDataURL(file);
         } else {
             field.onChange(file);
-            setError("");
+            clearError();
         }
     };
 
@@ -108,7 +109,7 @@ export default function FileUpload({ label, field, error, setError, type = "all"
                 accept={acceptedFileType[type].join(", ")}
             />
             <p className="text-sm text-gray-300 dark:text-gray-400 mt-2">Note: Only PDF, JPEG, PNG, and DOC file formats are supported. The document must be clear and must not exceed 5MB. Unclear documents will result in rejection.</p>
-            {error && <p className="mt-2 text-sm text-red-600">{error.message}</p>}
+            {error && <p className="mt-2 text-sm text-red-500">{error.message}</p>}
         </div>
     );
 }

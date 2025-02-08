@@ -35,11 +35,11 @@ export default function SetupAuthenticator({ isAuthenticatorEnabled }: { isAuthe
 
         const response = await addAuthenticatorSecretKey(authenticatorData.tempSessionId, authCode);
 
-        if (response === true) {
+        if (response.success) {
             router.refresh();
             setAuthenticatorData(null);
         }
-        else setErrorText(response.error);
+        else setErrorText(response.message);
     };
 
     return (

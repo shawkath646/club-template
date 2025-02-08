@@ -6,7 +6,14 @@ import getClubInfo from "@/constant/getClubInfo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const clubInfo = await getClubInfo();
-  return { title: "Home | " + clubInfo.name };
+  return {
+    title: "Home | " + clubInfo.name,
+    openGraph: {
+      title: {
+        absolute: clubInfo.localName + " | " + clubInfo.name
+      }
+    }
+  };
 };
 
 export default async function Home() {
@@ -17,7 +24,7 @@ export default async function Home() {
       <AdBanner
         data-ad-slot="5201887064"
         data-ad-format="auto"
-        data-full-width-responsive={true}
+        data-full-width-responsive="true"
       />
 
       {/* Notice Board */}
@@ -61,7 +68,7 @@ export default async function Home() {
       <AdBanner
         data-ad-slot="5201887064"
         data-ad-format="auto"
-        data-full-width-responsive={true}
+        data-full-width-responsive="true"
       />
     </>
   );

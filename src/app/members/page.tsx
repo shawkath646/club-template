@@ -32,10 +32,8 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
     let filterBy = searchParams.filterBy ?? "all";
     if (Array.isArray(filterBy)) filterBy = filterBy[0];
 
-
-    const URLPrefix = `${process.env.NEXT_PUBLIC_APP_BASE_URL}/members`;
-    const pageURLPrefix = `${URLPrefix}/?filterBy=${filterBy}&page=`;
-    const filterByPrefix = `${URLPrefix}/?page=${currentPage}&filterBy=`;
+    const pageURLPrefix = `/members?filterBy=${filterBy}&page=`;
+    const filterByPrefix = `/members?page=${currentPage}&filterBy=`;
 
     const { members, totalMembers } = await getPublicMembersPartialProfile({
         pageNumber: currentPage,
@@ -62,7 +60,7 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
         <>
             <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
                 <Link
-                    href={process.env.NEXT_PUBLIC_APP_BASE_URL as string}
+                    href="/"
                     className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
                 >
                     <IoIosArrowBack size={32} className="text-white drop-shadow-md" />
@@ -85,7 +83,7 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
                     <AdBanner
                         data-ad-slot="5910671376"
                         data-ad-format="autorelaxed"
-                        data-full-width-responsive={false}
+                        data-full-width-responsive="false"
                     />
                     <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         {afterAdMembers.map((data, index) => <MemberCard key={index} data={data} />)}
@@ -96,7 +94,7 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
                     <AdBanner
                         data-ad-slot="5910671376"
                         data-ad-format="autorelaxed"
-                        data-full-width-responsive={false}
+                        data-full-width-responsive="false"
                     />
                     <NoItemFound label="members" />
                 </>

@@ -47,7 +47,7 @@ export default function RadioBox({ label, field, options, error, singleLine, isE
             ) : (
                 <p>{field.value.charAt(0).toUpperCase() + field.value.slice(1)}</p>
             )}
-            {error && <p className="mt-2 text-sm text-red-600">{error.message}</p>}
+            {error && <p className="mt-2 text-sm text-red-500">{error.message}</p>}
         </div>
     );
 }

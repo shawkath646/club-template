@@ -1,13 +1,13 @@
 export type PartialFields<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-export type PagePropsType = {
-    params: Promise<{
-        slug: string;
-    }>;
-    searchParams: Promise<{
-        [key: string]: string | string[] | undefined;
-    }>;
+export type PagePropsType = { 
+    params: Promise<Record<string, string>>;
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export type ActionResponseType =
+    | { success: true }
+    | { success: false; message: string };
 
 export interface DialogStateType {
     isOpen: boolean;
@@ -15,26 +15,57 @@ export interface DialogStateType {
     message: string;
 }
 
-export interface DocumentType {
+export interface MemberProfileType {
     id: string;
-    status: string;
-    title: string;
-    issuedTo: string;
-    issuedBy: string;
-    issuedOn: Date;
-    validTo: Date;
-    format: string;
-    fileName: string;
-    downloadLink: string;
-    scope: string;
-    verifiable: boolean;
-}
-
-export interface DocumentVerificationType {
-    status?: boolean;
-    statusText?: string;
-    docInfo?: PartialFields<DocumentType, "downloadLink" | "fileName" | "scope" | "format" | "verifiable">;
-}
+    personal: {
+        fullName: string;
+        dateOfBirth: Date;
+        gender: string;
+        picture: string;
+        fatherName: string;
+        motherName: string;
+        address: string;
+    },
+    identification: {
+        primaryEmail: string;
+        phoneNumber: {
+            value: string;
+            isVerified: boolean;
+        }
+        personalIdentificationNo: string;
+        fbProfileLink: string;
+    }
+    educational: {
+        institute: string;
+        instituteAddress: string;
+        studentID: string;
+        background: string;
+        presentClass: string;
+    },
+    club: {
+        nbcId: number;
+        reason: string;
+        permissions: string[];
+        interestedIn: string;
+        extraCurricularActivities: string;
+        position: string[];
+        status: "approved" | "pending" | "rejected" | "suspended";
+        joinedOn: Date;
+        specialNote?: string;
+    },
+    auth: {
+        password: string;
+        previousPassword: string;
+        lastPasswordChange: Date;
+        isTwoStep: boolean;
+        twoStepMethods: {
+            phones: string[];
+            emails: string[];
+            authenticator: string;
+        },
+        backupCodes: string[];
+    }
+};
 
 export interface MemberFormType {
     fullName: string;
@@ -100,122 +131,6 @@ export interface MemberPublicPartialProfileType {
     }
 }
 
-export interface MemberProfileType {
-    id: string;
-    personal: {
-        fullName: string;
-        dateOfBirth: Date;
-        gender: string;
-        picture: string;
-        fatherName: string;
-        motherName: string;
-        address: string;
-    },
-    identification: {
-        primaryEmail: string;
-        phoneNumber: {
-            value: string;
-            isVerified: boolean;
-        }
-        personalIdentificationNo: string;
-        fbProfileLink: string;
-    }
-    educational: {
-        institute: string;
-        instituteAddress: string;
-        studentID: string;
-        background: string;
-        presentClass: string;
-    },
-    club: {
-        nbcId: number;
-        reason: string;
-        permissions: string[];
-        interestedIn: string;
-        extraCurricularActivities: string;
-        position: string[];
-        status: "approved" | "pending" | "rejected" | "suspended";
-        joinedOn: Date;
-        specialNote?: string;
-    },
-    auth: {
-        password: string;
-        previousPassword: string;
-        lastPasswordChange: Date;
-        isTwoStep: boolean;
-        twoStepMethods: {
-            phones: string[];
-            emails: string[];
-            authenticator: string;
-        },
-        backupCodes: string[];
-    }
-};
-
-export interface NoticeFormType {
-    title: string;
-    description: string;
-    attachment?: File | string | ArrayBuffer | null;
-    isImportant: boolean;
-}
-
-export interface NoticeType {
-    id: string;
-    title: string;
-    description: string;
-    attachment: string;
-    isImportant: boolean;
-    timestamp: Date;
-    seenBy: string[];
-}
-
-export interface LoginFormType {
-    nbcId: string;
-    password: string;
-}
-
-export interface ResetPasswordFormType {
-    nbcId: number;
-    email: string;
-    verificationCode: string;
-    newPassword: string;
-    confirmNewPassword: string;
-}
-
-export interface ClubInfoType {
-    name: string;
-    slogan: string;
-    address: string;
-    contacts: {
-        email: string;
-        phoneNumber: string;
-    }
-    establishedOn: Date;
-    logo: string;
-    social: {
-        facebookPage: string;
-        facebookGroup: string;
-        messengerGroupPublic: string;
-    }
-}
-
-export interface HistoryType {
-    id: string;
-    setBy: string;
-    setTo: string;
-    message: string;
-    timestamp: Date;
-}
-
-export interface PaymentType {
-    id: string;
-    paymentMethod: string;
-    paymentFor: string;
-    last4digit: string;
-    transactionId: string;
-    isApproved: string;
-}
-
 export interface MemberSearchBarResultType {
     id: string;
     fullName: string;
@@ -240,7 +155,7 @@ export interface UserSessionObject {
     sessionId: string;
 }
 
-export interface SessionObject {
+export interface ServerSessionObject {
     id: string;
     userId: string;
     location: string;
@@ -249,4 +164,114 @@ export interface SessionObject {
     timestamp: Date;
     lastActive: Date;
     status: "active" | "expired" | "signedout";
+}
+
+export interface LoginFormType {
+    nbcId: string;
+    password: string;
+}
+
+export interface ResetPasswordFormType {
+    nbcId: number;
+    email: string;
+    verificationCode: string;
+    newPassword: string;
+    confirmNewPassword: string;
+}
+
+export interface BlogPostType {
+    id: string;
+    title: string;
+    postText: string;
+    timestamp: Date;
+    thumbnail: string;
+    authorId: string;
+    authorName: string;
+    keywords: string[];
+    isModified: boolean;
+    isApproved: boolean;
+    seenBy: number;
+    slug: string;
+    excerpt: string;
+}
+
+export interface BlogPostFormType {
+    title: string;
+    postText: string;
+    thumbnail: string;
+    keywords: string[];
+    excerpt: string;
+}
+
+export interface DocumentType {
+    id: string;
+    status: string;
+    title: string;
+    issuedTo: string;
+    issuedBy: string;
+    issuedOn: Date;
+    validTo: Date;
+    format: string;
+    fileName: string;
+    downloadLink: string;
+    scope: string;
+    verifiable: boolean;
+}
+
+export interface DocumentVerificationType {
+    status?: boolean;
+    statusText?: string;
+    docInfo?: PartialFields<DocumentType, "downloadLink" | "fileName" | "scope" | "format" | "verifiable">;
+}
+
+export interface NoticeType {
+    id: string;
+    title: string;
+    description: string;
+    attachment: string;
+    isImportant: boolean;
+    timestamp: Date;
+    seenBy: string[];
+}
+
+export interface NoticeFormType {
+    title: string;
+    description: string;
+    attachment?: File | string | ArrayBuffer | null;
+    isImportant: boolean;
+}
+
+export interface HistoryType {
+    id: string;
+    setBy: string;
+    setTo: string;
+    message: string;
+    timestamp: Date;
+}
+
+export interface PaymentType {
+    id: string;
+    paymentMethod: string;
+    paymentFor: string;
+    last4digit: string;
+    transactionId: string;
+    isApproved: string;
+}
+
+export interface ClubInfoType {
+    name: string;
+    localName: string;
+    slogan: string;
+    address: string;
+    contacts: {
+        email: string;
+        phoneNumber: string;
+    }
+    establishedOn: Date;
+    logo: string;
+    social: {
+        facebookPage: string;
+        facebookGroup: string;
+        messengerGroupPublic: string;
+    }
 }

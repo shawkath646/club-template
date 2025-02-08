@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useState, useTransition } from "react";
 import StylistButton from "@/components/form/StylistButton";
-import { updatePosition } from "@/backend/members";
+import { updateMemberPosition } from "@/backend/members";
 import { capitalizeWords } from "@/utils/utils.frontend";
 import joiningFormOptions from "@/constant/joiningFormOptions.json";
 import { RxCross1 } from "react-icons/rx";
@@ -21,9 +21,11 @@ export default function UpdatePositionDialogContent({ docId, defaultPosition, se
     const router = useRouter();
 
     const handlePositionUpdate = () => startTransition(async () => {
-        await updatePosition(docId, currentPosition);
-        router.refresh();
-        setDialogOpen(false);
+        const response = await updateMemberPosition(docId, currentPosition);
+        if (response.success) {
+            router.refresh();
+            setDialogOpen(false);
+        };
     });
 
     return (
@@ -60,7 +62,7 @@ export default function UpdatePositionDialogContent({ docId, defaultPosition, se
                 ))}
             </select>
 
-            <div className="flex flex-wrap items-center justify-end gap-3">
+            <div className="flex items-center justify-end gap-3">
                 <StylistButton
                     colorScheme="red"
                     isDisabled={isLoading}

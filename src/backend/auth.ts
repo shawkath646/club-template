@@ -5,40 +5,23 @@ import { cache } from 'react';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { authenticator } from 'otplib';
-import { getMemberProfile } from './members';
+import { getMemberProfileById } from './members';
 import { generatePassword, generateRandomId, timestampToDate } from '@/utils/utils.backend';
 import { db } from '@/config/firebase.config';
 import { sendMail } from './baseApp';
-import resetPasswordEmailTemplate from '@/templates/resetPasswordEmail.template';
+import resetPasswordEmailTemplate from '@/templates/passwordResetEmail.template';
 import getClubInfo from '@/constant/getClubInfo';
-import { MemberProfileType, UserSessionObject, SessionObject } from '@/types';
+import { MemberProfileType, UserSessionObject, ServerSessionObject, ActionResponseType } from '@/types';
+
+const SECRET_KEY = process.env.AUTH_SECRET;
+if (!SECRET_KEY) throw new Error("Error: [Auth] No secret key found!");
 
 interface CookieObject extends JwtPayload {
   id: string;
   userId: string;
 }
 
-interface SignInOptions {
-  twoStepCode?: number;
-  redirectTo?: string;
-}
-
-interface SignOutOptions {
-  sessionId?: string;
-  redirectTo?: string;
-}
-
-interface TempSessionType {
-  secretKey: string;
-  createdAt: Date;
-  expiresAt: Date;
-  userId: string;
-}
-
-const SECRET_KEY = process.env.AUTH_SECRET;
-if (!SECRET_KEY) throw new Error("Error: [Auth] No secret key found!");
-
-const getSession = cache(async (): Promise<UserSessionObject | null> => {
+export const getSession = cache(async (): Promise<UserSessionObject | null> => {
 
   const cookiesList = await cookies();
   const sessionCookie = cookiesList.get('auth_session')?.value;
@@ -47,7 +30,7 @@ const getSession = cache(async (): Promise<UserSessionObject | null> => {
   const payload = jwt.verify(sessionCookie, SECRET_KEY) as CookieObject;
 
   const sessionDoc = await db.collection("members").doc(payload.userId).collection("sessions").doc(payload.id).get();
-  const sessionData = sessionDoc.data() as SessionObject | undefined;
+  const sessionData = sessionDoc.data() as ServerSessionObject | undefined;
 
   if (!sessionData || sessionData.status !== "active") {
     // cookiesList.delete('auth_session');
@@ -72,10 +55,31 @@ const getSession = cache(async (): Promise<UserSessionObject | null> => {
   };
 });
 
-const signIn = async (
+export const getAllSessions = cache(async () => {
+  const session = await getSession();
+  if (!session) forbidden();
+  const sessionSnapshot = await db.collection("members")
+    .doc(session.id)
+    .collection("sessions")
+    .orderBy("timestamp", "desc")
+    .get();
+  return sessionSnapshot.docs.map(doc => {
+    const data = doc.data() as ServerSessionObject;
+    data.lastActive = timestampToDate(data.lastActive);
+    data.timestamp = timestampToDate(data.timestamp);
+    return data;
+  });
+});
+
+interface SignInPropsType {
+  twoStepCode?: number;
+  redirectTo?: string;
+}
+
+export const signIn = async (
   nbcId: number,
   password: string,
-  { twoStepCode, redirectTo }: SignInOptions = {}
+  { twoStepCode, redirectTo }: SignInPropsType = {}
 ) => {
   const userRef = await db.collection("members").where("club.nbcId", "==", nbcId).limit(1).get();
   if (userRef.empty) return;
@@ -101,7 +105,7 @@ const signIn = async (
     console.error("Failed to fetch location:", locationError);
   }
 
-  const sessionObject: SessionObject = {
+  const sessionObject: ServerSessionObject = {
     id: "SESSION" + generateRandomId(10),
     userId: userData.id,
     ipAddress: deviceIP,
@@ -123,10 +127,10 @@ const signIn = async (
   const cookieList = await cookies();
   cookieList.set({ name: "auth_session", value: token, httpOnly: true, secure: true, expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) });
 
-  return redirect(redirectTo ?? (userData.club.permissions.length ? `${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools` : process.env.NEXT_PUBLIC_APP_BASE_URL as string));
+  return redirect(redirectTo ?? (userData.club.permissions.length ? "/admin-tools" : "/"));
 };
 
-const signOut = async ({ sessionId, redirectTo }: SignOutOptions = {}) => {
+export const signOut = async ({ sessionId, redirectTo }: SignOutPropsType = {}): Promise<void> => {
   const session = await getSession();
   if (!session) forbidden();
 
@@ -144,38 +148,34 @@ const signOut = async ({ sessionId, redirectTo }: SignOutOptions = {}) => {
 
     return redirect(redirectTo ?? "/");
   };
-
-  return true;
 };
 
+interface SignOutPropsType {
+  sessionId?: string;
+  redirectTo?: string;
+}
 
-const getAllSessions = cache(async () => {
-  const session = await getSession();
-  if (!session) forbidden();
-  const sessionSnapshot = await db.collection("members")
-    .doc(session.id)
-    .collection("sessions")
-    .orderBy("timestamp", "desc")
-    .get();
-  return sessionSnapshot.docs.map(doc => {
-    const data = doc.data() as SessionObject;
-    data.lastActive = timestampToDate(data.lastActive);
-    data.timestamp = timestampToDate(data.timestamp);
-    return data;
-  });
-});
-
-const changePassword = async (oldPassword: string, newPassword: string, logoutAllDevice: boolean) => {
+export const changePassword = async (oldPassword: string, newPassword: string, logoutAllDevice: boolean) => {
   const session = await getSession();
   if (!session) forbidden();
 
-  const userData = await getMemberProfile(session.id);
+  const userData = await getMemberProfileById(session.id);
 
   const isMatchOldPassword = await bcrypt.compare(newPassword, userData.auth.previousPassword);
-  if (newPassword === oldPassword || isMatchOldPassword) return { newPassword: "New password can't be old password" };
+  if (newPassword === oldPassword || isMatchOldPassword) {
+    return {
+      success: false,
+      newPassword: "New password can't be old password"
+    };
+  }
 
   const isPasswordCorrect = await bcrypt.compare(oldPassword, userData.auth.password);
-  if (!isPasswordCorrect) return { oldPassword: "Incorrect password" };
+  if (!isPasswordCorrect) {
+    return {
+      success: false,
+      oldPassword: "Incorrect password"
+    };
+  }
 
   const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
@@ -204,10 +204,115 @@ const changePassword = async (oldPassword: string, newPassword: string, logoutAl
     return redirect("/");
   };
 
-  return true;
+  return {
+    success: true
+  };
 };
 
-const changeTwoStepStatus = async (value: boolean) => {
+type GetPasswordResetCodeResponseType =
+  | { success: true; tempSessionId: string; }
+  | { success: false; nbcId: string; }
+  | { success: false; email: string; }
+
+export const getPasswordResetCode = async (primaryEmail: string, nbcId: number): Promise<GetPasswordResetCodeResponseType> => {
+  const queryDoc = await db.collection("members").where("club.nbcId", "==", nbcId).get();
+  if (queryDoc.empty) return {
+    success: false,
+    nbcId: "No user associated with the provided data.",
+    email: "No user associated with the provided data."
+  };
+
+  const userData = queryDoc.docs[0].data() as MemberProfileType;
+  if (userData.identification.primaryEmail !== primaryEmail) return {
+    success: false,
+    nbcId: "No user associated with the provided data.",
+    email: "No user associated with the provided data."
+  };
+
+  const secretKey = generatePassword({ numberOnly: true, length: 6 });
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  const tempSessionData: TempSessionType = {
+    userId: userData.id,
+    createdAt: new Date(),
+    secretKey,
+    expiresAt
+  };
+
+  const clubInfo = await getClubInfo();
+
+  await sendMail({
+    recipient: userData.identification.primaryEmail,
+    subject: `${clubInfo.name}: Verification code for resetting password`,
+    body: await resetPasswordEmailTemplate({
+      applicantName: userData.personal.fullName,
+      nbcId,
+      verificationCode: secretKey
+    }),
+    type: "html",
+  });
+
+  const tempSessionDoc = await db.collection("tempSession").add(tempSessionData);
+  return {
+    success: true,
+    tempSessionId: tempSessionDoc.id
+  };
+};
+
+interface TempSessionType {
+  secretKey: string;
+  createdAt: Date;
+  expiresAt: Date;
+  userId: string;
+}
+
+export const resetPassword = async (sessionId: string, verificationCode: string, newPassword: string) => {
+  const sessionDoc = await db.collection("tempSession").doc(sessionId).get();
+  if (!sessionDoc.exists) {
+    return {
+      success: false,
+      verificationCode: "Invalid or expired session."
+    };
+  }
+
+  const sessionData = sessionDoc.data() as TempSessionType;
+
+  const isCodeValid = sessionData.secretKey === verificationCode;
+  const isSessionValid = new Date() <= timestampToDate(sessionData.expiresAt);
+  if (!isCodeValid || !isSessionValid) {
+    return {
+      success: false,
+      verificationCode: "Invalid verification code."
+    };
+  }
+
+  const userData = await getMemberProfileById(sessionData.userId);
+
+  const isPasswordReused =
+    await bcrypt.compare(newPassword, userData.auth.password) ||
+    (userData.auth.previousPassword && await bcrypt.compare(newPassword, userData.auth.previousPassword));
+
+  if (isPasswordReused) {
+    return {
+      success: false,
+      newPassword: "New password can't be the same as the old password."
+    };
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await db.collection("members").doc(sessionData.userId).update({
+    "auth.previousPassword": userData.auth.password,
+    "auth.password": hashedPassword,
+  });
+
+  await db.collection("tempSession").doc(sessionId).delete();
+  return {
+    success: true
+  };
+};
+
+export const changeTwoStepStatus = async (value: boolean) => {
   const session = await getSession();
   if (!session) forbidden();
 
@@ -218,10 +323,12 @@ const changeTwoStepStatus = async (value: boolean) => {
       "auth.isTwoStep": value,
     });
 
-  return true;
+  return {
+    success: true
+  }
 };
 
-const getAuthenticatorSecretKey = async () => {
+export const getAuthenticatorSecretKey = async () => {
   const session = await getSession();
   if (!session) forbidden();
 
@@ -247,54 +354,71 @@ const getAuthenticatorSecretKey = async () => {
   };
 };
 
-const addAuthenticatorSecretKey = async (tempSessionId: string, token: string) => {
+export const addAuthenticatorSecretKey = async (tempSessionId: string, token: string): Promise<ActionResponseType> => {
   const session = await getSession();
   if (!session) forbidden();
 
   const tempSessionDoc = await db.collection("tempSession").doc(tempSessionId).get();
-  if (!tempSessionDoc.exists) return { error: "Temporary session not found" };
+  if (!tempSessionDoc.exists) {
+    return {
+      success: false,
+      message: "Temporary session not found."
+    };
+  }
 
   const tempSession = tempSessionDoc.data() as TempSessionType;
 
   if (new Date() > timestampToDate(tempSession.expiresAt)) {
     await tempSessionDoc.ref.delete();
-    return { error: "Temporary session expired" };
+    return {
+      success: false,
+      message: "Temporary session expired."
+    };
   }
 
   const isValidToken = authenticator.check(token, tempSession.secretKey);
-  if (!isValidToken) return { error: "Invalid token" };
+  if (!isValidToken) {
+    return {
+      success: false,
+      message: "Invalid token"
+    };
+  };
 
   await db.collection("members").doc(session.id).update({
     "auth.twoStepMethods.authenticator": tempSession.secretKey,
   });
 
   await tempSessionDoc.ref.delete();
-  return true;
+  return {
+    success: true
+  };
 };
 
-const removeAuthenticator = async () => {
+export const removeAuthenticator = async () => {
   const session = await getSession();
   if (!session) forbidden();
 
   await db.collection("members").doc(session.id).update("auth.twoStepMethods.authenticator", "");
-  return true;
+  return {
+    success: true
+  };
 };
 
-const getBackupCodes = cache(async () => {
+export const getBackupCodes = cache(async () => {
   const session = await getSession();
   if (!session) forbidden();
 
-  const userData = await getMemberProfile(session.id);
+  const userData = await getMemberProfileById(session.id);
   let backupCodes = userData.auth.backupCodes;
 
   if (!backupCodes.length) {
-    backupCodes = await resetBackupCodes();
+    backupCodes = (await resetBackupCodes()).newBackupCodes;
   };
 
   return backupCodes;
 });
 
-const resetBackupCodes = async () => {
+export const resetBackupCodes = async () => {
   const session = await getSession();
   if (!session) forbidden();
 
@@ -304,100 +428,8 @@ const resetBackupCodes = async () => {
   }
 
   await db.collection("members").doc(session.id).update({ "auth.backupCodes": newBackupCodes });
-  return newBackupCodes;
-};
-
-const getResetPasswordCode = async (primaryEmail: string, nbcId: number) => {
-  const queryDoc = await db.collection("members").where("club.nbcId", "==", nbcId).get();
-  if (queryDoc.empty) return {
-    nbcId: "No user associated with the provided data.",
-    email: "No user associated with the provided data."
-  };
-
-  const userData = queryDoc.docs[0].data() as MemberProfileType;
-  if (userData.identification.primaryEmail !== primaryEmail) return {
-    nbcId: "No user associated with the provided data.",
-    email: "No user associated with the provided data."
-  };
-
-  const secretKey = generatePassword({ numberOnly: true, length: 6 });
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
-  const tempSessionData: TempSessionType = {
-    userId: userData.id,
-    createdAt: new Date(),
-    secretKey,
-    expiresAt
-  };
-
-  const clubInfo = await getClubInfo();
-
-  await sendMail(
-    userData.identification.primaryEmail,
-    {
-      subject: `${clubInfo.name}: Verification code for resetting password`,
-      body: await resetPasswordEmailTemplate({
-        applicantName: userData.personal.fullName,
-        nbcId,
-        verificationCode: secretKey
-      }),
-      type: "html"
-    }
-  );
-
-  const tempSessionDoc = await db.collection("tempSession").add(tempSessionData);
-  return tempSessionDoc.id;
-};
-
-const resetPassword = async (sessionId: string, verificationCode: string, newPassword: string) => {
-  const sessionDoc = await db.collection("tempSession").doc(sessionId).get();
-  if (!sessionDoc.exists) {
-    return { verificationCode: "Invalid or expired session." };
+  return {
+    success: true,
+    newBackupCodes
   }
-
-  const sessionData = sessionDoc.data() as TempSessionType;
-
-  const isCodeValid = sessionData.secretKey === verificationCode;
-  const isSessionValid = new Date() <= timestampToDate(sessionData.expiresAt);
-  if (!isCodeValid || !isSessionValid) {
-    return { verificationCode: "Invalid verification code." };
-  }
-
-  const userData = await getMemberProfile(sessionData.userId);
-
-  const isPasswordReused =
-    await bcrypt.compare(newPassword, userData.auth.password) ||
-    (userData.auth.previousPassword && await bcrypt.compare(newPassword, userData.auth.previousPassword));
-
-  if (isPasswordReused) {
-    return { newPassword: "New password can't be the same as the old password." };
-  }
-
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-  await db.collection("members").doc(sessionData.userId).update({
-    "auth.previousPassword": userData.auth.password,
-    "auth.password": hashedPassword,
-  });
-
-  await db.collection("tempSession").doc(sessionId).delete();
-  return true;
-};
-
-
-
-export {
-  signIn,
-  signOut,
-  getSession,
-  getAllSessions,
-  changePassword,
-  changeTwoStepStatus,
-  getAuthenticatorSecretKey,
-  addAuthenticatorSecretKey,
-  removeAuthenticator,
-  getBackupCodes,
-  resetBackupCodes,
-  getResetPasswordCode,
-  resetPassword
 };

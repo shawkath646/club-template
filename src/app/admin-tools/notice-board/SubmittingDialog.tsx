@@ -27,7 +27,7 @@ export default function SubmittingDialog({ clubInfo, dialogState, setDialogState
     };
 
     const onNoticeURLCopy = async () => {
-        const noticeURL = `${process.env.NEXT_PUBLIC_APP_BASE_URL}/documents&notice-board?select=${dialogState.message}`;
+        const noticeURL = "/documents&notice-board?select=" + dialogState.message;
         await navigator.clipboard.writeText(noticeURL);
         setURLCopied(true);
     };

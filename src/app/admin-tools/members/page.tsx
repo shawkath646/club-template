@@ -17,10 +17,9 @@ export const metadata: Metadata = {
 
 type AllowedTab = "approved" | "pending" | "suspended" | "rejected";
 
-export default async function Page({ searchParams: searchParamsPromise }: PagePropsType) {
+export default async function Page(pageProps: PagePropsType) {
 
-    const searchParams = await searchParamsPromise;
-
+    const searchParams = await pageProps.searchParams;
     const currentPage = Number.isNaN(Number(searchParams.page)) ? 1 : Number(searchParams.page ?? 1);
     let currentTab: AllowedTab = (searchParams.tab ?? "approved") as AllowedTab;
     let filterBy = searchParams.filterBy ?? "all";
@@ -31,7 +30,7 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
     const allowedTabs: AllowedTab[] = ["approved", "pending", "suspended", "rejected"];
     if (!allowedTabs.includes(currentTab)) currentTab = "approved";
 
-    const URLPrefix = `${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members`;
+    const URLPrefix = "/admin-tools/members";
     const pageURLPrefix = `${URLPrefix}/?tab=${currentTab}&filterBy=${filterBy}&page=`;
     const filterByPrefix = `${URLPrefix}/?tab=${currentTab}&page=${currentPage}&filterBy=`;
 
@@ -53,7 +52,7 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
         <>
             <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
                 <Link
-                    href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools`}
+                    href="/admin-tools"
                     className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
                 >
                     <IoIosArrowBack size={32} className="text-white drop-shadow-md" />

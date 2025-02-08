@@ -6,27 +6,26 @@ import ClubInformations from "./ClubInformations";
 import MemberPermissions from "./MemberPermissions";
 import PDFDownloadButton from "./PDFDownloadButton";
 import ProfilePictureDownloadButton from "./ProfilePictureDownloadButton";
-import { getMemberProfile } from "@/backend/members";
+import { getMemberProfileById } from "@/backend/members";
 import { capitalizeWords, formatDate } from "@/utils/utils.backend";
 import { PagePropsType } from "@/types";
 import { IoIosArrowBack } from "react-icons/io";
 
-export async function generateMetadata({ searchParams: searchParamsPromise }: PagePropsType): Promise<Metadata> {
-    const searchParams = await searchParamsPromise;
-    let userId = searchParams.id;
+export async function generateMetadata(pageProps: PagePropsType): Promise<Metadata> {
+    let userId = (await pageProps.searchParams).id;
 
     if (Array.isArray(userId)) userId = userId[0];
     if (!userId) return { title: "Invalid ID provided" };
 
-    const memberProfile = await getMemberProfile(userId);
+    const memberProfile = await getMemberProfileById(userId);
     return {
         title: memberProfile.personal.fullName
     };
 };
 
-export default async function Page({ searchParams: searchParamsPromise }: PagePropsType) {
+export default async function Page(pageProps: PagePropsType) {
 
-    const searchParams = await searchParamsPromise;
+    const searchParams = await pageProps.searchParams;
     let userId = searchParams.id;
     let callbackUrl = searchParams.callbackUrl;
 
@@ -35,8 +34,8 @@ export default async function Page({ searchParams: searchParamsPromise }: PagePr
 
     if (!userId) notFound();
 
-    const decodedCallbackUrl = decodeURIComponent(callbackUrl || `${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members`);
-    const memberProfile = await getMemberProfile(userId);
+    const decodedCallbackUrl = decodeURIComponent(callbackUrl || "/admin-tools/members");
+    const memberProfile = await getMemberProfileById(userId);
 
     return (
         <>

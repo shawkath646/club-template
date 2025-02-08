@@ -8,7 +8,7 @@ import StylistButton from "@/components/form/StylistButton";
 import RadioBox from "@/components/form/RadioBox";
 import { yupResolver } from "@hookform/resolvers/yup";
 import validationSchema from "./formValidation";
-import { updateProfile } from "@/backend/members";
+import { updateSelfProfile } from "@/backend/members";
 import { getTodayDate } from "@/utils/utils.frontend";
 import joiningFormOptions from "@/constant/joiningFormOptions.json";
 import { MemberProfileType, MemberUpdateProfileType } from "@/types";
@@ -41,7 +41,7 @@ export default function InformationContainer({ memberProfile }: { memberProfile:
     });
 
     const onSubmit: SubmitHandler<MemberUpdateProfileType> = async (data) => {
-        await updateProfile(data);
+        await updateSelfProfile(data);
         router.refresh();
         setEditMode(false);
     };
@@ -49,7 +49,7 @@ export default function InformationContainer({ memberProfile }: { memberProfile:
     return (
         <>
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
-                <section className="flex space-x-5 items-center">
+                <section className="flex gap-5 items-center">
                     <ProfilePictureContainer
                         memberFullName={memberProfile.personal.fullName}
                         pictureUrl={memberProfile.personal.picture}

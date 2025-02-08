@@ -1,5 +1,6 @@
 "use server";
 import jwt from "jsonwebtoken";
+import { ActionResponseType } from "@/types";
 
 const baseAppUrl = "https://cloudburstlab.vercel.app";
 
@@ -47,52 +48,25 @@ interface AttachmentFileType {
     base64: string;
 };
 
-interface ApiResponseType {
-    success: boolean;
-    message: string;
+interface SendMailPropsType {
+    recipient: string,
+    subject: string;
+    body: string;
+    type?: "text" | "html";
+    cc?: string[];
+    bcc?: string[];
+    attachments?: AttachmentFileType[];
 }
 
-const sendMail = async (
-    recipient: string,
-    {
-        subject,
-        body,
-        type = "text",
-        cc = [],
-        bcc = [],
-        attachments = [],
-    }: {
-        subject: string;
-        body: string;
-        type?: "text" | "html";
-        cc?: string[];
-        bcc?: string[];
-        attachments?: AttachmentFileType[];
-    }
-) => {
-    const payloadBody = {
-        recipient,
-        subject,
-        body,
-        type,
-        cc,
-        bcc,
-        attachments,
-    };
-
+export const sendMail = async (props: SendMailPropsType) => {
     const response = await fetch(`${baseAppUrl}/api/services/send-mail`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${generateAuthorizationToken()}`,
         },
-        body: JSON.stringify(payloadBody),
+        body: JSON.stringify(props),
     });
 
-    const result = await response.json() as ApiResponseType;
-    return result;
-};
-
-export {
-    sendMail
+    return await response.json() as ActionResponseType;
 };

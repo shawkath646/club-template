@@ -25,7 +25,7 @@ export default function LoginForm({ redirectTo }: { redirectTo?: string; }) {
             <InputField type="number" label="NBC ID" {...register("nbcId")} error={errors.nbcId} />
             <InputField type="password" label="Password" {...register("password")} error={errors.password} />
 
-            <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/reset-password`} className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 block">Forgot your password?</Link>
+            <Link href="/reset-password" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 block">Forgot your password?</Link>
 
             <div className="text-center">
                 <StylistButton type="submit" size="md" isLoading={isSubmitting}>Login</StylistButton>

@@ -25,7 +25,7 @@ export default async function Page() {
                     Documents
                 </h1>
                 <Link
-                    href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/documents&notice/verify-doc`}
+                    href="/documents&notice/verify-doc"
                     className="inline-flex items-center space-x-2 sm:space-x-3 px-4 py-2 sm:px-6 sm:py-2.5 bg-blue-500 text-white font-medium text-xs sm:text-sm leading-tight uppercase rounded shadow-md hover:bg-blue-600 hover:shadow-lg focus:bg-blue-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-700 active:shadow-lg transition duration-150 ease-in-out dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:bg-blue-700 dark:active:bg-blue-800"
                 >
                     <p>Verify Document</p>

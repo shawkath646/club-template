@@ -22,7 +22,7 @@ export default function AddNotice({ clubInfo }: { clubInfo: ClubInfoType }) {
         message: "",
     });
 
-    const { register, control, handleSubmit, setError, reset, formState: { errors, isSubmitting } } = useForm<NoticeFormType>({
+    const { register, control, clearErrors, handleSubmit, setError, reset, formState: { errors, isSubmitting } } = useForm<NoticeFormType>({
         resolver: yupResolver(validationSchema)
     });
 
@@ -79,6 +79,7 @@ export default function AddNotice({ clubInfo }: { clubInfo: ClubInfoType }) {
                                     setError={(message) =>
                                         setError("attachment", { message })
                                     }
+                                    clearError={() => clearErrors("attachment")}
                                     error={errors.attachment}
                                 />
                             )}

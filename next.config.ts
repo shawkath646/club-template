@@ -1,21 +1,6 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig: import('next').NextConfig = {
-    async redirects() {
-        return [
-            {
-                source: '/documents/verify',
-                destination: '/documents&notice/verify-doc?docId=:docId',
-                permanent: true,
-                has: [
-                    {
-                        type: 'query',
-                        key: 'docId',
-                    },
-                ],
-            },
-        ]
-    },
     images: {
         remotePatterns: [
             {

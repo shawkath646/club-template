@@ -40,7 +40,7 @@ export default function SearchBar() {
                     />
                     {searchValue.length >= 3 && false ? (
                         <Link
-                            href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members?search=${searchValue}`}
+                            href={"/admin-tools/members?search=" + searchValue}
                             className="w-[120px] py-2 text-sm text-center inline-block bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:ring-green-500 font-medium text-white dark:text-gray-200 focus:ring-2 focus:ring-offset-2 rounded-lg shadow-md transform hover:scale-105 focus:scale-105 transition-all duration-300 ease-out"
                         >
                             Search
@@ -67,7 +67,7 @@ export default function SearchBar() {
                                     <ComboboxOption
                                         key={result.id}
                                         as={Link}
-                                        href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members/profile?id=${result.id}`}
+                                        href={"/admin-tools/members/profile?id=" + result.id}
                                         className="relative cursor-pointer select-none py-3 px-6 text-gray-900 dark:text-gray-200 flex justify-between items-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                                         value={result}
                                     >

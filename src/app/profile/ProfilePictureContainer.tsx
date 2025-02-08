@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import StylistButton from "@/components/form/StylistButton";
 import FileUpload from "@/components/form/FileUpload";
-import { changeProfilePicture } from "@/backend/members";
+import { updateSelfProfilePicture } from "@/backend/members";
 
 export default function ProfilePictureContainer({
     pictureUrl,
@@ -22,7 +22,7 @@ export default function ProfilePictureContainer({
 
     const handleProfilePictureChange = () => startTransition(async () => {
         if (!newProfilePicture) setErrorText("Invalid profile picture selected");
-        await changeProfilePicture(newProfilePicture);
+        await updateSelfProfilePicture(newProfilePicture);
         setNewProfilePicture("");
         router.refresh();
         setErrorText("");
@@ -95,6 +95,7 @@ export default function ProfilePictureContainer({
                                     value: newProfilePicture,
                                 }}
                                 setError={setErrorText}
+                                clearError={() => setErrorText("")}
                                 isBase64
                                 error={{ type: "validate", message: errorText }}
                             />

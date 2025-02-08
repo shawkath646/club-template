@@ -2,19 +2,19 @@
 import getClubInfo from "@/constant/getClubInfo";
 
 const resetPasswordEmailTemplate = async ({
-    applicantName,
-    nbcId,
-    verificationCode
+  applicantName,
+  nbcId,
+  verificationCode
 }: {
-    applicantName: string;
-    nbcId: number;
-    verificationCode: string;
+  applicantName: string;
+  nbcId: number;
+  verificationCode: string;
 }) => {
 
-    const clubInfo = await getClubInfo();
-    const today = new Date();
+  const clubInfo = await getClubInfo();
+  const today = new Date();
 
-    return (`
+  return (`
     <!DOCTYPE html>
     <html>
       <head>
@@ -36,9 +36,8 @@ const resetPasswordEmailTemplate = async ({
             <p>
               We are informing you that someone has tried to resetting your ${clubInfo.name} Id's password. If that was you, enter the 6 digit code to proceed otherwise you may ignore it. We always recommend you to enable two step protection to prevent unauthorized access.
             </p>
-            <p>
-              <strong>NBC ID:</strong> ${nbcId}<br />
-              <p>Verification Code:</p>
+            <strong>NBC ID:</strong> ${nbcId}<br />
+            <p>Verification Code:</p>
             <p style="background-color: #e0f7fa; padding: 15px; font-size: 18px; border-radius: 8px; border: 1px solid #90e0ef; color: #0077b6;">
              ${verificationCode}
             </p>

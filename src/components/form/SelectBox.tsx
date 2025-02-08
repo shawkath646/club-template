@@ -37,7 +37,7 @@ export default function SelectBox({ field, label, options, error, isEditable = t
                     </option>
                 ))}
             </select>
-            {error && <p className="mt-2 text-sm text-red-600">{error.message}</p>}
+            {error && <p className="mt-2 text-sm text-red-500">{error.message}</p>}
         </div>
     );
 }

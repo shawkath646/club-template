@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { updatePermissions } from "@/backend/members";
+import { updateMemberPermission } from "@/backend/members";
 import permissionsList from "@/constant/permissionsList.json";
 import { IoCheckbox } from "react-icons/io5";
 
@@ -15,12 +15,7 @@ export default function MemberPermissions({ preloadPermissions, docId }: { prelo
             : [...permissions, permission];
 
         setPermissions(updatedPermissions);
-
-        try {
-            await updatePermissions(docId, updatedPermissions);
-        } catch (error) {
-            console.error("Failed to update permissions:", error);
-        }
+        await updateMemberPermission(docId, updatedPermissions);
     };
 
     const PermissionCheckBox = ({ text }: { text: string }) => {

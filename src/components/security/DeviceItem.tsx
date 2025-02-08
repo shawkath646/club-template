@@ -5,11 +5,11 @@ import { useTransition } from "react";
 import StylistButton from "@/components/form/StylistButton";
 import { formatDate } from "@/utils/utils.frontend";
 import * as deviceIcons from "@/constant/deviceIcons";
-import { SessionObject } from "@/types";
+import { ServerSessionObject } from "@/types";
 import { signOut } from "@/backend/auth";
 
 
-export default function DeviceItem({ sessionItem, currentSessionId }: { sessionItem: SessionObject; currentSessionId: string; }) {
+export default function DeviceItem({ sessionItem, currentSessionId }: { sessionItem: ServerSessionObject; currentSessionId: string; }) {
 
     const [isLoading, startTransition] = useTransition();
 

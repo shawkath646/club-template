@@ -5,6 +5,7 @@ import getClubInfo from "@/constant/getClubInfo";
 export default async function Footer() {
 
     const clubInfo = await getClubInfo();
+    const today = new Date();
 
     return (
         <footer className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-8">
@@ -13,7 +14,7 @@ export default async function Footer() {
 
                     <section>
                         <div className="flex items-center space-x-4">
-                            <Image src={clubInfo.logo} alt={`${clubInfo.name} Logo`} height={48} width={48} className="h-12 w-12" />
+                            <Image src={clubInfo.logo} alt={clubInfo.name + "logo"} height={48} width={48} className="h-12 w-12" />
                             <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{clubInfo.name}</h1>
                         </div>
 
@@ -27,13 +28,18 @@ export default async function Footer() {
                             <Link href="/privacy-policy" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                                 Privacy Policy
                             </Link>
+                            <Link href="/terms-of-service" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                                Terms of Service
+                            </Link>
                         </nav>
                     </section>
 
                     <div className="mt-6 sm:mt-0 flex flex-col space-y-2">
-                        <p className="text-gray-600 dark:text-gray-400">Phone: {clubInfo.contacts.phoneNumber}</p>
+                        <p className="text-gray-600 dark:text-gray-400">Phone:&nbsp;
+                        <Link href={"tel:" + clubInfo.contacts.phoneNumber}>{clubInfo.contacts.phoneNumber}</Link>
+                        </p>
                         <p className="text-gray-600 dark:text-gray-400">Email:&nbsp;
-                            <Link href={`mailto:${clubInfo.contacts.email}`}>{clubInfo.contacts.email}</Link>
+                            <Link href={"mailto:" + clubInfo.contacts.email}>{clubInfo.contacts.email}</Link>
                         </p>
                         <p className="text-gray-600 dark:text-gray-400 text-wrap">Address: {clubInfo.address}</p>
                         <Link href={clubInfo.social.facebookPage} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
@@ -48,7 +54,7 @@ export default async function Footer() {
                     </p>
 
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 sm:mt-0">
-                        © 2022 - 2024 All rights reserved by {clubInfo.name}
+                        © 2022 - {today.getFullYear()} All rights reserved by {clubInfo.name}
                     </p>
                 </div>
             </div>

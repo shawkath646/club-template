@@ -24,7 +24,7 @@ export default async function Page() {
         <>
             <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
                 <Link
-                    href={process.env.NEXT_PUBLIC_APP_BASE_URL as string}
+                    href="/"
                     className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
                 >
                     <IoIosArrowBack size={32} className="text-white drop-shadow-md" />
@@ -38,7 +38,7 @@ export default async function Page() {
                 {tools.map((tool, index) => (
                     <Link
                         key={index}
-                        href={process.env.NEXT_PUBLIC_APP_BASE_URL + tool.href}
+                        href={tool.href}
                         className="bg-white/20 dark:bg-gray-800/20 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center text-center transform hover:scale-105 hover:bg-blue-100 dark:hover:bg-gray-700"
                     >
                         <div className="mb-4 text-blue-500 dark:text-blue-400">

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 interface AdsBannerProps {
   "data-ad-slot": string;
   "data-ad-format": string;
-  "data-full-width-responsive": boolean;
+  "data-full-width-responsive": string;
   "data-ad-layout"?: string;
 }
 
@@ -25,7 +25,6 @@ export default function AdBanner(props: AdsBannerProps) {
 
   return (
     <ins
-      key={props["data-ad-slot"]}
       className="adsbygoogle"
       style={{ display: "block" }}
       data-ad-client={"ca-pub-" + process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT_ID}

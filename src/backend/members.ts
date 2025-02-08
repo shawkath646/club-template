@@ -1,5 +1,5 @@
 "use server";
-import { forbidden, notFound } from "next/navigation";
+import { forbidden, notFound, unauthorized } from "next/navigation";
 import { cache } from "react";
 import bcrypt from 'bcrypt';
 import { db, bucket } from "@/config/firebase.config";
@@ -14,9 +14,9 @@ import {
 } from "@/utils/utils.backend";
 import { setHistory } from "./history";
 import uploadFileToFirestore from "./uploadFileToFirestore";
-import approvedEmailTemplate from "@/templates/approvedEmail.template";
-import suspensionEmailTemplate from "@/templates/suspensionEmail.template";
-import rejectionEmailTemplate from "@/templates/rejectionEmail.template";
+import approvedEmailTemplate from "@/templates/memberApprovalEmail.template";
+import suspensionEmailTemplate from "@/templates/memberSuspensionEmail.template";
+import rejectionEmailTemplate from "@/templates/memberRejectionEmail.template";
 import getClubInfo from "@/constant/getClubInfo";
 import joiningFormOptions from "@/constant/joiningFormOptions.json";
 import {
@@ -27,18 +27,22 @@ import {
     PartialFields,
     MemberPublicPartialProfileType,
     MemberPublicSearchBarResultType,
-    MemberUpdateProfileType
+    MemberUpdateProfileType,
+    ActionResponseType
 } from "@/types";
 
+export const getAllMembersProfile = cache(async () => {
+    const docSnapshot = await db.collection("members").get();
 
+    return docSnapshot.docs.map(doc => {
+        const profile = doc.data() as MemberProfileType;
+        profile.personal.dateOfBirth = timestampToDate(profile.personal.dateOfBirth);
+        profile.club.joinedOn = timestampToDate(profile.club.joinedOn);
+        return profile;
+    });
+});
 
-interface MembersPartialProfileProps {
-    query: "approved" | "pending" | "suspended" | "rejected";
-    pageNumber: number;
-    filterBy?: string;
-}
-
-const getMemberProfile = cache(async (docId: string) => {
+export const getMemberProfileById = cache(async (docId: string) => {
     const docRef = await db.collection("members").doc(docId).get();
     if (!docRef.exists) return notFound();
     const userData = docRef.data() as MemberProfileType;
@@ -48,53 +52,104 @@ const getMemberProfile = cache(async (docId: string) => {
     return userData;
 });
 
-const getMembersPartialProfile = cache(async (options: MembersPartialProfileProps) => {
-    const { query, pageNumber, filterBy } = options;
+export const memberSearchBarResult = cache(async (searchText: string): Promise<MemberSearchBarResultType[]> => {
+    const membersCollection = db.collection("members");
 
-    let collectionQuery = db.collection("members")
-        .orderBy("club.joinedOn", "desc")
-        .where("club.status", "==", query);
+    if (searchText.startsWith('MEM') && searchText.length === 13) {
+        const memberDoc = await membersCollection.doc(searchText).get();
+        if (!memberDoc.exists) return [];
 
-    if (filterBy && filterBy !== "all") {
-        collectionQuery = collectionQuery.where("club.position", "==", filterBy);
+        const memberProfile = memberDoc.data() as MemberProfileType;
+        return [{
+            id: memberProfile.id,
+            fullName: memberProfile.personal.fullName,
+            nbcId: memberProfile.club.nbcId
+        }];
     }
 
-    const [docCollection, totalCountSnapshot] = await Promise.all([
-        collectionQuery.limit(12).offset((pageNumber - 1) * 12).get(),
-        collectionQuery.get()
-    ]);
+    if (searchText.length === 6 && !isNaN(Number(searchText))) {
+        const nbcIdQuery = await membersCollection
+            .where("club.nbcId", "==", parseInt(searchText))
+            .limit(1)
+            .get();
 
-    const totalMembers = totalCountSnapshot.docs.length;
+        if (nbcIdQuery.empty) return [];
 
-    const mapToPartialProfile = (doc: FirebaseFirestore.DocumentSnapshot): MemberPartialProfileType => {
-        const memberData = doc.data() as MemberProfileType;
+        const memberProfile = nbcIdQuery.docs[0].data() as MemberProfileType;
+        return [{
+            id: memberProfile.id,
+            fullName: memberProfile.personal.fullName,
+            nbcId: memberProfile.club.nbcId
+        }];
+    }
 
-        return {
-            club: {
-                status: memberData.club.status,
-                nbcId: memberData.club.nbcId,
-                position: memberData.club.position
-            },
-            educational: {
-                institute: memberData.educational.institute
-            },
-            id: doc.id,
-            identification: {
-                email: memberData.identification.primaryEmail
-            },
-            personal: {
-                fullName: memberData.personal.fullName,
-                picture: memberData.personal.picture
-            }
-        };
-    };
+    let searchResult: MemberSearchBarResultType[] = [];
+    const membersSnapshot = await membersCollection.get();
 
-    const members = docCollection.docs.map(mapToPartialProfile);
+    membersSnapshot.forEach(doc => {
+        const memberProfile = doc.data() as MemberProfileType;
 
-    return { members, totalMembers };
+        searchText = searchText.toLowerCase();
+
+        const matchesFullName = memberProfile.personal.fullName.toLowerCase().includes(searchText);
+        const matchesInstitute = memberProfile.educational.institute.toLowerCase().includes(searchText);
+        const matchesEmail = memberProfile.identification.primaryEmail.toLowerCase().includes(searchText);
+
+        if (matchesFullName || matchesInstitute || matchesEmail) {
+            searchResult.push({
+                id: memberProfile.id,
+                fullName: memberProfile.personal.fullName,
+                nbcId: memberProfile.club.nbcId
+            });
+        }
+    });
+
+    return searchResult;
 });
 
-const getPublicMembersPartialProfile = cache(async (options: PartialFields<MembersPartialProfileProps, "query">) => {
+export const memberPublicSearchBarResult = cache(async (searchText: string): Promise<MemberPublicSearchBarResultType[]> => {
+    const membersSnapshot = await db.collection("members").where("club.status", "==", "approved").get();
+
+    const membersData = membersSnapshot.docs.map(doc => doc.data() as MemberProfileType);
+
+    const sortedMembers = membersData.sort((a, b) => {
+        const positionA = joiningFormOptions.positions.indexOf(a.club.position[0]);
+        const positionB = joiningFormOptions.positions.indexOf(b.club.position[0]);
+        return positionA - positionB;
+    });
+
+    const membersWithIndex = sortedMembers.map((member, index) => {
+        return { ...member, originalIndex: index };
+    });
+
+    const filteredMembers = membersWithIndex.filter(member =>
+        member.club.nbcId.toString() === searchText ||
+        member.personal.fullName.toLowerCase().includes(searchText.toLowerCase()) ||
+        member.educational.institute.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    const membersPerPage = 12;
+    const resultsWithPageInfo = filteredMembers.map((member) => {
+        const pageNumber = Math.floor(member.originalIndex / membersPerPage) + 1;
+
+        return {
+            nbcId: member.club.nbcId,
+            fullName: member.personal.fullName,
+            position: member.club.position,
+            pageNumber,
+        } as MemberPublicSearchBarResultType;
+    });
+
+    return resultsWithPageInfo;
+});
+
+interface MembersPartialProfileProps {
+    query: "approved" | "pending" | "suspended" | "rejected";
+    pageNumber: number;
+    filterBy?: string;
+}
+
+export const getPublicMembersPartialProfile = cache(async (options: PartialFields<MembersPartialProfileProps, "query">) => {
     const { pageNumber, filterBy } = options;
 
     const positionHierarchy = ["president", "co-ordinator", "campus-representative", "member"];
@@ -144,14 +199,79 @@ const getPublicMembersPartialProfile = cache(async (options: PartialFields<Membe
     return { members: paginatedMembers, totalMembers };
 });
 
-const downloadProfilePicture = async (applicationId: string) => {
-    const fileRef = bucket.file(`profile_${applicationId}`);
+export const getMembersPartialProfile = cache(async (options: MembersPartialProfileProps) => {
+    const { query, pageNumber, filterBy } = options;
+
+    let collectionQuery = db.collection("members")
+        .orderBy("club.joinedOn", "desc")
+        .where("club.status", "==", query);
+
+    if (filterBy && filterBy !== "all") {
+        collectionQuery = collectionQuery.where("club.position", "==", filterBy);
+    }
+
+    const [docCollection, totalCountSnapshot] = await Promise.all([
+        collectionQuery.limit(12).offset((pageNumber - 1) * 12).get(),
+        collectionQuery.get()
+    ]);
+
+    const totalMembers = totalCountSnapshot.docs.length;
+
+    const mapToPartialProfile = (doc: FirebaseFirestore.DocumentSnapshot): MemberPartialProfileType => {
+        const memberData = doc.data() as MemberProfileType;
+
+        return {
+            club: {
+                status: memberData.club.status,
+                nbcId: memberData.club.nbcId,
+                position: memberData.club.position
+            },
+            educational: {
+                institute: memberData.educational.institute
+            },
+            id: doc.id,
+            identification: {
+                email: memberData.identification.primaryEmail
+            },
+            personal: {
+                fullName: memberData.personal.fullName,
+                picture: memberData.personal.picture
+            }
+        };
+    };
+
+    const members = docCollection.docs.map(mapToPartialProfile);
+
+    return { members, totalMembers };
+});
+
+export const getMembersCount = cache(async () => {
+    const membersCollection = db.collection("members");
+    const statuses = ["pending", "approved", "suspended", "rejected"];
+    const countPromises = statuses.map(status =>
+        membersCollection.where("club.status", "==", status).count().get()
+    );
+    const counts = await Promise.all(countPromises);
+    const [pendingMembers, approvedMembers, suspendedMembers, rejectedMembers] = counts.map(
+        count => count.data().count
+    );
+
+    return {
+        pendingMembers,
+        approvedMembers,
+        suspendedMembers,
+        rejectedMembers,
+    };
+});
+
+export const downloadProfilePicture = async (docId: string) => {
+    const fileRef = bucket.file(`profile_${docId}`);
     const [buffer] = await fileRef.download();
     const base64Image = buffer.toString('base64');
     return base64Image;
 };
 
-const submitMemberRequest = async (formData: MemberFormType) => {
+export const submitMemberRequest = async (formData: MemberFormType) => {
     const errors: Array<{ field: keyof MemberFormType; message: string }> = [];
 
     const [existingUserEmail, existingUserIdentification] = await Promise.all([
@@ -169,7 +289,7 @@ const submitMemberRequest = async (formData: MemberFormType) => {
 
     if (errors.length > 0) {
         return {
-            status: false,
+            success: false,
             errors,
         };
     };
@@ -230,231 +350,23 @@ const submitMemberRequest = async (formData: MemberFormType) => {
     await db.collection("members").doc(docId).set(memberProfile);
 
     return {
-        status: true,
+        success: true,
         docId
     };
 };
 
-const updatePermissions = async (docId: string, permissions: string[]) => {
-    await db.collection("members").doc(docId).update("club.permissions", permissions);
-    await setHistory(docId, `Member permissions updated to ${permissions}`);
-};
-
-const updateStatus = async (
-    docId: string,
-    options: {
-        status: MemberProfileType["club"]["status"],
-        specialNote: string
-    }
-) => {
-
-    const clubInfo = await getClubInfo();
-    const userData = await getMemberProfile(docId);
-
-    const clubObject: MemberProfileType["club"] = {
-        ...userData.club,
-        ...options
-    };
-
-    if (options.status === "approved") {
-        const nbcId = userData.club.nbcId || await generateNbcId();
-        const joinedOn = userData.club.nbcId ? userData.club.joinedOn : new Date();
-
-        clubObject.nbcId = nbcId;
-        clubObject.joinedOn = joinedOn;
-
-        const password = generatePassword();
-        await db.collection("members").doc(docId).update("auth.password", await bcrypt.hash(password, 10));
-
-        await sendMail(
-            userData.identification.primaryEmail,
-            {
-                subject: `${clubInfo.name}: Your Application as ${capitalizeWords(userData.club.position[0])} Has Been Approved`,
-                body: await approvedEmailTemplate({
-                    applicantName: userData.personal.fullName,
-                    applicantPosition: userData.club.position,
-                    applicationId: userData.id,
-                    nbcId,
-                    password,
-                    specialNote: userData.club.specialNote,
-                    isNewUser: !userData.club.nbcId
-                }),
-                type: "html"
-            }
-        );
-        await setHistory(docId, `[setBy] approved member [setTo] as ${userData.club.position}`);
-    } else if (options.status === "suspended") {
-        await sendMail(
-            userData.identification.primaryEmail,
-            {
-                subject: `${clubInfo.name}: Your Membership Has Been Suspended`,
-                body: await suspensionEmailTemplate({
-                    applicantName: userData.personal.fullName,
-                    suspensionReason: userData.club.specialNote || "Not mentioned",
-                    applicationId: userData.id,
-                    nbcId: userData.club.nbcId,
-                    applicantPosition: userData.club.position
-                }),
-                type: "html"
-            }
-        );
-
-        await setHistory(docId, `[setBy] suspended [setTo]'s membership.`);
-    } else if (options.status === "rejected") {
-        await sendMail(
-            userData.identification.primaryEmail,
-            {
-                subject: `${clubInfo.name}: Your Application as ${capitalizeWords(userData.club.position[0])} Has Been Declined`,
-                body: await rejectionEmailTemplate({
-                    applicantName: userData.personal.fullName,
-                    applicantPosition: userData.club.position,
-                    applicationId: userData.id,
-                    rejectionReason: userData.club.specialNote
-                }),
-                type: "html"
-            }
-        );
-
-        await setHistory(docId, `[setBy] rejected [setTo]'s application.`);
-    }
-    await db.collection("members").doc(docId).update("club", clubObject);
-};
-
-const getAllMembersProfile = cache(async () => {
-    const docSnapshot = await db.collection("members").get();
-
-    return docSnapshot.docs.map(doc => {
-        const profile = doc.data() as MemberProfileType;
-        profile.personal.dateOfBirth = timestampToDate(profile.personal.dateOfBirth);
-        profile.club.joinedOn = timestampToDate(profile.club.joinedOn);
-        return profile;
-    });
-});
-
-const getMembersCount = cache(async () => {
-    const membersCollection = db.collection("members");
-    const statuses = ["pending", "approved", "suspended", "rejected"];
-    const countPromises = statuses.map(status =>
-        membersCollection.where("club.status", "==", status).count().get()
-    );
-    const counts = await Promise.all(countPromises);
-    const [pendingMembers, approvedMembers, suspendedMembers, rejectedMembers] = counts.map(
-        count => count.data().count
-    );
-
-    return {
-        pendingMembers,
-        approvedMembers,
-        suspendedMembers,
-        rejectedMembers,
-    };
-});
-
-const memberSearchBarResult = cache(async (searchText: string): Promise<MemberSearchBarResultType[]> => {
-    const membersCollection = db.collection("members");
-
-    if (searchText.startsWith('MEM') && searchText.length === 13) {
-        const memberDoc = await membersCollection.doc(searchText).get();
-        if (!memberDoc.exists) return [];
-
-        const memberProfile = memberDoc.data() as MemberProfileType;
-        return [{
-            id: memberProfile.id,
-            fullName: memberProfile.personal.fullName,
-            nbcId: memberProfile.club.nbcId
-        }];
-    }
-
-    if (searchText.length === 6 && !isNaN(Number(searchText))) {
-        const nbcIdQuery = await membersCollection
-            .where("club.nbcId", "==", parseInt(searchText))
-            .limit(1)
-            .get();
-
-        if (nbcIdQuery.empty) return [];
-
-        const memberProfile = nbcIdQuery.docs[0].data() as MemberProfileType;
-        return [{
-            id: memberProfile.id,
-            fullName: memberProfile.personal.fullName,
-            nbcId: memberProfile.club.nbcId
-        }];
-    }
-
-    let searchResult: MemberSearchBarResultType[] = [];
-    const membersSnapshot = await membersCollection.get();
-
-    membersSnapshot.forEach(doc => {
-        const memberProfile = doc.data() as MemberProfileType;
-
-        searchText = searchText.toLowerCase();
-
-        const matchesFullName = memberProfile.personal.fullName.toLowerCase().includes(searchText);
-        const matchesInstitute = memberProfile.educational.institute.toLowerCase().includes(searchText);
-        const matchesEmail = memberProfile.identification.primaryEmail.toLowerCase().includes(searchText);
-
-        if (matchesFullName || matchesInstitute || matchesEmail) {
-            searchResult.push({
-                id: memberProfile.id,
-                fullName: memberProfile.personal.fullName,
-                nbcId: memberProfile.club.nbcId
-            });
-        }
-    });
-
-    return searchResult;
-});
-
-const memberPublicSearchBarResult = cache(async (searchText: string): Promise<MemberPublicSearchBarResultType[]> => {
-    const membersSnapshot = await db.collection("members").where("club.status", "==", "approved").get();
-
-    const membersData = membersSnapshot.docs.map(doc => doc.data() as MemberProfileType);
-
-    const sortedMembers = membersData.sort((a, b) => {
-        const positionA = joiningFormOptions.positions.indexOf(a.club.position[0]);
-        const positionB = joiningFormOptions.positions.indexOf(b.club.position[0]);
-        return positionA - positionB;
-    });
-
-    const membersWithIndex = sortedMembers.map((member, index) => {
-        return { ...member, originalIndex: index };
-    });
-
-    const filteredMembers = membersWithIndex.filter(member =>
-        member.club.nbcId.toString() === searchText ||
-        member.personal.fullName.toLowerCase().includes(searchText.toLowerCase()) ||
-        member.educational.institute.toLowerCase().includes(searchText.toLowerCase())
-    );
-
-    const membersPerPage = 12;
-    const resultsWithPageInfo = filteredMembers.map((member) => {
-        const pageNumber = Math.floor(member.originalIndex / membersPerPage) + 1;
-
-        return {
-            nbcId: member.club.nbcId,
-            fullName: member.personal.fullName,
-            position: member.club.position,
-            pageNumber,
-        } as MemberPublicSearchBarResultType;
-    });
-
-    return resultsWithPageInfo;
-});
-
-const updatePosition = async (docId: string, position: string[]) => {
-    await db.collection("members").doc(docId).update("club.position", position);
-    return true;
-};
-
-const changeProfilePicture = async (base64Image: string) => {
+export const updateSelfProfilePicture = async (base64Image: string): Promise<ActionResponseType> => {
     const session = await getSession();
     if (!session) forbidden();
+
     const downloadUrl = await uploadFileToFirestore(base64Image, { fileName: `profile_${session.id}`, fileType: "image" });
     await db.collection("members").doc(session.id).update("personal.picture", downloadUrl);
-    return true;
+    return {
+        success: true
+    };
 };
 
-const updateProfile = async (updatedData: MemberUpdateProfileType) => {
+export const updateSelfProfile = async (updatedData: MemberUpdateProfileType): Promise<ActionResponseType> => {
     const session = await getSession();
     if (!session) forbidden();
 
@@ -481,23 +393,133 @@ const updateProfile = async (updatedData: MemberUpdateProfileType) => {
     };
 
     await db.collection("members").doc(session.id).set(updatedUserObject, { merge: true });
-    return true;
+    return {
+        success: true
+    };
 };
 
+export const updateMemberNbcId = async (docId: string, newNbcId: number): Promise<ActionResponseType> => {
+    const session = await getSession();
+    if (!session) forbidden();
+    if (!session.permissions.includes("members")) unauthorized();
 
-export {
-    submitMemberRequest,
-    getMembersPartialProfile,
-    getMemberProfile,
-    updatePermissions,
-    updateStatus,
-    getAllMembersProfile,
-    downloadProfilePicture,
-    getMembersCount,
-    memberSearchBarResult,
-    getPublicMembersPartialProfile,
-    memberPublicSearchBarResult,
-    updatePosition,
-    changeProfilePicture,
-    updateProfile
+    const nbcIdSnapshot = await db
+        .collection("members")
+        .where("club.nbcId", "==", newNbcId)
+        .get();
+
+    if (!nbcIdSnapshot.empty) {
+        return {
+            success: false,
+            message: "New NBC ID is already associated with another member."
+        };
+    };
+
+    await db.collection("members").doc(docId).update({ "club.nbcId": newNbcId });
+    await setHistory(docId, `NBC ID updated to ${newNbcId}`);
+    return {
+        success: true
+    };
+};
+
+export const updateMemberPosition = async (docId: string, position: string[]): Promise<ActionResponseType> => {
+    const session = await getSession();
+    if (!session) forbidden();
+    if (!session.permissions.includes("members")) unauthorized();
+
+    await db.collection("members").doc(docId).update("club.position", position);
+    return {
+        success: true
+    };
+};
+
+export const updateMemberStatus = async (
+    docId: string,
+    options: {
+        status: MemberProfileType["club"]["status"],
+        specialNote: string
+    }
+): Promise<ActionResponseType> => {
+
+    const session = await getSession();
+    if (!session) forbidden();
+    if (!session.permissions.includes("members")) unauthorized();
+
+    const clubInfo = await getClubInfo();
+    const userData = await getMemberProfileById(docId);
+
+    const clubObject: MemberProfileType["club"] = {
+        ...userData.club,
+        ...options
+    };
+
+    if (options.status === "approved") {
+        const nbcId = userData.club.nbcId || await generateNbcId();
+        const joinedOn = userData.club.nbcId ? userData.club.joinedOn : new Date();
+
+        clubObject.nbcId = nbcId;
+        clubObject.joinedOn = joinedOn;
+
+        const password = generatePassword();
+        await db.collection("members").doc(docId).update("auth.password", await bcrypt.hash(password, 10));
+
+        await sendMail({
+            recipient: userData.identification.primaryEmail,
+            subject: `${clubInfo.name}: Your Application as ${capitalizeWords(userData.club.position[0])} Has Been Approved`,
+            body: await approvedEmailTemplate({
+                applicantName: userData.personal.fullName,
+                applicantPosition: userData.club.position,
+                applicationId: userData.id,
+                nbcId,
+                password,
+                specialNote: userData.club.specialNote,
+                isNewUser: !userData.club.nbcId
+            }),
+            type: "html"
+        });
+        await setHistory(docId, `[setBy] approved member [setTo] as ${userData.club.position}`);
+    } else if (options.status === "suspended") {
+        await sendMail({
+            recipient: userData.identification.primaryEmail,
+            subject: `${clubInfo.name}: Your Membership Has Been Suspended`,
+            body: await suspensionEmailTemplate({
+                applicantName: userData.personal.fullName,
+                suspensionReason: userData.club.specialNote || "Unknown",
+                applicationId: userData.id,
+                nbcId: userData.club.nbcId,
+                applicantPosition: userData.club.position
+            }),
+            type: "html"
+        });
+        await setHistory(docId, `[setBy] suspended [setTo]'s membership.`);
+    } else if (options.status === "rejected") {
+        await sendMail({
+            recipient: userData.identification.primaryEmail,
+            subject: `${clubInfo.name}: Your Application as ${capitalizeWords(userData.club.position[0])} Has Been Declined`,
+            body: await rejectionEmailTemplate({
+                applicantName: userData.personal.fullName,
+                applicantPosition: userData.club.position,
+                applicationId: userData.id,
+                rejectionReason: userData.club.specialNote
+            }),
+            type: "html"
+        });
+        await setHistory(docId, `[setBy] rejected [setTo]'s application.`);
+    }
+    await db.collection("members").doc(docId).update("club", clubObject);
+    return {
+        success: true
+    };
+};
+
+export const updateMemberPermission = async (docId: string, permissions: string[]): Promise<ActionResponseType> => {
+    const session = await getSession();
+    if (!session) forbidden();
+    if (!session.permissions.includes("members")) unauthorized();
+    
+    await db.collection("members").doc(docId).update("club.permissions", permissions);
+    await setHistory(docId, `Member permissions updated to ${permissions}`);
+    return {
+        success: true
+    };
 };

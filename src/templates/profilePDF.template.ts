@@ -1,6 +1,6 @@
 "use server";
 import { cache } from "react";
-import { getMemberProfile } from "@/backend/members";
+import { getMemberProfileById } from "@/backend/members";
 import { formatDate } from "@/utils/utils.backend";
 import { capitalizeWords } from "@/utils/utils.backend";
 import getClubInfo from "@/constant/getClubInfo";
@@ -9,7 +9,7 @@ import getClubInfo from "@/constant/getClubInfo";
 const profilePDFTemplate = cache(async (applicationId: string) => {
 
   const clubInfo = await getClubInfo();
-  const memberProfile = await getMemberProfile(applicationId);
+  const memberProfile = await getMemberProfileById(applicationId);
 
   const today = new Date();
 

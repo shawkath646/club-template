@@ -61,7 +61,7 @@ export default async function MemberCard({ data }: { data: MemberPartialProfileT
                 </p>
             </div>
             <Link
-                href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools/members/profile?id=${data.id}&callbackUrl=${encodedURL}`}
+                href={`/admin-tools/members/profile?id=${data.id}&callbackUrl=${encodedURL}`}
                 className="block mt-6 text-center text-white bg-blue-500/60 dark:bg-blue-600/60 hover:bg-blue-600 dark:hover:bg-blue-700 py-2 px-4 w-full rounded-lg font-semibold text-sm shadow-md transition-colors"
             >
                 View Profile

@@ -55,7 +55,7 @@ export default function Navbar({ clubInfo, session }: { clubInfo: ClubInfoType; 
                     {navMenuRoutes.map((item, key) => (
                         <Link
                             key={key}
-                            href={process.env.NEXT_PUBLIC_APP_BASE_URL + item.route}
+                            href={item.route}
                             className={`hidden lg:block px-3 py-2 rounded-md font-semibold transition-all ${hasScrolled ? 'text-blue-100 hover:text-white dark:text-gray-300 dark:hover:text-white' : 'bg-white hover:bg-blue-500 hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700 shadow-md text-blue-500 dark:text-gray-200'}`}
                         >
                             {item.name}
@@ -69,13 +69,13 @@ export default function Navbar({ clubInfo, session }: { clubInfo: ClubInfoType; 
                             {(!session) && (
                                 <>
                                     <MenuItem>
-                                        <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/join`} className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                        <Link href="/join" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
                                             <FaUserPlus size={17} />
                                             <p>Join as member</p>
                                         </Link>
                                     </MenuItem>
                                     <MenuItem>
-                                        <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/login`} className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                        <Link href="/login`" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
                                             <FaUser size={17} />
                                             <p>Login as member</p>
                                         </Link>
@@ -84,7 +84,7 @@ export default function Navbar({ clubInfo, session }: { clubInfo: ClubInfoType; 
                             )}
                             {session && (
                                 <MenuItem>
-                                    <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/profile`} className="w-full px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                    <Link href="/profile" className="w-full px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
                                         <FaUserCircle size={17} />
                                         <p>Profile</p>
                                     </Link>
@@ -92,7 +92,7 @@ export default function Navbar({ clubInfo, session }: { clubInfo: ClubInfoType; 
                             )}
                             {!!session?.permissions.length && (
                                 <MenuItem>
-                                    <Link href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/admin-tools`} className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                    <Link href="/admin-tools" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
                                         <IoMdSettings size={17} />
                                         <p>Admin tools</p>
                                     </Link>

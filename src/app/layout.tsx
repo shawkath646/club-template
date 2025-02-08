@@ -48,7 +48,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={inter.className}>
         <Navbar clubInfo={clubInfo} session={session} />
         <main className="bg-gradient-to-tr from-blue-500 dark:from-blue-950 via-teal-500 dark:via-teal-950 to-emerald-500 dark:to-emerald-950 text-black dark:text-gray-200 overflow-x-hidden">
-          <div className="container min-h-[750px] mx-auto px-4 sm:px-6 lg:px-8 pb-10 pt-[80px]">
+          <div className="container min-h-[800px] mx-auto px-4 sm:px-6 lg:px-8 pb-10 pt-[80px]">
             {children}
           </div>
         </main>

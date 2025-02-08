@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useState, useTransition } from "react";
 import { RadioGroup, Radio } from "@headlessui/react";
 import StylistButton from "@/components/form/StylistButton";
 import InputField from "@/components/form/InputField";
-import { updateStatus } from "@/backend/members";
+import { updateMemberStatus } from "@/backend/members";
 import joiningFormOptions from "@/constant/joiningFormOptions.json";
 import { MemberProfileType } from "@/types";
 
@@ -24,7 +24,7 @@ export default function UpdateStatusDialogContent({ defaultStatus, docId, setDia
     const router = useRouter();
 
     const handleStatusUpdate = () => startTransition(async () => {
-        await updateStatus(docId, { status: selectedStatus, specialNote });
+        await updateMemberStatus(docId, { status: selectedStatus, specialNote });
         router.refresh();
     });
 
@@ -62,7 +62,7 @@ export default function UpdateStatusDialogContent({ defaultStatus, docId, setDia
                 onChange={(e) => setSpecialNote(e.target.value)}
             />
 
-            <div className="flex flex-wrap items-center justify-end gap-3 mt-8">
+            <div className="flex items-center justify-end gap-3 mt-8">
                 <StylistButton
                     colorScheme="red"
                     isDisabled={isLoading}

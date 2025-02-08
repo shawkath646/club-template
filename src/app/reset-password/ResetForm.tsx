@@ -6,7 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import validationSchema from "./formValidation";
 import InputField from "@/components/form/InputField";
 import StylistButton from "@/components/form/StylistButton";
-import { getResetPasswordCode, resetPassword } from "@/backend/auth";
+import { getPasswordResetCode, resetPassword } from "@/backend/auth";
 import { ResetPasswordFormType } from "@/types";
 
 
@@ -32,7 +32,7 @@ export default function ResetPasswordForm({
 
     const onSubmit: SubmitHandler<ResetPasswordFormType> = async (data) => {
         const response = await resetPassword(sessionId, data.verificationCode, data.newPassword);
-        if (response === true) {
+        if (response.success) {
             router.push(redirectTo ?? "/login");
             return;
         }
@@ -50,13 +50,16 @@ export default function ResetPasswordForm({
             await validationSchema.validateAt("email", { email: providedEmail });
             await validationSchema.validateAt("nbcId", { nbcId: providedNbcId });
 
-            const response = await getResetPasswordCode(providedEmail, Number(providedNbcId));
+            const response = await getPasswordResetCode(providedEmail, Number(providedNbcId));
 
-            if (typeof response === "string") {
-                setSessionId(response);
+            if (response.success) {
+                setSessionId(response.tempSessionId);
             } else {
-                response.email && setError("email", { message: response.email });
-                response.nbcId && setError("nbcId", { message: response.nbcId });
+                if ("email" in response) {
+                    setError("email", { message: response.email });
+                } else if ("nbcId" in response) {
+                    setError("nbcId", { message: response.nbcId });
+                }
             }
         } catch (err: any) {
             if (err.path && err.message) {
