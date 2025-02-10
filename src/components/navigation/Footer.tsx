@@ -18,7 +18,7 @@ export default async function Footer() {
                             <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{clubInfo.name}</h1>
                         </div>
 
-                        <nav className="flex space-x-6 mt-8">
+                        <nav className="flex mt-8 whitespace-nowrap flex-wrap gap-x-6 gap-y-3">
                             <Link href="/sponsor" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                                 Be a Sponsor
                             </Link>

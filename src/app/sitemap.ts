@@ -58,8 +58,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.2,
         },
     ];
-
-    console.log([...blogPostsSitemap, ...staticPages])
-
     return [...blogPostsSitemap, ...staticPages];
 }

@@ -88,12 +88,12 @@ export default async function Page(pageProps: PagePropsType) {
             <section className="mt-6 text-gray-800 dark:text-gray-300 leading-relaxed">
                 <MarkdownPreview markdownContent={postData.postText} />
             </section>
-            {!postData.isApproved && (
-                <section className="flex items-center justify-end gap-5">
-                    <RejectButton docId={postData.id} />
+            <section className="flex items-center justify-end gap-5">
+                {!postData.isApproved && (
                     <PublishButton docId={postData.id} />
-                </section>
-            )}
+                )}
+                <RejectButton docId={postData.id} />
+            </section>
         </>
     );
 }

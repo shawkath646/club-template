@@ -193,6 +193,7 @@ export interface BlogPostType {
     seenBy: number;
     slug: string;
     excerpt: string;
+    modifiedOn: Date;
 }
 
 export interface BlogPostFormType {

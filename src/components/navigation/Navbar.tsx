@@ -75,7 +75,7 @@ export default function Navbar({ clubInfo, session }: { clubInfo: ClubInfoType; 
                                         </Link>
                                     </MenuItem>
                                     <MenuItem>
-                                        <Link href="/login`" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
+                                        <Link href="/login" className="px-4 py-2 text-sm transition duration-150 ease-in-out rounded-md dark:text-white text-gray-800 hover:bg-gray-300 dark:hover:bg-gray-900 flex space-x-4 items-center">
                                             <FaUser size={17} />
                                             <p>Login as member</p>
                                         </Link>

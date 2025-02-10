@@ -17,12 +17,10 @@ const validationSchema = yup.object().shape({
     keywords: yup
         .array()
         .required("Keywords are required")
-        .of(yup.string().required().trim())
-        .min(3, "At least three keyword is required"),
+        .of(yup.string().required().trim()),
     excerpt: yup
         .string()
-        .required("Excerpt is required")
-        .min(5, "Excerpt must be at least 5 characters")
+        .default("")
         .max(230, "Excerpt must be at most 230 characters")
 });
 

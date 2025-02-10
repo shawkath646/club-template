@@ -5,7 +5,7 @@ import { getSession } from "./auth";
 import { getMemberProfileById } from "./members";
 import uploadFileToFirestore from "./uploadFileToFirestore";
 import { sendMail } from "./baseApp";
-import { generateRandomId, timestampToDate } from "@/utils/utils.backend";
+import { generateRandomId, timestampToDate, stripMarkdown, extractKeywords } from "@/utils/utils.backend";
 import { bucket, db } from "@/config/firebase.config";
 import blogPostApprovalEmailTemplate from "@/templates/blogPostApprovalEmail.template";
 import blogPostRejectionEmailTemplate from "@/templates/blogPostRejectionEmail.templates";
@@ -81,6 +81,15 @@ export const addBlogPost = async (
 
     if (existingPostData && (session.id !== existingPostData.authorId || existingPostData.isApproved)) unauthorized();
 
+    if (!postData.excerpt?.trim()) {
+        const rawText = stripMarkdown(postData.postText);
+        postData.excerpt = (await rawText).slice(0, 250).trim() + "...";
+    }
+
+    if (!postData.keywords || postData.keywords.length === 0) {
+        postData.keywords = await extractKeywords(postData.title);
+    }
+
     if (!modifiedPostId || postData.thumbnail !== existingPostData?.thumbnail) {
         postData.thumbnail = await uploadFileToFirestore(postData.thumbnail, {
             fileType: "image",
@@ -96,16 +105,23 @@ export const addBlogPost = async (
         timestamp: existingPostData?.timestamp || new Date(),
         isApproved: existingPostData?.isApproved ?? false,
         isModified: Boolean(modifiedPostId),
+        modifiedOn: new Date()
     };
+
     await db.collection("blogPosts").doc(docId).set(postObject);
     return { success: true };
 };
+
 
 export const getBlogPost = cache(async (identifier: string, bySlug: boolean = false) => {
     let docRef;
 
     if (bySlug) {
-        const docSnapshot = await db.collection("blogPosts").where("slug", "==", identifier).get();
+        const decodedIdentifier = decodeURIComponent(identifier);
+        const docSnapshot = await db.collection("blogPosts")
+            .where("slug", "==", decodedIdentifier)
+            .get();
+
         if (docSnapshot.empty) notFound();
         docRef = docSnapshot.docs[0];
     } else {
@@ -125,6 +141,7 @@ export const getBlogPost = cache(async (identifier: string, bySlug: boolean = fa
     };
 });
 
+
 export const approveBlogPost = async (docId: string): Promise<ActionResponseType> => {
     const session = await getSession();
     if (!session) forbidden();
@@ -135,7 +152,7 @@ export const approveBlogPost = async (docId: string): Promise<ActionResponseType
     const slug = postData.title
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/[^a-z0-9\u0980-\u09FF\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
 

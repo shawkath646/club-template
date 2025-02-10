@@ -58,7 +58,7 @@ export default function BlogPostForm({ clubInfo, postData }: { clubInfo: ClubInf
                 <InputField label="Title" {...register("title")} error={errors.title} />
 
                 <div className="flex flex-col md:flex-row gap-4">
-                    <TextAreaField label="Excerpt" {...register("excerpt")} error={errors.excerpt} className="flex-1" rows={5} />
+                    <TextAreaField label="Short Description (Optional)" {...register("excerpt")} error={errors.excerpt} className="flex-1" rows={5} />
 
                     <Controller
                         name="thumbnail"

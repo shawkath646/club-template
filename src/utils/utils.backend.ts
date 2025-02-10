@@ -1,6 +1,9 @@
 "use server";
+import { remark } from "remark";
+import strip from "strip-markdown";
 import { firestore } from 'firebase-admin';
 import { db } from '@/config/firebase.config';
+import keywordStopWords from "@/constant/keywordStopWords.json";
 
 const timestampToDate = (input: firestore.Timestamp | Date): Date => {
     if (input instanceof Date) return input;
@@ -68,6 +71,18 @@ const formatDate = (input: Date, { locale = 'en-US', isTime = false } = {}) => {
 
     return input.toLocaleDateString(locale, dateOptions);
 };
+
+export const stripMarkdown = async (markdownText: string): Promise<string> => {
+    const result = await remark().use(strip).process(markdownText);
+    return result.toString();
+};
+
+export const extractKeywords = async (title: string): Promise<string[]> => {
+    const words = title.toLowerCase().replace(/[^\p{L}\s]/gu, "").split(/\s+/);
+    const stopwords = new Set(keywordStopWords);
+    return [...new Set(words.filter(word => word.length > 2 && !stopwords.has(word)))].slice(0, 5);
+};
+
 
 export {
     timestampToDate,
