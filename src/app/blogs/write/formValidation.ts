@@ -10,7 +10,7 @@ const validationSchema = yup.object().shape({
         .string()
         .required("Post text is required")
         .min(50, "Post text must be at least 50 characters")
-        .max(10000, "Post text must be at most 10000 characters"),
+        .max(12000, "Post text must be at most 12000 characters"),
     thumbnail: yup
         .string()
         .required("Thumbnail is required"),
@@ -21,7 +21,7 @@ const validationSchema = yup.object().shape({
     excerpt: yup
         .string()
         .default("")
-        .max(230, "Excerpt must be at most 230 characters")
+        .max(420, "Excerpt must be at most 420 characters")
 });
 
 export default validationSchema;

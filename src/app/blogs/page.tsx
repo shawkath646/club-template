@@ -105,7 +105,7 @@ export default async function Page(pageProps: PagePropsType) {
                                 </span>
                             </div>
 
-                            <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 h-[6rem]">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 h-[12rem]">
                                 {item.excerpt}
                             </p>
 

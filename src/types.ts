@@ -263,6 +263,7 @@ export interface ClubInfoType {
     name: string;
     localName: string;
     slogan: string;
+    description: string;
     address: string;
     contacts: {
         email: string;
@@ -274,5 +275,11 @@ export interface ClubInfoType {
         facebookPage: string;
         facebookGroup: string;
         messengerGroupPublic: string;
+    };
+    branding: {
+        name: string;
+        logo: string;
+        url: string;
+        slogan: string;
     }
 }

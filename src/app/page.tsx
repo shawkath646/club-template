@@ -8,9 +8,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const clubInfo = await getClubInfo();
   return {
     title: "Home | " + clubInfo.name,
+    description: clubInfo.description,
+    keywords: [ clubInfo.name, clubInfo.localName, "Student science club", "Science Olympiad Bangladesh", "Science Club Activities", "Science magazine publishing", "Club Home Page", clubInfo.slogan, clubInfo.branding.name, clubInfo.branding.slogan ],
     openGraph: {
       title: {
-        absolute: clubInfo.localName + " | " + clubInfo.name
+        absolute: clubInfo.localName + " - " + clubInfo.name
       }
     }
   };

@@ -47,7 +47,7 @@ export default function Navbar({ clubInfo, session }: { clubInfo: ClubInfoType; 
                     href="/"
                     className={`flex space-x-1 items-center text-lg ${hasScrolled ? "text-white" : "text-black dark:text-gray-200"} dark:text-gray-200" font-medium hover:text-blue-500 dark:hover:text-blue-400 transition-all`}
                 >
-                    <Image src={clubInfo.logo} height={50} width={50} alt={`${clubInfo.name} logo`} />
+                    <Image src={clubInfo.logo} height={50} width={50} alt={`${clubInfo.name} logo`} priority />
                     <p>{clubInfo.name}</p>
                 </Link>
 

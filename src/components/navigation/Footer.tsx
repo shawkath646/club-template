@@ -50,7 +50,7 @@ export default async function Footer() {
 
                 <div className="border-t border-gray-300 dark:border-gray-700 mt-8 pt-6 flex flex-wrap justify-between items-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Application developed by <Link target="_blank" href="https://cloudburstlab.vercel.app" className="text-blue-600 dark:text-blue-400 hover:underline">CloudBurst Lab</Link>
+                        Application developed by <Link target="_blank" href={clubInfo.branding.url} className="text-blue-600 dark:text-blue-400 hover:underline">{clubInfo.branding.name}</Link>
                     </p>
 
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 sm:mt-0">

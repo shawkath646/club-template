@@ -1,27 +1,42 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import Image from "next/image";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import ShareButton from "./ShareButton";
 import { addBlogPostView, getBlogPost } from "@/backend/blogPosts";
+import getClubInfo from "@/constant/getClubInfo";
 import { formatDate } from "@/utils/utils.backend";
 import { PagePropsType } from "@/types";
 import { FaEye, FaUser, FaClock } from "react-icons/fa";
-import { IoIosArrowBack } from "react-icons/io";
-
 
 export async function generateMetadata(pageProps: PagePropsType): Promise<Metadata> {
-
-    const postData = await getBlogPost((await pageProps.params).slug, true);
+    const clubInfo = await getClubInfo();
+    const slug = decodeURIComponent((await pageProps.params).slug);
+    const postData = await getBlogPost(slug, { bySlug: true });
 
     return {
         title: postData.title,
         description: postData.excerpt,
         authors: [{ name: postData.authorName }],
+        keywords: [
+            clubInfo.name,
+            clubInfo.localName,
+            ...postData.keywords,
+            "Bengali blog post",
+            "Scientific blog post",
+            "Science news",
+            "Latest scientific research",
+            "STEM articles",
+            "Educational blog",
+            "Science and technology",
+            "Research insights",
+            "Science club articles",
+            "Read scientific articles",
+            clubInfo.branding.name
+        ],
         openGraph: {
             title: postData.title,
             description: postData.excerpt,
-            url: process.env.NEXT_PUBLIC_APP_BASE_URL + "/blogs/view" + postData.slug,
+            url: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/blogs/view/${postData.slug}`,
             type: "article",
             publishedTime: postData.timestamp.toISOString(),
             images: [
@@ -33,35 +48,17 @@ export async function generateMetadata(pageProps: PagePropsType): Promise<Metada
                 }
             ]
         },
-        twitter: {
-            card: "summary_large_image",
-            title: postData.title,
-            description: postData.excerpt,
-            images: [postData.thumbnail]
-        }
-    }
+    };
 };
 
 
 export default async function Page(pageProps: PagePropsType) {
-
-    const postData = await getBlogPost(decodeURIComponent((await pageProps.params).slug), true);
+    const slug = decodeURIComponent((await pageProps.params).slug);
+    const postData = await getBlogPost(slug, { bySlug: true });
     await addBlogPostView(postData.id);
 
     return (
         <>
-            <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
-                <Link
-                    href="/blogs"
-                    className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
-                >
-                    <IoIosArrowBack size={32} className="text-white drop-shadow-md" />
-                </Link>
-                <h2 className="text-xl md:text-2xl text-white font-semibold drop-shadow-md">
-                    View Blog Post
-                </h2>
-            </menu>
-
             <Image
                 src={postData.thumbnail}
                 alt={postData.title}

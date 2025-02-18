@@ -1,7 +1,8 @@
+import Image from "next/image";
 import getClubInfo from "@/constant/getClubInfo";
+import ScientificItems from "@/assets/Banners/coloured-science-elements.png";
 
 export default async function Introduction() {
-
     const clubInfo = await getClubInfo();
 
     return (
@@ -14,11 +15,20 @@ export default async function Introduction() {
                     {clubInfo.slogan}
                 </p>
                 <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed">
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aspernatur
-                    rerum vero et deserunt, ullam quia recusandae illum nihil ex, mollitia
-                    minus harum, distinctio veritatis id illo totam officiis sed quos!
+                    {clubInfo.description}
                 </p>
+            </div>
+
+            <div className="flex justify-center order-1 lg:order-none">
+                <Image
+                    src={ScientificItems}
+                    alt="Scientific Elements"
+                    width={400}
+                    height={400}
+                    className="w-auto h-[300px]"
+                    priority
+                />
             </div>
         </section>
     );
-};
+}

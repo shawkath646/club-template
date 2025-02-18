@@ -6,9 +6,7 @@ import StylistButton from "@/components/form/StylistButton";
 import InputField from "@/components/form/InputField";
 import { rejectBlogPost } from "@/backend/blogPosts";
 
-
-
-export default function RejectButton({ docId }: { docId: string; }) {
+export default function RejectButton({ docId, isApproved }: { docId: string; isApproved: boolean; }) {
 
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
@@ -28,15 +26,15 @@ export default function RejectButton({ docId }: { docId: string; }) {
 
     return (
         <>
-            <StylistButton size="sm" colorScheme="red" onClick={() => setDialogOpen(true)}>Reject</StylistButton>
+            <StylistButton size="sm" colorScheme="red" onClick={() => setDialogOpen(true)}>{isApproved ? "Remove" : "Reject"}</StylistButton>
             <Dialog as="div" open={isDialogOpen} onClose={() => { }}>
                 <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
                     <DialogPanel transition className="w-full max-w-lg rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
                         <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                            Post Rejection Confirmation
+                            Post {isApproved ? "Removing" : "Rejection"} Confirmation
                         </DialogTitle>
                         <p className="text-gray-700 dark:text-gray-300 mb-6">
-                            Are you sure you want to reject this blog post? Only reject it if it violates our terms and services. Rejecting this blog will remove it permanently.
+                            Are you sure you want to reject this blog post? Only {isApproved ? "remove" : "reject"} it if it violates our terms and services. {isApproved ? "Removing" : "Rejecting"} this blog will delete it permanently.
                         </p>
                         <InputField label="Reason" value={rejectionReason} onChange={e => setRejectionReason(e.target.value)} />
                         <div className="mt-3 flex items-center justify-end gap-5">

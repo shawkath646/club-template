@@ -13,6 +13,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
   const clubInfo = await getClubInfo();
+  
   return {
     title: {
       template: "%s | " + clubInfo.name,
@@ -26,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_BASE_URL as string),
     category: "Science",
     creator: "Shawkat Hossain Maruf <https://sh-portfolio-maker.vercel.app/p/shawkath646>",
-    publisher: "CloudBurst Lab <https://cloudburstlab.vercel.app>",
+    publisher: `${clubInfo.branding.name} <${clubInfo.branding.url}>`,
   };
 };
 

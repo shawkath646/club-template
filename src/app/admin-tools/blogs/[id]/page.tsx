@@ -1,25 +1,41 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import Image from "next/image";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import RejectButton from "./RejectButton";
 import PublishButton from "./PublishButton";
 import { getBlogPost } from "@/backend/blogPosts";
+import getClubInfo from "@/constant/getClubInfo";
 import { formatDate } from "@/utils/utils.backend";
 import { PagePropsType } from "@/types";
 import { FaEye, FaUser, FaClock } from "react-icons/fa";
-import { IoIosArrowBack } from "react-icons/io";
 
 export async function generateMetadata(pageProps: PagePropsType): Promise<Metadata> {
+    const clubInfo = await getClubInfo();
     const postData = await getBlogPost((await pageProps.params).id);
+    
     return {
         title: postData.title,
         description: postData.excerpt,
         authors: [{ name: postData.authorName }],
+        keywords: [
+            clubInfo.name, 
+            clubInfo.localName, 
+            ...postData.keywords,
+            "Bengali blog post",
+            "Scientific blog post", 
+            "Science news", 
+            "Latest scientific research", 
+            "STEM articles", 
+            "Educational blog", 
+            "Science and technology", 
+            "Research insights", 
+            "Science club articles", 
+            "Read scientific articles"
+        ],
         openGraph: {
             title: postData.title,
             description: postData.excerpt,
-            url: process.env.NEXT_PUBLIC_APP_BASE_URL + "/admin-tools/blogs/" + postData.id,
+            url: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/blogs/${postData.id}`,
             type: "article",
             publishedTime: postData.timestamp.toISOString(),
             images: [
@@ -31,14 +47,9 @@ export async function generateMetadata(pageProps: PagePropsType): Promise<Metada
                 }
             ]
         },
-        twitter: {
-            card: "summary_large_image",
-            title: postData.title,
-            description: postData.excerpt,
-            images: [postData.thumbnail]
-        }
-    }
+    };
 };
+
 
 export default async function Page(pageProps: PagePropsType) {
 
@@ -46,18 +57,6 @@ export default async function Page(pageProps: PagePropsType) {
 
     return (
         <>
-            <menu className="flex space-x-3 items-center text-white dark:text-gray-200 mb-5 bg-black/20 py-3 px-2 rounded shadow-lg">
-                <Link
-                    href="/admin-tools/blogs"
-                    className="hover:text-gray-300 transition-all duration-300 ease-in-out hover:scale-105"
-                >
-                    <IoIosArrowBack size={32} className="text-white drop-shadow-md" />
-                </Link>
-                <h2 className="text-xl md:text-2xl text-white font-semibold drop-shadow-md">
-                    View Blog Post
-                </h2>
-            </menu>
-
             <Image
                 src={postData.thumbnail}
                 alt={postData.title}
@@ -88,11 +87,26 @@ export default async function Page(pageProps: PagePropsType) {
             <section className="mt-6 text-gray-800 dark:text-gray-300 leading-relaxed">
                 <MarkdownPreview markdownContent={postData.postText} />
             </section>
+            {postData.keywords.length > 0 && (
+                <section className="mt-5">
+                    <p>Keywords:</p>
+                    <div className="mt-3 flex flex-wrap gap-2 items-center mb-3">
+                        {postData.keywords.map((item, index) => (
+                            <span
+                                key={index}
+                                className="px-3 py-1 bg-yellow-500/20 text-yellow-500 rounded-md text-sm hover:bg-yellow-500/30 transition"
+                            >
+                                {item}
+                            </span>
+                        ))}
+                    </div>
+                </section>
+            )}
             <section className="flex items-center justify-end gap-5">
-                {!postData.isApproved && (
+                {!postData.isApproved && ( 
                     <PublishButton docId={postData.id} />
                 )}
-                <RejectButton docId={postData.id} />
+                <RejectButton docId={postData.id} isApproved={postData.isApproved} />
             </section>
         </>
     );

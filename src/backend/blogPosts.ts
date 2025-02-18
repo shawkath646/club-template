@@ -113,13 +113,12 @@ export const addBlogPost = async (
 };
 
 
-export const getBlogPost = cache(async (identifier: string, bySlug: boolean = false) => {
+export const getBlogPost = cache(async (identifier: string, options: { bySlug?: boolean } = {}) => {
     let docRef;
 
-    if (bySlug) {
-        const decodedIdentifier = decodeURIComponent(identifier);
+    if (options.bySlug) {
         const docSnapshot = await db.collection("blogPosts")
-            .where("slug", "==", decodedIdentifier)
+            .where("slug", "==", identifier)
             .get();
 
         if (docSnapshot.empty) notFound();
